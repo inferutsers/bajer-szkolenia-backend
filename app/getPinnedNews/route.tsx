@@ -1,15 +1,8 @@
 'use server'
 import getDatabase from "@/connection/database";
+import newsElement from "@/interfaces/newsElement";
 import { noContent } from "@/responses/responses";
 import { NextResponse } from "next/server";
-
-interface newsElement{
-    id: Number,
-    title?: String,
-    description?: String,
-    date?: Date,
-    pin: Boolean
-}
 
 export async function GET(req: Request, res: Response){
     const _ = req.headers
