@@ -1,3 +1,5 @@
+import mailStructure from "./mailStructure";
+
 export default interface signupElement{
     id: Number,
     name: String,
@@ -11,5 +13,7 @@ export default interface signupElement{
     date: Date,
     courseID: Number,
     supPrice: Number,
-    confirmationSent: Boolean
+    emailsSent?: mailStructure[],
+    paidIn: Number,
+    invoices?: Buffer[]
 }
