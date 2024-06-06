@@ -6,5 +6,6 @@ export default interface courseElement{
     title?: String,
     place?: String,
     instructor?: String,
-    note?: String
+    note?: String,
+    slots: Number
 }

@@ -12,7 +12,7 @@ export async function GET(req: Request, res: Response){
     const db = await getDatabase()
     const results = await db.query("SELECT * FROM courses WHERE id = $1 LIMIT 1", [courseID])
     if (!results || results.rowCount == 0) { return noContent }
-    const result: courseElement = results.rows.map((result) => ({id: result.id, date: result.date, span: result.span, price: result.price, title: result.title, place: result.place, instructor: result.instructor, note: result.note }))[0]
+    const result: courseElement = results.rows.map((result) => ({id: result.id, date: result.date, span: result.span, price: result.price, title: result.title, place: result.place, instructor: result.instructor, note: result.note, slots: result.slots }))[0]
     if (!result) { return serviceUnavailable }
     return NextResponse.json(result, {status: 200})
 }

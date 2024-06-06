@@ -9,6 +9,6 @@ export async function GET(req: Request, res: Response){
     const db = await getDatabase()
     const results = await db.query('SELECT * FROM courses ORDER BY date LIMIT 4')
     if (results.rowCount == 0){ return noContent }
-    const elements: courseElement[] = results.rows.map((result) => ({ id: result.id, date: result.date, span: result.span, price: result.price, title: result.title, place: result.place, instructor: result.instructor, note: result.note }) )
+    const elements: courseElement[] = results.rows.map((result) => ({ id: result.id, date: result.date, span: result.span, price: result.price, title: result.title, place: result.place, instructor: result.instructor, note: result.note, slots: result.slots }) )
     return NextResponse.json(elements, {status: 200})
 }
