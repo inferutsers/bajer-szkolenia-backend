@@ -9,6 +9,6 @@ export async function GET(req: Request, res: Response){
     const db = await getDatabase()
     const results = await db.query('SELECT * FROM news')
     if (results.rowCount == 0){ return noContent }
-    const elements: newsElement[] = results.rows.map((result) => ({ id: result.id, title: result.title, description: result.description, date: result.date, pin: result.pin }) )
+    const elements: newsElement[] = results.rows.map((result) => ({ id: result.id, title: result.title, description: result.description, date: result.date, pin: result.pin, image: result.image }) )
     return NextResponse.json(elements, {status: 200})
 }
