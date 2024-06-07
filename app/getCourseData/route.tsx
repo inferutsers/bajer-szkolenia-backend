@@ -2,7 +2,7 @@
 
 import getDatabase from "@/connection/database"
 import courseElement from "@/interfaces/courseElement"
-import { badRequest, noContent, serviceUnavailable } from "@/responses/responses"
+import { badRequest, noContent, notFound, serviceUnavailable } from "@/responses/responses"
 import { NextResponse } from "next/server"
 
 export async function GET(req: Request, res: Response){
@@ -11,7 +11,7 @@ export async function GET(req: Request, res: Response){
     if (!courseID) { return badRequest }
     const db = await getDatabase()
     const results = await db.query("SELECT * FROM courses WHERE id = $1 LIMIT 1", [courseID])
-    if (!results || results.rowCount == 0) { return noContent }
+    if (!results || results.rowCount == 0) { return notFound }
     const courseSignupsArray = await db.query('SELECT "id" from "signups" WHERE "courseID" = $1', [courseID])
     const courseSignupsAmount = courseSignupsArray.rowCount as Number
     const result: courseElement = results.rows.map((result) => ({id: result.id, date: result.date, span: result.span, price: result.price, title: result.title, place: result.place, instructor: result.instructor, note: result.note, slots: result.slots, slotAvailable: (courseSignupsAmount < result.slots) as boolean, available: result.available }))[0]
