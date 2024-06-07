@@ -8,7 +8,9 @@ import { NextResponse } from "next/server";
 export async function GET(req: Request, res: Response){
     const _ = req.headers
     const db = await getDatabase()
-    const results = await db.query('SELECT * FROM courses ORDER BY date LIMIT 4')
+    const currentDate = new Date()
+    const currentDateFormatted = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate()} ${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()}+${currentDate.getTimezoneOffset()}`
+    const results = await db.query('SELECT * FROM courses WHERE date > $1 ORDER BY date DESC LIMIT 4', [currentDateFormatted])
     if (results.rowCount == 0){ return noContent }
     var elements: courseElement[] = await Promise.all(results.rows.map(async (result) => ({ id: result.id, date: result.date, span: result.span, price: result.price, title: result.title, place: result.place, instructor: result.instructor, note: result.note, slots: result.slots, slotAvailable: await getSlotAvailability(db, result.id, result.slots), available: result.available }) ))
     return NextResponse.json(elements, {status: 200})
