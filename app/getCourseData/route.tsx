@@ -12,7 +12,9 @@ export async function GET(req: Request, res: Response){
     const db = await getDatabase()
     const results = await db.query("SELECT * FROM courses WHERE id = $1 LIMIT 1", [courseID])
     if (!results || results.rowCount == 0) { return noContent }
-    const result: courseElement = results.rows.map((result) => ({id: result.id, date: result.date, span: result.span, price: result.price, title: result.title, place: result.place, instructor: result.instructor, note: result.note, slots: result.slots, available: result.available }))[0]
+    const courseSignupsArray = await db.query('SELECT "id" from "signups" WHERE "courseID" = $1', [courseID])
+    const courseSignupsAmount = courseSignupsArray.rowCount as Number
+    const result: courseElement = results.rows.map((result) => ({id: result.id, date: result.date, span: result.span, price: result.price, title: result.title, place: result.place, instructor: result.instructor, note: result.note, slots: result.slots, slotAvailable: (courseSignupsAmount < result.slots) as boolean, available: result.available }))[0]
     if (!result) { return serviceUnavailable }
     return NextResponse.json(result, {status: 200})
 }

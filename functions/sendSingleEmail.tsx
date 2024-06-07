@@ -14,7 +14,7 @@ export default async function sendSingleEmail(receiver: String, subject: String,
             html: html as string
         });
         if(info.rejected.length > 0) { return { receivers: [receiver], subject: subject, text: text, html: html, failure: true } }
-        return { messageID: info.messageID, receivers: [receiver], subject: subject, text: text, html: html, failure: false }
+        return { messageID: info.messageId, response: info.response, receivers: [receiver], subject: subject, text: text, html: html, failure: false }
     } catch {
         return { receivers: [receiver], subject: subject, text: text, html: html, failure: true }
     }

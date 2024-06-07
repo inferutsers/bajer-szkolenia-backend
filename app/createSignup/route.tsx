@@ -5,7 +5,7 @@ import sendSingleEmail from "@/functions/sendSingleEmail"
 import courseElement from "@/interfaces/courseElement"
 import mailStructure from "@/interfaces/mailStructure"
 import signupElement from "@/interfaces/signupElement"
-import { badRequest, serviceUnavailable, notFound, notAllowed, notAcceptable } from "@/responses/responses"
+import { badRequest, serviceUnavailable, notFound, notAllowed, notAcceptable, unprocessableContent } from "@/responses/responses"
 import { NextResponse } from "next/server"
 
 export async function POST(req: Request, res: Response){
@@ -24,10 +24,10 @@ export async function POST(req: Request, res: Response){
     const db = await getDatabase()
     const courseFoundArray = await db.query("SELECT * FROM courses WHERE id = $1 LIMIT 1", [courseID])
     if (!courseFoundArray || courseFoundArray.rowCount == 0) { return notFound }
-    const courseFound: courseElement = courseFoundArray.rows.map((result) => ({id: result.id, date: result.date, span: result.span, price: result.price, title: result.title, place: result.place, instructor: result.instructor, note: result.note, slots: result.slots, available: result.available}))[0]
-    if (!courseFound) { return serviceUnavailable }
-    const courseSignupsArray = await db.query('SELECT "id" from "signups" WHERE "courseID" = $1', [courseFound.id])
+    const courseSignupsArray = await db.query('SELECT "id" from "signups" WHERE "courseID" = $1', [courseID])
     const courseSignupsAmount = courseSignupsArray.rowCount as Number
+    const courseFound: courseElement = courseFoundArray.rows.map((result) => ({id: result.id, date: result.date, span: result.span, price: result.price, title: result.title, place: result.place, instructor: result.instructor, note: result.note, slots: result.slots, slotAvailable: (courseSignupsAmount < result.slots), available: result.available}))[0]
+    if (!courseFound) { return serviceUnavailable }
     if (courseSignupsAmount >= courseFound.slots || courseFound.available == false){ return notAcceptable }
     const currentDate = new Date()
     const currentDateFormatted = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate()} ${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()}+${currentDate.getTimezoneOffset()}`
@@ -37,6 +37,9 @@ export async function POST(req: Request, res: Response){
     const mailSent: mailStructure = await sendSingleEmail(returnedSignup.email, "Potwierdzenie zapisu", "text", "<b>HTML TEXT</b>")
     if(mailSent.failure == false) {
         await db.query('UPDATE signups SET "emailsSent" = ARRAY_APPEND("emailsSent", $1)  WHERE "id" = $2', [mailSent, returnedSignup.id])
+        return NextResponse.json({id: response.rows[0].id}, {status: 200})
+    } else {
+        await db.query('DELETE FROM signups WHERE id = $1', [returnedSignup.id])
+        return unprocessableContent
     }
-    return NextResponse.json({id: response.rows[0].id, mailDelivered: !mailSent.failure}, {status: 200})
 }
