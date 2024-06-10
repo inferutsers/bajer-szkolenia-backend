@@ -15,6 +15,7 @@
     "pg": "^8.12.0",
     "react": "^18",
     "react-dom": "^18",
+    "utf8": "^3.0.0",
     "uuid": "^10.0.0"
   },
   "devDependencies": {
@@ -24,6 +25,7 @@
     "@types/pg": "^8.11.6",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/utf8": "^3.0.3",
     "@types/uuid": "^9.0.8",
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
