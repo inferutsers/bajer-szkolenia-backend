@@ -1,5 +1,3 @@
-'use server'
-
 import getDatabase from "@/connection/database"
 import courseElement from "@/interfaces/courseElement"
 import { badRequest, noContent, notFound, serviceUnavailable } from "@/responses/responses"

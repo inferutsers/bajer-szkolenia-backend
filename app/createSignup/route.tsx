@@ -1,5 +1,3 @@
-'use server'
-
 import getDatabase from "@/connection/database"
 import sendSingleEmail from "@/functions/sendSingleEmail"
 import courseElement from "@/interfaces/courseElement"

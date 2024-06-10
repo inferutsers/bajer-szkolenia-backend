@@ -4,7 +4,6 @@ import { getSlotAvailability } from "@/functions/getSlotAvailability";
 import courseElement from "@/interfaces/courseElement";
 import { noContent } from "@/responses/responses";
 import { NextResponse } from "next/server";
-import { Pool } from "pg";
 
 export async function GET(req: Request, res: Response){
     const _ = req.headers

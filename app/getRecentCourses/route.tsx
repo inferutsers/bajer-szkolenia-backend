@@ -1,4 +1,3 @@
-'use server'
 import getDatabase from "@/connection/database";
 import { getSlotAvailability } from "@/functions/getSlotAvailability";
 import courseElement from "@/interfaces/courseElement";

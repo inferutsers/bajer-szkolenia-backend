@@ -1,7 +1,5 @@
-'use server'
 import getMailer from "@/connection/mailer";
 import mailStructure from "@/interfaces/mailStructure";
-import signupElement from "@/interfaces/signupElement";
 
 export default async function sendSingleEmail(receiver: String, subject: String, text: String, html: String): Promise<mailStructure>{
     const mailer = await getMailer()

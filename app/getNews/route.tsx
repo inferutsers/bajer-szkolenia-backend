@@ -1,4 +1,3 @@
-'use server'
 import getDatabase from "@/connection/database";
 import newsElement from "@/interfaces/newsElement";
 import { noContent } from "@/responses/responses";
