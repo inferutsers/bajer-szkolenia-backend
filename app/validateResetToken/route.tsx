@@ -7,7 +7,7 @@ export async function GET(req: Request, res: Response){
     const headers = req.headers
     const resetToken = headers.get("resetToken")
     if (!resetToken) { return badRequest }
-    const db = await getDatabase()
+    const db = await getDatabase(req)
     const accountFoundArray = await db.query('SELECT * FROM "administration" WHERE "passwordResetToken" = $1 AND "status" > 0 LIMIT 1', [resetToken])
     if (!accountFoundArray || accountFoundArray.rowCount == 0) { return notFound }
     const accountFound: administrationAccount = accountFoundArray.rows.map((result) => ({id: result.id, login: result.login, displayName: result.displayName, password: result.password, status: result.status, sessionID: result.sessionID, sessionValidity: result.sessionValidity, passwordResetToken: result.passwordResetToken}))[0]

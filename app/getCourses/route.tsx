@@ -7,7 +7,7 @@ import { NextResponse } from "next/server";
 
 export async function GET(req: Request, res: Response){
     const _ = req.headers
-    const db = await getDatabase()
+    const db = await getDatabase(req)
     const currentDate = new Date()
     const currentDateFormatted = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate()} ${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()}+${currentDate.getTimezoneOffset()}`
     const results = await db.query('SELECT * FROM courses WHERE date > $1 ORDER BY date', [currentDateFormatted])

@@ -17,7 +17,7 @@ export async function POST(req: Request, res: Response){
     const span = headers.get("CSpan")
     const slots = headers.get("CSlots")
     if (!sessionID || !date || !title || !place || !instructor || !note || !price || !span || !slots) { return badRequest }
-    const db = await getDatabase()
+    const db = await getDatabase(req)
     const validatedUser = await validateSession(db, sessionID)
     if (!validatedUser) { return unauthorized }
     const insteredCourseArray = await db.query('INSERT INTO "courses"("date", "title", "place", "instructor", "note", "price", "span", "slots", "available") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, true) RETURNING *', [date, utf8.decode(title), utf8.decode(place), utf8.decode(instructor), utf8.decode(note), price, span, slots])

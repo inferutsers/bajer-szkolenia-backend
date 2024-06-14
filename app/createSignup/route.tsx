@@ -19,7 +19,7 @@ export async function POST(req: Request, res: Response){
     const scompanyadress = headers.get("sCompanyAdress")
     const scompanynip = headers.get("sCompanyNIP")
     if ((!scompanyname || !scompanyadress || !scompanynip) && siscompany == "true") { return badRequest }
-    const db = await getDatabase()
+    const db = await getDatabase(req)
     const currentDate = new Date()
     const currentDateFormatted = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate()} ${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()}+${currentDate.getTimezoneOffset()}`
     const courseFoundArray = await db.query("SELECT * FROM courses WHERE id = $1 AND date > $2 LIMIT 1", [courseID, currentDateFormatted])

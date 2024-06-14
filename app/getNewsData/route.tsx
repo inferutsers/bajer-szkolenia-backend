@@ -7,7 +7,7 @@ export async function GET(req: Request, res: Response){
     const headers = req.headers
     const newsID = headers.get("newsID")
     if (!newsID) { return badRequest }
-    const db = await getDatabase()
+    const db = await getDatabase(req)
     const currentDate = new Date()
     const currentDateFormatted = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate()}`
     const results = await db.query('SELECT * FROM news WHERE id = $1 AND date <= $2 LIMIT 1', [newsID, currentDateFormatted])

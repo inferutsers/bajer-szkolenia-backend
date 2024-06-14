@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 
 export async function GET(req: Request, res: Response){
     const _ = req.headers
-    const db = await getDatabase()
+    const db = await getDatabase(req)
     const currentDate = new Date()
     const currentDateFormatted = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate()}`
     const results = await db.query('SELECT * FROM news WHERE pin = true AND date <= $1 ORDER BY date DESC LIMIT 4', [currentDateFormatted])

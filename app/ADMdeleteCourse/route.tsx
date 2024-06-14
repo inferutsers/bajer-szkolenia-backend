@@ -8,7 +8,7 @@ export async function DELETE(req: Request, res: Response){
     const sessionID = headers.get("sessionID")
     const courseID = headers.get("courseID")
     if (!sessionID || !courseID) { return badRequest }
-    const db = await getDatabase()
+    const db = await getDatabase(req)
     const validatedUser = await validateSession(db, sessionID)
     if (!validatedUser) { return unauthorized }
     const courseFoundArray = await db.query('SELECT * FROM "courses" WHERE "id" = $1 LIMIT 1', [courseID])

@@ -7,7 +7,7 @@ export async function GET(req: Request, res: Response){
     const headers = req.headers
     const courseID = headers.get("courseID")
     if (!courseID) { return badRequest }
-    const db = await getDatabase()
+    const db = await getDatabase(req)
     const currentDate = new Date()
     const currentDateFormatted = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate()} ${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()}+${currentDate.getTimezoneOffset()}`
     const results = await db.query("SELECT * FROM courses WHERE id = $1 AND date > $2 LIMIT 1", [courseID, currentDateFormatted])

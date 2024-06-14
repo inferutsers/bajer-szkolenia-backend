@@ -9,7 +9,7 @@ export async function GET(req: Request, res: Response){
     const headers = req.headers
     const sessionID = headers.get("sessionID")
     if (!sessionID) { return badRequest }
-    const db = await getDatabase()
+    const db = await getDatabase(req)
     const validatedUser = await validateSession(db, sessionID)
     if (!validatedUser) { return unauthorized }
     const currentDate = new Date()
