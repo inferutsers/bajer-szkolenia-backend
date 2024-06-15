@@ -1,7 +1,7 @@
 import getDatabase from "@/connection/database"
 import validateSession from "@/functions/validateSession"
 import ADMcourseElement from "@/interfaces/ADMcourseElement"
-import { badRequest, notFound, unauthorized } from "@/responses/responses"
+import { badRequest, unauthorized } from "@/responses/responses"
 import { NextResponse } from "next/server"
 import utf8 from "utf8"
 
