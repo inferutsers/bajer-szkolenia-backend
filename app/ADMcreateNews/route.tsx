@@ -1,5 +1,6 @@
 import getDatabase from "@/connection/database"
 import getBufferFromImage from "@/functions/getBufferFromImage"
+import processBody from "@/functions/processBody"
 import validateSession from "@/functions/validateSession"
 import newsElement from "@/interfaces/newsElement"
 import { badRequest, unauthorized } from "@/responses/responses"
@@ -13,7 +14,7 @@ export async function POST(req: NextRequest, res: Response){
     const title = headers.get("CTitle")
     const description = headers.get("CDescription")
     const pin = headers.get("CPin")
-    const image = await req.json()
+    const image = await processBody(req)
     if (!sessionID || !date || !title || !description || !pin) { return badRequest }
     const db = await getDatabase(req)
     const validatedUser = await validateSession(db, sessionID)

@@ -1,12 +1,13 @@
 import getDatabase from "@/connection/database"
 import getBufferFromImage from "@/functions/getBufferFromImage"
+import processBody from "@/functions/processBody"
 import validateSession from "@/functions/validateSession"
 import newsElement from "@/interfaces/newsElement"
 import { badRequest, notFound, unauthorized } from "@/responses/responses"
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import utf8 from "utf8"
 
-export async function PATCH(req: Request, res: Response){
+export async function PATCH(req: NextRequest, res: Response){
     const headers = req.headers
     const sessionID = headers.get("sessionID")
     const newsID = headers.get("newsID")
@@ -14,7 +15,7 @@ export async function PATCH(req: Request, res: Response){
     const title = headers.get("CTitle")
     const description = headers.get("CDescription")
     const pin = headers.get("CPin")
-    const image = await req.json()
+    const image = await processBody(req)
     if (!sessionID || !newsID || !date || !title || !description || !pin) { return badRequest }
     const db = await getDatabase(req)
     const validatedUser = await validateSession(db, sessionID)
