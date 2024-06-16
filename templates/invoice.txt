@@ -1,1 +1,16 @@
-Twoja faktura
+BAJER EXPERT
+Centrum Szkoleniowe Spółdzielni i Wspólnot Mieszkaniowych Jerzy Bajer
+ul. Zygmunta Krasińskiego 4/2 07-100 Węgrów
+NIP: 8240003999
+Tel: +48 728816495
+Email: info@bajerszkolenia.pl
+
+Dzień dobry, {name} {surname}
+ 
+W załączniku przesyłamy Fakturę VAT o numerze {invoiceno}. Informujemy, że do zapłaty pozostało {topay} PLN.
+Dziękujemy za wybranie naszych usług.
+ 
+WAŻNE: Faktura VAT została wystawiona w oparciu o dane przesłane w formularzu zapisu. Jeżeli informacje te są niepoprawne, prosimy o kontakt mailowy.
+
+Pozdrawiamy,
+Zespół BAJER EXPERT

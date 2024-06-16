@@ -3,7 +3,7 @@ import signupElement from "@/interfaces/signupElement";
 import jsPDF from "jspdf";
 import fs from "fs";
 
-export default function generateInvoice(signup: signupElement, course: ADMcourseElement): String{
+export default function generateInvoice(signup: signupElement, course: ADMcourseElement, invoiceNumber: string): String{
     const pdf = new jsPDF()
     const regularFont = fs.readFileSync("/home/ubuntu/backend/fonts/Arial-Unicode-Regular.ttf", 'binary')
     pdf.addFileToVFS('Arial-Unicode-Regular.ttf', regularFont);
@@ -12,7 +12,7 @@ export default function generateInvoice(signup: signupElement, course: ADMcourse
     pdf.addFileToVFS('Arial-Unicode-Bold.ttf', boldFont);
     pdf.addFont('Arial-Unicode-Bold.ttf', 'ArialUTF', 'bold');
     pdf.setFont("ArialUTF", "bold")
-    pdf.text("FAKTURA VAT NR 2137/2024", 25, 25)
+    pdf.text(`FAKTURA VAT NR ${invoiceNumber}`, 25, 25)
     pdf.setFont("ArialUTF", "normal")
     pdf.setFontSize(15)
     pdf.text("Sprzedawca", 35, 47)
@@ -21,7 +21,7 @@ export default function generateInvoice(signup: signupElement, course: ADMcourse
     pdf.line(135, 50, 185, 50)
     pdf.setFontSize(8)
     const currentDate = new Date()
-    const currentDateFormatted = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate()}`
+    const currentDateFormatted = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`
     pdf.text(`Wystawiona: ${currentDateFormatted}, Węgrów`, 140, 24)
     //SPRZEDAWCA
     pdf.text("BAJER EXPERT", 25, 55)
@@ -75,5 +75,8 @@ export default function generateInvoice(signup: signupElement, course: ADMcourse
     pdf.setFont("ArialUTF", "bold")
     pdf.text(`Razem: ${signup.supPrice} PLN`, 150, 112 + heightOffset, { maxWidth: 35 })
     pdf.text(`Do zapłaty pozostało: ${signup.supPrice as number - (signup.paidIn as number)} PLN`, 25, 130)
+    pdf.setFontSize(8)
+    pdf.setFont("ArialUTF", "normal")
+    pdf.text(`Uwagi: Numer identyfikacyjny zapisu - #${signup.id}`, 25, 145)
     return pdf.output()
 }
