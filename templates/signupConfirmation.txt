@@ -33,8 +33,8 @@ WAŻNE: Jeżeli którekolwiek z powyższych informacji jest nieprawidłowa, pros
 
 DANE DO PŁATNOŚCI
 
-Numer rachunku: {paymentaccountnumber}
-Odbiorca: {paymentreceiver}
+Numer rachunku: PLxxxxxxxxxxxxxxxxxxxxxxxxxx
+Odbiorca: BAJER EXPERT Jerzy Bajer
 Tytuł: {paymenttitle}
 Kwota: {paymentamount} PLN
 
