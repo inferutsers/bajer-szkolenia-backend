@@ -1,20 +1,20 @@
 import mailStructure from "./mailStructure";
 
 export default interface signupElement{
-    id: Number,
-    name: String,
-    surname: String,
-    email: String,
-    phoneNumber: String,
-    isCompany: Boolean,
-    companyName?: String,
-    companyAdress?: String,
-    companyNIP?: String,
+    id: number,
+    name: string,
+    surname: string,
+    email: string,
+    phoneNumber: string,
+    isCompany: boolean,
+    companyName?: string,
+    companyAdress?: string,
+    companyNIP?: string,
     date: Date,
-    courseID: Number,
-    supPrice: Number,
+    courseID: number,
+    supPrice: number,
     emailsSent?: mailStructure[],
-    paidIn: Number,
-    invoiceNumber?: String,
-    courseName?: String
+    paidIn: number,
+    invoiceNumber?: string,
+    courseName?: string
 }

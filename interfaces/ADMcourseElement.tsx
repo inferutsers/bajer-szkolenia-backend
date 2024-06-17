@@ -1,13 +1,13 @@
 export default interface ADMcourseElement{
-    id: Number,
+    id: number,
     date: Date,
-    span: Number,
-    price: Number,
-    title?: String,
-    place?: String,
-    instructor?: String,
-    note?: String,
-    slots: Number,
-    slotsUsed: Number,
-    available: Boolean
+    span: number,
+    price: number,
+    title: string,
+    place?: string,
+    instructor?: string,
+    note?: string,
+    slots: number,
+    slotsUsed: number,
+    available: boolean
 }

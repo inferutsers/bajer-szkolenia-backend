@@ -1,9 +1,7 @@
-import ADMcourseElement from "@/interfaces/ADMcourseElement";
-import signupElement from "@/interfaces/signupElement";
 import jsPDF from "jspdf";
-import fs from "fs";
+import fs from "fs"
 
-export default function generateInvoice(signup: signupElement, course: ADMcourseElement, invoiceNumber: string): String{
+export default function generateInvoicePDF(signupID: number, vat: number, invoiceNumber: string, phoneNumber: string, email: string, name: string, surname: string, isCompany: boolean, supPrice: number, courseTitle: string, courseSpan: number, paidIn: Number, adress?: string, companyName?: string, companyNIP?: string ): String{
     const pdf = new jsPDF()
     const regularFont = fs.readFileSync("/home/ubuntu/backend/fonts/Arial-Unicode-Regular.ttf", 'binary')
     pdf.addFileToVFS('Arial-Unicode-Regular.ttf', regularFont);
@@ -33,22 +31,22 @@ export default function generateInvoice(signup: signupElement, course: ADMcourse
     pdf.text("Tel: +48 728816495", 25, 73)
     pdf.text("Email: info@bajerszkolenia.pl", 25, 76)
     //NABYWCA
-    if (signup.isCompany){
-        const companyAdressSliced = signup.companyAdress!.split("|=|")
+    if (isCompany){
+        const companyAdressSliced = adress!.split("|=|")
         const companyAdressStreet = companyAdressSliced[0]
         const companyAdressPostCode = companyAdressSliced[1]
         const companyAdressCity = companyAdressSliced[2]
-        pdf.text(signup.companyName as string, 135, 55, {maxWidth: 50})
-        const heightOffset = pdf.getTextDimensions(signup.companyName as string, {maxWidth: 50}).h - pdf.getTextDimensions("x").h
+        pdf.text(companyName as string, 135, 55, {maxWidth: 50})
+        const heightOffset = pdf.getTextDimensions(companyName as string, {maxWidth: 50}).h - pdf.getTextDimensions("x").h
         pdf.text(companyAdressStreet, 135, 58 + heightOffset)
         pdf.text(`${companyAdressPostCode} ${companyAdressCity}`, 135, 61 + heightOffset)
-        pdf.text(`NIP: ${signup.companyNIP}`, 135, 64 + heightOffset)
-        pdf.text(`Tel: ${signup.phoneNumber}`, 135, 67 + heightOffset)
-        pdf.text(`Email: ${signup.email}`, 135, 70 + heightOffset)
+        pdf.text(`NIP: ${companyNIP}`, 135, 64 + heightOffset)
+        pdf.text(`Tel: ${phoneNumber}`, 135, 67 + heightOffset)
+        pdf.text(`Email: ${email}`, 135, 70 + heightOffset)
     } else {
-        pdf.text(`${signup.name} ${signup.surname}`, 135, 55)
-        pdf.text(`Tel: ${signup.phoneNumber}`, 135, 58)
-        pdf.text(`Email: ${signup.email}`, 135, 61)
+        pdf.text(`${name} ${surname}`, 135, 55)
+        pdf.text(`Tel: ${phoneNumber}`, 135, 58)
+        pdf.text(`Email: ${email}`, 135, 61)
     }
     pdf.text("Sposób zapłaty: Przelew", 25, 90)
     //TABELA HEADER
@@ -64,19 +62,19 @@ export default function generateInvoice(signup: signupElement, course: ADMcourse
     //TABELA USLUGA
     pdf.setFont("ArialUTF", "normal")
     pdf.text("1", 25, 105)
-    pdf.text(`${course.title} (${course.span} minut)`, 45, 105, { maxWidth: 40 })
+    pdf.text(`${courseTitle} (${courseSpan} minut)`, 45, 105, { maxWidth: 40 })
     pdf.text("1 szt", 85, 105)
-    pdf.text(`${(signup.supPrice as number / 1.23).toFixed(2)} PLN`, 105, 105)
+    pdf.text(`${(supPrice as number / 1.23).toFixed(2)} PLN`, 105, 105)
     pdf.text("23%", 135, 105)
-    pdf.text(`${String(signup.supPrice as number)} PLN`, 155, 105)
-    const heightOffset = pdf.getTextDimensions(`${course.title} (${course.span} minut)`, {maxWidth: 40}).h - pdf.getTextDimensions("x").h
+    pdf.text(`${String(supPrice as number)} PLN`, 155, 105)
+    const heightOffset = pdf.getTextDimensions(`${courseTitle} (${courseSpan} minut)`, {maxWidth: 40}).h - pdf.getTextDimensions("x").h
     pdf.line(25, 107 + heightOffset, 185, 107 + heightOffset)
     pdf.setFontSize(11)
     pdf.setFont("ArialUTF", "bold")
-    pdf.text(`Razem: ${signup.supPrice} PLN`, 150, 112 + heightOffset, { maxWidth: 35 })
-    pdf.text(`Do zapłaty pozostało: ${signup.supPrice as number - (signup.paidIn as number)} PLN`, 25, 130)
+    pdf.text(`Razem: ${supPrice} PLN`, 150, 112 + heightOffset, { maxWidth: 35 })
+    pdf.text(`Do zapłaty pozostało: ${supPrice as number - (paidIn as number)} PLN`, 25, 130)
     pdf.setFontSize(8)
     pdf.setFont("ArialUTF", "normal")
-    pdf.text(`Uwagi: Numer identyfikacyjny zapisu - #${signup.id}`, 25, 145)
+    pdf.text(`Uwagi: Numer identyfikacyjny zapisu - #${signupID}`, 25, 145)
     return pdf.output()
 }

@@ -6,6 +6,8 @@ import signupElement from "@/interfaces/signupElement"
 import { badRequest, serviceUnavailable, notFound, notAcceptable, unprocessableContent } from "@/responses/responses"
 import { NextResponse } from "next/server"
 import fs from "fs"
+import utf8 from "utf8"
+import mailFormatAsConfirmation from "@/functions/mailFormatAsConfirmation"
 
 export async function POST(req: Request, res: Response){
     const headers = req.headers
@@ -15,11 +17,10 @@ export async function POST(req: Request, res: Response){
     const semail = headers.get("sEmail")
     const sphonenumber = headers.get("sPhonenumber")
     const siscompany = headers.get("sIsCompany")
-    if (!courseID || !sname || !ssurname || !semail || !sphonenumber || !siscompany) { return badRequest }
     const scompanyname = headers.get("sCompanyName")
     const scompanyadress = headers.get("sCompanyAdress")
     const scompanynip = headers.get("sCompanyNIP")
-    if ((!scompanyname || !scompanyadress || !scompanynip) && siscompany == "true") { return badRequest }
+    if (!courseID || !sname || !ssurname || !semail || !sphonenumber || !siscompany || !scompanyname || !scompanyadress || !scompanynip ) { return badRequest }
     const db = await getDatabase(req)
     const currentDate = new Date()
     const currentDateFormatted = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate()} ${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()}+${currentDate.getTimezoneOffset()}`
@@ -29,12 +30,12 @@ export async function POST(req: Request, res: Response){
     const courseSignupsAmount = courseSignupsArray.rowCount as Number
     const courseFound: courseElement = courseFoundArray.rows.map((result) => ({id: result.id, date: result.date, span: result.span, price: result.price, title: result.title, place: result.place, instructor: result.instructor, note: result.note, slots: result.slots, slotAvailable: (courseSignupsAmount < result.slots), available: result.available}))[0]
     if (!courseFound) { return serviceUnavailable }
-    if (courseSignupsAmount >= courseFound.slots || courseFound.available == false){ return notAcceptable }
-    const response = await db.query('INSERT INTO signups("id", "name", "surname", "email", "phoneNumber", "isCompany", "companyName", "companyAdress", "companyNIP", "date", "courseID", "supPrice") VALUES (DEFAULT, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *', [sname, ssurname, semail, sphonenumber, siscompany, scompanyname, scompanyadress, scompanynip, currentDateFormatted, courseFound.id, courseFound.price])
+    if ((courseSignupsAmount as number) >= courseFound.slots || courseFound.available == false){ return notAcceptable }
+    const response = await db.query('INSERT INTO signups("id", "name", "surname", "email", "phoneNumber", "isCompany", "companyName", "companyAdress", "companyNIP", "date", "courseID", "supPrice") VALUES (DEFAULT, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *', [utf8.decode(sname), utf8.decode(ssurname), utf8.decode(semail), sphonenumber, siscompany, utf8.decode(scompanyname), utf8.decode(scompanyadress), scompanynip, currentDateFormatted, courseFound.id, courseFound.price])
     if (!response || response.rowCount == 0) { return badRequest }
     const returnedSignup: signupElement = response.rows.map((result) => ({id: result.id, name: result.name, surname: result.surname, email: result.email, phoneNumber: result.phoneNumber, isCompany: result.isCompany, companyName: result.companyName, companyAdress: result.companyAdress, companyNIP: result.companyNIP, date: result.date, courseID: result.courseID, supPrice: result.supPrice, emailsSent: result.emailsSent, paidIn: result.paidIn}))[0]
-    const mailContentHTML = fs.readFileSync("/home/ubuntu/backend/templates/signupConfirmation.html", 'utf-8').replaceAll("{name}", returnedSignup.name as string).replaceAll("{surname}", returnedSignup.surname as string).replaceAll("{coursename}", courseFound.title as string).replaceAll("{coursedate}", `${courseFound.date.getFullYear()}-${String(courseFound.date.getMonth() + 1).padStart(2, "0")}-${String(courseFound.date.getDate()).padStart(2, "0")}`).replaceAll("{coursetime}", `${String(courseFound.date.getUTCHours() + 2).padStart(2, "0")}:${String(courseFound.date.getUTCMinutes()).padStart(2, "0")} - ${String((new Date(courseFound.date.getTime() + (courseFound.span as number)*60000)).getUTCHours() + 2).padStart(2, "0")}:${String((new Date(courseFound.date.getTime() + (courseFound.span as number)*60000)).getUTCMinutes()).padStart(2, "0")} (GMT+2)`).replaceAll("{courseinstructor}", courseFound.instructor as string).replaceAll("{courseplace}", courseFound.place as string).replaceAll("{coursenote}", courseFound.note as string).replaceAll("{signupphonenumber}", returnedSignup.phoneNumber as string).replaceAll("{signupemail}", returnedSignup.email as string).replaceAll("{signupcompanyname}", returnedSignup.companyName as string).replaceAll("{signupcompanyadress}", (returnedSignup.companyAdress as string).replaceAll("|=|", " ")).replaceAll("{signupcompanynip}", returnedSignup.companyNIP as string).replaceAll("{paymenttitle}", `${returnedSignup.id}${returnedSignup.name}${returnedSignup.surname}`).replaceAll("{paymentamount}", String(returnedSignup.supPrice as number - (returnedSignup.paidIn as number)))
-    const mailContentRaw = fs.readFileSync("/home/ubuntu/backend/templates/signupConfirmation.txt", 'utf-8').replaceAll("{name}", returnedSignup.name as string).replaceAll("{surname}", returnedSignup.surname as string).replaceAll("{coursename}", courseFound.title as string).replaceAll("{coursedate}", `${courseFound.date.getFullYear()}-${String(courseFound.date.getMonth() + 1).padStart(2, "0")}-${String(courseFound.date.getDate()).padStart(2, "0")}`).replaceAll("{coursetime}", `${String(courseFound.date.getUTCHours() + 2).padStart(2, "0")}:${String(courseFound.date.getUTCMinutes()).padStart(2, "0")} - ${String((new Date(courseFound.date.getTime() + (courseFound.span as number)*60000)).getUTCHours() + 2).padStart(2, "0")}:${String((new Date(courseFound.date.getTime() + (courseFound.span as number)*60000)).getUTCMinutes()).padStart(2, "0")} (GMT+2)`).replaceAll("{courseinstructor}", courseFound.instructor as string).replaceAll("{courseplace}", courseFound.place as string).replaceAll("{coursenote}", courseFound.note as string).replaceAll("{signupphonenumber}", returnedSignup.phoneNumber as string).replaceAll("{signupemail}", returnedSignup.email as string).replaceAll("{signupcompanyname}", returnedSignup.companyName as string).replaceAll("{signupcompanyadress}", (returnedSignup.companyAdress as string).replaceAll("|=|", " ")).replaceAll("{signupcompanynip}", returnedSignup.companyNIP as string).replaceAll("{paymenttitle}", `${returnedSignup.id}${returnedSignup.name}${returnedSignup.surname}`).replaceAll("{paymentamount}", String(returnedSignup.supPrice as number - (returnedSignup.paidIn as number)))
+    const mailContentHTML = mailFormatAsConfirmation(fs.readFileSync("/home/ubuntu/backend/templates/signupConfirmation.html", 'utf-8'), returnedSignup, courseFound)
+    const mailContentRaw = mailFormatAsConfirmation(fs.readFileSync("/home/ubuntu/backend/templates/signupConfirmation.txt", 'utf-8'), returnedSignup, courseFound)
     const mailSent: mailStructure = await sendSingleEmail(returnedSignup.email, "Potwierdzenie zapisu", mailContentRaw, mailContentHTML)
     if(mailSent.failure == false) {
         await db.query('UPDATE signups SET "emailsSent" = ARRAY_APPEND("emailsSent", $1)  WHERE "id" = $2', [mailSent, returnedSignup.id])

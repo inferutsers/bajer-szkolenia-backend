@@ -1,13 +1,13 @@
 export default interface courseElement{
-    id: Number,
+    id: number,
     date: Date,
-    span: Number,
-    price: Number,
-    title?: String,
-    place?: String,
-    instructor?: String,
-    note?: String,
-    slots: Number,
-    slotAvailable: Boolean,
-    available: Boolean
+    span: number,
+    price: number,
+    title: string,
+    place?: string,
+    instructor?: string,
+    note?: string,
+    slots: number,
+    slotAvailable: boolean,
+    available: boolean
 }
