@@ -8,6 +8,6 @@ export default interface courseElement{
     instructor?: string,
     note?: string,
     slots: number,
-    slotAvailable: boolean,
+    slotAvailable?: boolean,
     available: boolean
 }
