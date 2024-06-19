@@ -1,6 +1,5 @@
 import ADMcourseElement from "@/interfaces/ADMcourseElement";
 import signupElement from "@/interfaces/signupElement";
-import jsPDF from "jspdf";
 import fs from "fs";
 import { Pool } from "pg";
 import generateInvoicePDF from "./generateInvoicePDF";

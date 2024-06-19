@@ -1,12 +1,10 @@
 import getDatabase from "@/connection/database"
-import { getCourse } from "@/functions/queries/course"
 import { getSignup } from "@/functions/queries/signups"
-import sendSignupConfirmation from "@/functions/sendSignupConfirmation"
 import validateSession from "@/functions/validateSession"
-import { badRequest, gone, notFound, unauthorized, unprocessableContent } from "@/responses/responses"
+import { badRequest, notFound, unauthorized, unprocessableContent } from "@/responses/responses"
 import { NextResponse } from "next/server"
 
-export async function POST(req: Request, res: Response){
+export async function DELETE(req: Request, res: Response){
     const headers = req.headers
     const sessionID = headers.get("sessionID")
     const signupID = headers.get("signupID")
@@ -16,12 +14,7 @@ export async function POST(req: Request, res: Response){
     if (!validatedUser) { return unauthorized }
     const signup = await getSignup(db, signupID)
     if (!signup) { return notFound }
-    const course = await getCourse(db, signup.courseID)
-    if (!course) { return gone}
-    const signupConfirmation = await sendSignupConfirmation(db, signup, course)
-    if(signupConfirmation.mailSent == true) {
-        return NextResponse.json(null, {status: 200})
-    } else {
-        return unprocessableContent
-    }
+    const signupsChanged = await db.query('UPDATE "signups" SET "invalidated" = true WHERE "id" = $1', [signupID])
+    if (!signupsChanged || signupsChanged.rowCount != 1) { return unprocessableContent }
+    return NextResponse.json(null, {status: 200})
 }

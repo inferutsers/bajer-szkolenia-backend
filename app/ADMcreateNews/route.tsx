@@ -1,6 +1,7 @@
 import getDatabase from "@/connection/database"
 import getBufferFromImage from "@/functions/getBufferFromImage"
 import processBody from "@/functions/processBody"
+import { formatAsNewsElement } from "@/functions/queries/news"
 import validateSession from "@/functions/validateSession"
 import newsElement from "@/interfaces/newsElement"
 import { badRequest, unauthorized } from "@/responses/responses"
@@ -22,6 +23,6 @@ export async function POST(req: NextRequest, res: Response){
     const imgbufer = await getBufferFromImage(image)
     const insertedNewsArray = await db.query('INSERT INTO "news"("title", "description", "date", "pin", "image") VALUES ($1, $2, $3, $4, $5) RETURNING *', [utf8.decode(title), utf8.decode(description), date, pin, imgbufer])
     if (!insertedNewsArray || insertedNewsArray.rowCount == 0) { return badRequest }
-    var insertedNews: newsElement = insertedNewsArray.rows.map((result) => ({ id: result.id, title: result.title, description: result.description, date: result.date, pin: result.pin, image: result.image }))[0]
+    var insertedNews: newsElement = formatAsNewsElement(insertedNewsArray.rows[0])
     return NextResponse.json(insertedNews, {status: 200})
 }

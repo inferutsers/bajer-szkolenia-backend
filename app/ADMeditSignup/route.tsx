@@ -1,6 +1,5 @@
 import getDatabase from "@/connection/database"
-import getCourseName from "@/functions/getCourseName"
-import getInvoiceNumber from "@/functions/getInvoiceNumber"
+import { formatAsSignupElement, getSignup } from "@/functions/queries/signups"
 import validateSession from "@/functions/validateSession"
 import signupElement from "@/interfaces/signupElement"
 import { badRequest, notFound, unauthorized } from "@/responses/responses"
@@ -24,10 +23,10 @@ export async function PATCH(req: Request, res: Response){
     const db = await getDatabase(req)
     const validatedUser = await validateSession(db, sessionID)
     if (!validatedUser) { return unauthorized }
-    const signupArray = await db.query('SELECT * FROM "signups" WHERE "id" = $1 LIMIT 1', [signupID])
-    if (!signupArray || signupArray.rowCount == 0) { return notFound }
-    const returnedSignupArray = await db.query('UPDATE "signups" SET "name" = $1, "surname" = $2, "email" = $3, "phoneNumber" = $4, "isCompany" = $5, "companyName" = $6, "companyAdress" = $7, "companyNIP" = $8, "supPrice" = $9 WHERE "id" = $10 RETURNING *', [utf8.decode(suName), utf8.decode(suSurname), utf8.decode(suEmail), suPhonenumber, suIscompany, utf8.decode(suCompanyname as string), utf8.decode(suCompanyadress as string), suCompanyNIP, suSupprice, signupID])
+    const signup = await getSignup(db, signupID)
+    if (!signup) { return notFound }
+    const returnedSignupArray = await db.query('UPDATE "signups" SET "name" = $1, "surname" = $2, "email" = $3, "phoneNumber" = $4, "isCompany" = $5, "companyName" = $6, "companyAdress" = $7, "companyNIP" = $8, "supPrice" = $9 WHERE "id" = $10 AND "invalidated" = false RETURNING *', [utf8.decode(suName), utf8.decode(suSurname), utf8.decode(suEmail), suPhonenumber, suIscompany, utf8.decode(suCompanyname as string), utf8.decode(suCompanyadress as string), suCompanyNIP, suSupprice, signupID])
     if (!returnedSignupArray || returnedSignupArray.rowCount == 0) { return badRequest }
-    const returnedSignup: signupElement = (await Promise.all(returnedSignupArray.rows.map(async (result) => ({id: result.id, name: result.name, surname: result.surname, email: result.email, phoneNumber: result.phoneNumber, isCompany: result.isCompany, companyName: result.companyName, companyAdress: result.companyAdress, companyNIP: result.companyNIP, date: result.date, courseID: result.courseID, supPrice: result.supPrice, emailsSent: result.emailsSent, paidIn: result.paidIn, invoiceNumber: await getInvoiceNumber(db, result.id), courseName: await getCourseName(db, result.courseID)}))))[0]
+    const returnedSignup: signupElement = await formatAsSignupElement(returnedSignupArray.rows[0], db)
     return NextResponse.json(returnedSignup, {status: 200})
 }

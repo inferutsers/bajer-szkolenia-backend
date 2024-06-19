@@ -1,8 +1,8 @@
 import getDatabase from "@/connection/database"
-import { getSignupInvoiceFile } from "@/functions/queries/invoices"
 import validateSession from "@/functions/validateSession"
 import { badRequest, notFound, unauthorized } from "@/responses/responses"
 import { NextResponse } from "next/server"
+import { getSignup } from "@/functions/queries/signups"
 
 export async function GET(req: Request, res: Response){
     const headers = req.headers
@@ -12,7 +12,7 @@ export async function GET(req: Request, res: Response){
     const db = await getDatabase(req)
     const validatedUser = await validateSession(db, sessionID)
     if (!validatedUser) { return unauthorized }
-    const invoice = await getSignupInvoiceFile(db, signupID)
-    if (!invoice) { return notFound }
-    return NextResponse.json(invoice, {status: 200})
+    const signup = await getSignup(db, signupID)
+    if (!signup) { return notFound }
+    return NextResponse.json(signup, {status: 200})
 }

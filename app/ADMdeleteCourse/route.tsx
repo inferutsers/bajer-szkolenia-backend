@@ -1,4 +1,5 @@
 import getDatabase from "@/connection/database";
+import { getCourse } from "@/functions/queries/course";
 import validateSession from "@/functions/validateSession";
 import { badRequest, notFound, unauthorized } from "@/responses/responses";
 import { NextResponse } from "next/server";
@@ -11,8 +12,8 @@ export async function DELETE(req: Request, res: Response){
     const db = await getDatabase(req)
     const validatedUser = await validateSession(db, sessionID)
     if (!validatedUser) { return unauthorized }
-    const courseFoundArray = await db.query('SELECT * FROM "courses" WHERE "id" = $1 LIMIT 1', [courseID])
-    if (!courseFoundArray || courseFoundArray.rowCount == 0) { return notFound }
+    const course = await getCourse(db, courseID)
+    if (!course) { return notFound }
     await db.query('DELETE FROM "courses" WHERE "id" = $1', [courseID])
     return NextResponse.json(null, {status: 200})
 }
