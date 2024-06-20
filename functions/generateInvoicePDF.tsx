@@ -1,8 +1,10 @@
 import jsPDF from "jspdf";
 import fs from "fs"
+import PriceFormater from "price-to-words-pl"
 
 export default function generateInvoicePDF(signupID: number, vat: number, invoiceNumber: string, phoneNumber: string, email: string, name: string, surname: string, isCompany: boolean, supPrice: number, courseTitle: string, courseSpan: number, paidIn: Number, adress?: string, companyName?: string, companyNIP?: string ): String{
     const pdf = new jsPDF()
+    const priceFormatter = new PriceFormater()
     const regularFont = fs.readFileSync("/home/ubuntu/backend/fonts/Arial-Unicode-Regular.ttf", 'binary')
     pdf.addFileToVFS('Arial-Unicode-Regular.ttf', regularFont);
     pdf.addFont('Arial-Unicode-Regular.ttf', 'ArialUTF', 'normal');
@@ -10,7 +12,11 @@ export default function generateInvoicePDF(signupID: number, vat: number, invoic
     pdf.addFileToVFS('Arial-Unicode-Bold.ttf', boldFont);
     pdf.addFont('Arial-Unicode-Bold.ttf', 'ArialUTF', 'bold');
     pdf.setFont("ArialUTF", "bold")
-    pdf.text(`FAKTURA VAT NR ${invoiceNumber}`, 25, 25)
+    if (vat > 0){
+        pdf.text(`FAKTURA VAT NR ${invoiceNumber}`, 25, 25)
+    } else {
+        pdf.text(`FAKTURA NR ${invoiceNumber}`, 25, 25)
+    }
     pdf.setFont("ArialUTF", "normal")
     pdf.setFontSize(15)
     pdf.text("Sprzedawca", 35, 47)
@@ -20,7 +26,7 @@ export default function generateInvoicePDF(signupID: number, vat: number, invoic
     pdf.setFontSize(8)
     const currentDate = new Date()
     const currentDateFormatted = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`
-    pdf.text(`Wystawiona: ${currentDateFormatted}, Węgrów`, 140, 24)
+    pdf.text(`Węgrów, dn. ${currentDateFormatted}`, 140, 24)
     //SPRZEDAWCA
     pdf.text("BAJER EXPERT", 25, 55)
     pdf.text("Centrum Szkoleniowe Spółdzielni", 25, 58)
@@ -54,8 +60,9 @@ export default function generateInvoicePDF(signupID: number, vat: number, invoic
     pdf.text("LP", 25, 100)
     pdf.text("Nazwa usługi", 45, 100)
     pdf.text("Ilość", 85, 100)
-    pdf.text("Wartość netto", 105, 100)
-    pdf.text("VAT", 135, 100)
+    pdf.text("Wartość netto", 95, 100)
+    pdf.text("VAT", 120, 100)
+    pdf.text("Wartość VAT", 130, 100)
     pdf.text("Wartość brutto", 155, 100)
     pdf.setLineWidth(0.5)
     pdf.line(25, 102, 185, 102)
@@ -64,17 +71,36 @@ export default function generateInvoicePDF(signupID: number, vat: number, invoic
     pdf.text("1", 25, 105)
     pdf.text(`${courseTitle} (${courseSpan} minut)`, 45, 105, { maxWidth: 40 })
     pdf.text("1 szt", 85, 105)
-    pdf.text(`${(supPrice as number / 1.23).toFixed(2)} PLN`, 105, 105)
-    pdf.text("23%", 135, 105)
-    pdf.text(`${String(supPrice as number)} PLN`, 155, 105)
+    const netto = (supPrice as number / (1 + (vat / 100)))
+    const vatAmount = supPrice - netto
+    pdf.text(`${netto.toFixed(2)} PLN`, 95, 105)
+    if (vat > 0){
+        pdf.text(`${vat}%`, 120, 105)
+    } else {
+        pdf.text("np", 120, 105)
+    }
+    pdf.text(`${vatAmount.toFixed(2)} PLN`, 130, 105)
+    pdf.text(`${(supPrice as number).toFixed(2)} PLN`, 155, 105)
     const heightOffset = pdf.getTextDimensions(`${courseTitle} (${courseSpan} minut)`, {maxWidth: 40}).h - pdf.getTextDimensions("x").h
     pdf.line(25, 107 + heightOffset, 185, 107 + heightOffset)
     pdf.setFontSize(11)
     pdf.setFont("ArialUTF", "bold")
-    pdf.text(`Razem: ${supPrice} PLN`, 150, 112 + heightOffset, { maxWidth: 35 })
-    pdf.text(`Do zapłaty pozostało: ${supPrice as number - (paidIn as number)} PLN`, 25, 130)
+    pdf.text(`Razem: ${supPrice.toFixed(2)} PLN`, 140, 112 + heightOffset, { maxWidth: 35 })
+    pdf.text(`Do zapłaty pozostało: ${(supPrice as number - (paidIn as number)).toFixed(2)} PLN`, 25, 130)
     pdf.setFontSize(8)
     pdf.setFont("ArialUTF", "normal")
-    pdf.text(`Uwagi: Numer identyfikacyjny zapisu - #${signupID}`, 25, 145)
+    pdf.text(`Slownie: ${priceFormatter.convert((supPrice as number - (paidIn as number)))}`, 25, 135)
+    pdf.text(`Uwagi: Podstawa zwolnienia - Art. 113 ustawy VAT; Numer identyfikacyjny zapisu - #${signupID}`, 25, 145)
+    pdf.text(`Rachunek bankowy nr: PL37 1240 2731 1111 0011 3946 7964`, 25, 155)
+    pdf.setLineWidth(0.2)
+    pdf.line(25, 270, 75, 270)
+    pdf.text("Osoba upoważniona", 37, 273)
+    pdf.text("do odbioru faktury", 37, 276)
+    pdf.line(135, 270, 185, 270)
+    pdf.text("Osoba upoważniona", 147, 273)
+    pdf.text("do wystawienia faktury", 147, 276)
+    pdf.setFont("ArialUTF", "bold")
+    pdf.setFontSize(10)
+    pdf.text("Wiesława Bajer", 147, 268)
     return pdf.output()
 }

@@ -1,7 +1,10 @@
 import getDatabase from "@/connection/database"
-import { getSignup } from "@/functions/queries/signups"
+import generateSignupInvoice from "@/functions/generateSignupInvoice"
+import { ADMgetCourse } from "@/functions/queries/course"
+import { formatAsSignupElement, getSignup } from "@/functions/queries/signups"
 import validateSession from "@/functions/validateSession"
-import { badRequest, notFound, unauthorized, unprocessableContent } from "@/responses/responses"
+import signupElement from "@/interfaces/signupElement"
+import { badRequest, notAcceptable, notFound, unauthorized, unprocessableContent } from "@/responses/responses"
 import { NextResponse } from "next/server"
 
 export async function POST(req: Request, res: Response){
@@ -15,7 +18,15 @@ export async function POST(req: Request, res: Response){
     if (!validatedUser) { return unauthorized }
     const signup = await getSignup(db, signupID)
     if (!signup) { return notFound }
-    const editedSignup = await db.query('UPDATE "signups" SET "paidIn" = "paidIn" + $1 WHERE "id" = $2 AND "invalidated" = false', [paymentAmount, signupID])
-    if (!editedSignup || editedSignup.rowCount == 0) { return unprocessableContent }
+    if ((signup.supPrice - signup.paidIn) < (Number(paymentAmount))) { return notAcceptable }
+    const editedSignupArray = await db.query('UPDATE "signups" SET "paidIn" = "paidIn" + $1 WHERE "id" = $2 AND "invalidated" = false RETURNING *', [paymentAmount, signupID])
+    if (!editedSignupArray || editedSignupArray.rowCount == 0) { return unprocessableContent }
+    const editedSignup: signupElement = await formatAsSignupElement(editedSignupArray.rows[0], db)
+    if (editedSignup.paidIn >= editedSignup.supPrice) { 
+        const course = await ADMgetCourse(db, editedSignup.courseID)
+        if (course != undefined){
+            await generateSignupInvoice(db, editedSignup, course)
+        }
+    }
     return NextResponse.json(null, {status: 200})
 }

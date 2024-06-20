@@ -7,10 +7,10 @@ Email: info@bajerszkolenia.pl
 
 Dzień dobry, {name} {surname}
  
-W załączniku przesyłamy Fakturę VAT o numerze {invoiceno}. Informujemy, że do zapłaty pozostało {topay} PLN.
+W załączniku przesyłamy Fakturę o numerze {invoiceno}. Informujemy, że do zapłaty pozostało {topay} PLN.
 Dziękujemy za wybranie naszych usług.
  
-WAŻNE: Faktura VAT została wystawiona w oparciu o dane przesłane w formularzu zapisu. Jeżeli informacje te są niepoprawne, prosimy o kontakt mailowy.
+WAŻNE: Faktura została wystawiona w oparciu o dane przesłane w formularzu zapisu. Jeżeli informacje te są niepoprawne, prosimy o kontakt mailowy.
 
 Pozdrawiamy,
 Zespół BAJER EXPERT

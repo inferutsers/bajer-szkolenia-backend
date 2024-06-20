@@ -5,5 +5,5 @@ export default function mailFormatAsInvoice(input: string, signup: signupElement
     .replaceAll("{name}", signup.name as string)
     .replaceAll("{surname}", signup.surname as string)
     .replaceAll("{invoiceno}", invoiceNumber)
-    .replaceAll("{topay}", String(signup.supPrice as number - (signup.paidIn as number)))
+    .replaceAll("{topay}", (signup.supPrice as number - (signup.paidIn as number)).toFixed(2))
 }

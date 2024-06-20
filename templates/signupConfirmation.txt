@@ -33,15 +33,15 @@ WAŻNE: Jeżeli którekolwiek z powyższych informacji jest nieprawidłowa, pros
 
 DANE DO PŁATNOŚCI
 
-Numer rachunku: PLxxxxxxxxxxxxxxxxxxxxxxxxxx
-Odbiorca: BAJER EXPERT Jerzy Bajer
+Numer rachunku: PL37 1240 2731 1111 0011 3946 7964
+Odbiorca: BAJER EXPERT
 Tytuł: {paymenttitle}
 Kwota: {paymentamount} PLN
 
-Poinformujemy państwa o otrzymaniu płatnosci. Jej termin to 7 dni (roboczych) od momentu zapisu. Prosimy o terminowe dokonanie wpłaty.
+Poinformujemy państwa o otrzymaniu płatnosci. Jej termin to najpóźniej 24h przed rozpoczęciem szkolenia. Prosimy o terminowe dokonanie wpłaty.
 WAŻNE: W przypadku braku wpłaty zapis zostanie anulowany.
 
-Fakturę VAT wystawiamy najpóźniej w dniu usługi.
+Fakturę wystawiamy najpóźniej w dniu usługi.
 
 Pozdrawiamy,
 Zespół BAJER EXPERT
