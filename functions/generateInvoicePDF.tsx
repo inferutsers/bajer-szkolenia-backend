@@ -112,7 +112,7 @@ export default function generateInvoicePDF(vat: number, invoiceNumber: string, n
     pdf.text(`Slownie: ${priceFormatter.convert((supPrice as number - (paidIn as number)))}`, 25, 135)
     var notes = ""
     if (vat == 0){ 
-        notes = notes + "Uwagi: Podstawa zwolnienia - Art. 113 ustawy VAT; "
+        notes = notes + "Podstawa zwolnienia - Art. 113 ustawy VAT; "
     }
     if (signupID){
         notes = notes + `Numer identyfikacyjny zapisu - #${signupID}`
