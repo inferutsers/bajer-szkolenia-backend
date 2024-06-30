@@ -2,7 +2,7 @@ import jsPDF from "jspdf";
 import fs from "fs"
 import PriceFormater from "price-to-words-pl"
 
-export default function generateInvoicePDF(signupID: number, vat: number, invoiceNumber: string, phoneNumber: string, email: string, name: string, surname: string, isCompany: boolean, supPrice: number, courseTitle: string, courseSpan: number, paidIn: Number, adress?: string, companyName?: string, companyNIP?: string ): String{
+export default function generateInvoicePDF(vat: number, invoiceNumber: string, name: string, surname: string, isCompany: boolean, supPrice: number, courseTitle: string, paidIn: Number, courseSpan?: number, signupID?: number, phoneNumber?: string, email?: string, adress?: string, companyName?: string, companyNIP?: string ): String{
     const pdf = new jsPDF()
     const priceFormatter = new PriceFormater()
     const regularFont = fs.readFileSync("/home/ubuntu/backend/fonts/Arial-Unicode-Regular.ttf", 'binary')
@@ -47,12 +47,28 @@ export default function generateInvoicePDF(signupID: number, vat: number, invoic
         pdf.text(companyAdressStreet, 135, 58 + heightOffset)
         pdf.text(`${companyAdressPostCode} ${companyAdressCity}`, 135, 61 + heightOffset)
         pdf.text(`NIP: ${companyNIP}`, 135, 64 + heightOffset)
+        if (phoneNumber){
         pdf.text(`Tel: ${phoneNumber}`, 135, 67 + heightOffset)
-        pdf.text(`Email: ${email}`, 135, 70 + heightOffset)
+        }
+        if (email){
+            if (phoneNumber){
+                pdf.text(`Email: ${email}`, 135, 70 + heightOffset)
+            } else {
+                pdf.text(`Email: ${email}`, 135, 67 + heightOffset)
+            }
+        }
     } else {
         pdf.text(`${name} ${surname}`, 135, 55)
+        if (phoneNumber){
         pdf.text(`Tel: ${phoneNumber}`, 135, 58)
-        pdf.text(`Email: ${email}`, 135, 61)
+        }
+        if (email){
+            if (phoneNumber){
+                pdf.text(`Email: ${email}`, 135, 61)
+            } else {
+                pdf.text(`Email: ${email}`, 135, 58)
+            }
+        }
     }
     pdf.text("Sposób zapłaty: Przelew", 25, 90)
     //TABELA HEADER
@@ -69,7 +85,11 @@ export default function generateInvoicePDF(signupID: number, vat: number, invoic
     //TABELA USLUGA
     pdf.setFont("ArialUTF", "normal")
     pdf.text("1", 25, 105)
-    pdf.text(`${courseTitle} (${courseSpan} minut)`, 45, 105, { maxWidth: 40 })
+    if (!courseSpan){
+        pdf.text(`${courseTitle}`, 45, 105, { maxWidth: 40 })
+    } else {
+        pdf.text(`${courseTitle} (${courseSpan} minut)`, 45, 105, { maxWidth: 40 })
+    }
     pdf.text("1 szt", 85, 105)
     const netto = (supPrice as number / (1 + (vat / 100)))
     const vatAmount = supPrice - netto
@@ -81,7 +101,7 @@ export default function generateInvoicePDF(signupID: number, vat: number, invoic
     }
     pdf.text(`${vatAmount.toFixed(2)} PLN`, 130, 105)
     pdf.text(`${(supPrice as number).toFixed(2)} PLN`, 155, 105)
-    const heightOffset = pdf.getTextDimensions(`${courseTitle} (${courseSpan} minut)`, {maxWidth: 40}).h - pdf.getTextDimensions("x").h
+    const heightOffset = pdf.getTextDimensions(!courseSpan ? `${courseTitle}` : `${courseTitle} (${courseSpan} minut)`, {maxWidth: 40}).h - pdf.getTextDimensions("x").h
     pdf.line(25, 107 + heightOffset, 185, 107 + heightOffset)
     pdf.setFontSize(11)
     pdf.setFont("ArialUTF", "bold")
@@ -90,7 +110,16 @@ export default function generateInvoicePDF(signupID: number, vat: number, invoic
     pdf.setFontSize(8)
     pdf.setFont("ArialUTF", "normal")
     pdf.text(`Slownie: ${priceFormatter.convert((supPrice as number - (paidIn as number)))}`, 25, 135)
-    pdf.text(`Uwagi: Podstawa zwolnienia - Art. 113 ustawy VAT; Numer identyfikacyjny zapisu - #${signupID}`, 25, 145)
+    var notes = ""
+    if (vat == 0){ 
+        notes = notes + "Uwagi: Podstawa zwolnienia - Art. 113 ustawy VAT; "
+    }
+    if (signupID){
+        notes = notes + `Numer identyfikacyjny zapisu - #${signupID}`
+    } 
+    if (notes != ""){
+        pdf.text(`Uwagi: ${notes}`, 25, 145)
+    }
     pdf.text(`Rachunek bankowy nr: PL37 1240 2731 1111 0011 3946 7964`, 25, 155)
     pdf.setLineWidth(0.2)
     pdf.line(25, 270, 75, 270)

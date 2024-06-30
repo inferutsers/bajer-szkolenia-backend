@@ -10,7 +10,7 @@ import mailStructure from "@/interfaces/mailStructure";
 
 export default async function generateSignupInvoice(db: Pool, signup: signupElement, course: ADMcourseElement): Promise<{mailSent: boolean}>{
     const invoiceNumber = `${(await db.query('SELECT "integerValue" FROM "options" WHERE "id" = 0 LIMIT 1')).rows[0].integerValue}/${(new Date).getFullYear()}`
-    const invoiceString = generateInvoicePDF(signup.id, 0, invoiceNumber, signup.phoneNumber, signup.email, signup.name, signup.surname, signup.isCompany, signup.supPrice, course.title, course.span, signup.paidIn, signup.companyAdress, signup.companyName, signup.companyNIP)
+    const invoiceString = generateInvoicePDF(0, invoiceNumber, signup.name, signup.surname, signup.isCompany, signup.supPrice, course.title, signup.paidIn, course.span, signup.id, signup.phoneNumber, signup.email, signup.companyAdress, signup.companyName, signup.companyNIP)
     const invoiceBuffer = Buffer.from(invoiceString, 'binary')
     await db.query('INSERT INTO "invoices"("signup", "number", "file") VALUES ($1, $2, $3)', [signup.id, invoiceNumber, invoiceBuffer])
     await db.query('UPDATE "options" SET "integerValue" = "integerValue" + 1 WHERE "id" = 0')
