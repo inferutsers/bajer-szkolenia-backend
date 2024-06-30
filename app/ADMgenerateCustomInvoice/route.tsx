@@ -3,6 +3,7 @@ import generateInvoicePDF from "@/functions/generateInvoicePDF"
 import validateSession from "@/functions/validateSession"
 import { badRequest, unauthorized } from "@/responses/responses"
 import { NextResponse } from "next/server"
+import utf8 from "utf8"
 
 export async function POST(req: Request, res: Response){
     const headers = req.headers,
@@ -24,7 +25,7 @@ export async function POST(req: Request, res: Response){
     const validatedUser = await validateSession(db, sessionID)
     if (!validatedUser) { return unauthorized }
     const invoiceNumber = `${(await db.query('SELECT "integerValue" FROM "options" WHERE "id" = 0 LIMIT 1')).rows[0].integerValue}/${(new Date).getFullYear()}`
-    const invoiceString = generateInvoicePDF(Number(invoiceVat), invoiceNumber, clientName, clientSurname, Boolean(JSON.parse(isCompany)), Number(servicePrice), serviceName, Number(clientPayment), undefined, undefined, !clientPhonenumber ? undefined : clientPhonenumber, !clientEmail ? undefined : clientEmail, !clientAdress ? undefined : clientAdress, !clientCompanyName ? undefined : clientCompanyName, !clientCompanyNIP ? undefined : clientCompanyNIP)
+    const invoiceString = generateInvoicePDF(Number(invoiceVat), invoiceNumber, utf8.decode(clientName), utf8.decode(clientSurname), Boolean(JSON.parse(isCompany)), Number(servicePrice), utf8.decode(serviceName), Number(clientPayment), undefined, undefined, !clientPhonenumber ? undefined : clientPhonenumber, !clientEmail ? undefined : utf8.decode(clientEmail), !clientAdress ? undefined : utf8.decode(clientAdress), !clientCompanyName ? undefined : utf8.decode(clientCompanyName), !clientCompanyNIP ? undefined : clientCompanyNIP)
     const invoiceBuffer = Buffer.from(invoiceString, 'binary')
     await db.query('INSERT INTO "invoices"("number", "file") VALUES ($1, $2)', [invoiceNumber, invoiceBuffer])
     await db.query('UPDATE "options" SET "integerValue" = "integerValue" + 1 WHERE "id" = 0')
