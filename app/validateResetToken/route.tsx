@@ -4,8 +4,8 @@ import { badRequest, notFound } from "@/responses/responses"
 import { NextResponse } from "next/server"
 
 export async function GET(req: Request, res: Response){
-    const headers = req.headers
-    const resetToken = headers.get("resetToken")
+    const headers = req.headers,
+    resetToken = headers.get("resetToken")
     if (!resetToken) { return badRequest }
     const db = await getDatabase(req)
     const accountFoundArray = await db.query('SELECT * FROM "administration" WHERE "passwordResetToken" = $1 AND "status" > 0 LIMIT 1', [resetToken])

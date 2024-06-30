@@ -7,18 +7,18 @@ import { NextResponse } from "next/server"
 import utf8 from "utf8"
 
 export async function PATCH(req: Request, res: Response){
-    const headers = req.headers
-    const sessionID = headers.get("sessionID")
-    const signupID = headers.get("signupID")
-    const suName = headers.get("suName")
-    const suSurname = headers.get("suSurname")
-    const suEmail = headers.get("suEmail")
-    const suPhonenumber = headers.get("suPhonenumber")
-    const suIscompany = headers.get("suIscompany")
-    const suCompanyname = headers.get("suCompanyname")
-    const suCompanyadress = headers.get("suCompanyadress")
-    const suCompanyNIP = headers.get("suCompanyNIP")
-    const suSupprice = headers.get("suSupprice")
+    const headers = req.headers,
+    sessionID = headers.get("sessionID"),
+    signupID = headers.get("signupID"),
+    suName = headers.get("suName"),
+    suSurname = headers.get("suSurname"),
+    suEmail = headers.get("suEmail"),
+    suPhonenumber = headers.get("suPhonenumber"),
+    suIscompany = headers.get("suIscompany"),
+    suCompanyname = headers.get("suCompanyname"),
+    suCompanyadress = headers.get("suCompanyadress"),
+    suCompanyNIP = headers.get("suCompanyNIP"),
+    suSupprice = headers.get("suSupprice")
     if (!sessionID || !signupID || !suName || !suSurname || !suEmail || !suPhonenumber || !suIscompany || !suSupprice) { return badRequest }
     const db = await getDatabase(req)
     const validatedUser = await validateSession(db, sessionID)

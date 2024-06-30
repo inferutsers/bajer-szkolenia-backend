@@ -5,9 +5,9 @@ import { NextResponse } from "next/server"
 import bcrypt from "bcrypt"
 
 export async function POST(req: Request, res: Response){
-    const headers = req.headers
-    const resetToken = headers.get("resetToken")
-    const newPassword = headers.get("newPassword")
+    const headers = req.headers,
+    resetToken = headers.get("resetToken"),
+    newPassword = headers.get("newPassword")
     if (!resetToken || !newPassword) { return badRequest }
     const db = await getDatabase(req)
     const accountFoundArray = await db.query('SELECT * FROM "administration" WHERE "passwordResetToken" = $1 AND "status" > 0 LIMIT 1', [resetToken])

@@ -9,14 +9,14 @@ import { NextRequest, NextResponse } from "next/server"
 import utf8 from "utf8"
 
 export async function PATCH(req: NextRequest, res: Response){
-    const headers = req.headers
-    const sessionID = headers.get("sessionID")
-    const newsID = headers.get("newsID")
-    const date = headers.get("CDate")
-    const title = headers.get("CTitle")
-    const description = headers.get("CDescription")
-    const pin = headers.get("CPin")
-    const image = await processBody(req)
+    const headers = req.headers,
+    sessionID = headers.get("sessionID"),
+    newsID = headers.get("newsID"),
+    date = headers.get("CDate"),
+    title = headers.get("CTitle"),
+    description = headers.get("CDescription"),
+    pin = headers.get("CPin"),
+    image = await processBody(req)
     if (!sessionID || !newsID || !date || !title || !description || !pin) { return badRequest }
     const db = await getDatabase(req)
     const validatedUser = await validateSession(db, sessionID)

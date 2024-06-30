@@ -7,8 +7,8 @@ import fs from 'fs'
 import sendSingleEmail from "@/functions/sendSingleEmail"
 
 export async function POST(req: Request, res: Response){
-    const headers = req.headers
-    const confirmationKey = headers.get("confirmationKey")
+    const headers = req.headers,
+    confirmationKey = headers.get("confirmationKey")
     if (!confirmationKey) { return badRequest }
     const db = await getDatabase(req)
     const isThereAKeyLikeThat = await getNewsletterUserPresenceByConfirmationKey(db, confirmationKey, true)
@@ -17,8 +17,8 @@ export async function POST(req: Request, res: Response){
     if (!newsletterUser || newsletterUser.rowCount == 0) { return notFound }
     const email = newsletterUser.rows[0].email
     await db.query('DELETE FROM "newsletterUsers" WHERE "confirmationKey" = $1 AND "email" = $2', [confirmationKey, email])
-    const mailContentHTML = mailFormatAsNewsletterCancel(fs.readFileSync("/home/ubuntu/backend/templates/newsletterCancel.html", 'utf-8'), email)
-    const mailContentRaw = mailFormatAsNewsletterCancel(fs.readFileSync("/home/ubuntu/backend/templates/newsletterCancel.txt", 'utf-8'), email)
+    const mailContentHTML = mailFormatAsNewsletterCancel(fs.readFileSync("/home/ubuntu/backend/templates/newsletterCancel.html", 'utf-8'), email),
+    mailContentRaw = mailFormatAsNewsletterCancel(fs.readFileSync("/home/ubuntu/backend/templates/newsletterCancel.txt", 'utf-8'), email)
     await sendSingleEmail(email, "Rezygnacja z newslettera", mailContentRaw, mailContentHTML)
     return NextResponse.json(null, {status: 200})
 }

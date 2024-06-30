@@ -6,9 +6,9 @@ import { NextResponse } from "next/server";
 import { v4 as uuidv4 } from 'uuid';
 
 export async function GET(req: Request, res: Response){
-    const headers = req.headers
-    const login = headers.get("SSLogin")
-    const password = headers.get("SSPassword")
+    const headers = req.headers,
+    login = headers.get("SSLogin"),
+    password = headers.get("SSPassword")
     if (!headers || !login || !password) { return badRequest }
     const db = await getDatabase(req)
     const accountFoundArray = await db.query('SELECT * FROM "administration" WHERE "login" = $1 AND "status" > 0 AND "passwordResetToken" IS NULL LIMIT 1', [login])

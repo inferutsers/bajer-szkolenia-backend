@@ -10,16 +10,16 @@ import { getCurrentDateLong } from "@/functions/dates"
 import { formatAsSignupElement } from "@/functions/queries/signups"
 
 export async function POST(req: Request, res: Response){
-    const headers = req.headers
-    const courseID = headers.get("courseID")
-    const sname = headers.get("sName")
-    const ssurname = headers.get("sSurname")
-    const semail = headers.get("sEmail")
-    const sphonenumber = headers.get("sPhonenumber")
-    const siscompany = headers.get("sIsCompany")
-    const scompanyname = headers.get("sCompanyName")
-    const scompanyadress = headers.get("sCompanyAdress")
-    const scompanynip = headers.get("sCompanyNIP")
+    const headers = req.headers,
+    courseID = headers.get("courseID"),
+    sname = headers.get("sName"),
+    ssurname = headers.get("sSurname"),
+    semail = headers.get("sEmail"),
+    sphonenumber = headers.get("sPhonenumber"),
+    siscompany = headers.get("sIsCompany"),
+    scompanyname = headers.get("sCompanyName"),
+    scompanyadress = headers.get("sCompanyAdress"),
+    scompanynip = headers.get("sCompanyNIP")
     if (!courseID || !sname || !ssurname || !semail || !sphonenumber || !siscompany ) { return badRequest }
     const db = await getDatabase(req)
     const course = await getCourse(db, courseID)

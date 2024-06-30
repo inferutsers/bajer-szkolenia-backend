@@ -8,10 +8,10 @@ import { badRequest, notAcceptable, notFound, unauthorized, unprocessableContent
 import { NextResponse } from "next/server"
 
 export async function POST(req: Request, res: Response){
-    const headers = req.headers
-    const sessionID = headers.get("sessionID")
-    const signupID = headers.get("signupID")
-    const paymentAmount = headers.get("paymentAmount")
+    const headers = req.headers,
+    sessionID = headers.get("sessionID"),
+    signupID = headers.get("signupID"),
+    paymentAmount = headers.get("paymentAmount")
     if (!sessionID || !signupID || !paymentAmount) { return badRequest }
     const db = await getDatabase(req)
     const validatedUser = await validateSession(db, sessionID)

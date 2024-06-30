@@ -4,8 +4,8 @@ import { badRequest, notFound } from "@/responses/responses"
 import { NextResponse } from "next/server"
 
 export async function GET(req: Request, res: Response){
-    const headers = req.headers
-    const courseID = headers.get("courseID")
+    const headers = req.headers,
+    courseID = headers.get("courseID")
     if (!courseID) { return badRequest }
     const db = await getDatabase(req)
     const course = await getCourse(db, courseID)

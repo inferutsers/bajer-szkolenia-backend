@@ -7,9 +7,9 @@ import { badRequest, gone, notFound, unauthorized, unprocessableContent } from "
 import { NextResponse } from "next/server"
 
 export async function POST(req: Request, res: Response){
-    const headers = req.headers
-    const sessionID = headers.get("sessionID")
-    const signupID = headers.get("signupID")
+    const headers = req.headers,
+    sessionID = headers.get("sessionID"),
+    signupID = headers.get("signupID")
     if (!sessionID || !signupID) { return badRequest }
     const db = await getDatabase(req)
     const validatedUser = await validateSession(db, sessionID)

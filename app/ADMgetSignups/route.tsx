@@ -5,8 +5,8 @@ import { NextResponse } from "next/server"
 import { getCourseSignups, getSignups } from "@/functions/queries/signups"
 
 export async function GET(req: Request, res: Response){
-    const headers = req.headers
-    const sessionID = headers.get("sessionID")
+    const headers = req.headers,
+    sessionID = headers.get("sessionID")
     if (!sessionID) { return badRequest }
     const db = await getDatabase(req)
     const validatedUser = await validateSession(db, sessionID)

@@ -7,16 +7,16 @@ import { NextResponse } from "next/server"
 import utf8 from "utf8"
 
 export async function POST(req: Request, res: Response){
-    const headers = req.headers
-    const sessionID = headers.get("sessionID")
-    const date = headers.get("CDate")
-    const title = headers.get("CTitle")
-    const place = headers.get("CPlace")
-    const instructor = headers.get("CInstructor")
-    const note = headers.get("CNote")
-    const price = headers.get("CPrice")
-    const span = headers.get("CSpan")
-    const slots = headers.get("CSlots")
+    const headers = req.headers,
+    sessionID = headers.get("sessionID"),
+    date = headers.get("CDate"),
+    title = headers.get("CTitle"),
+    place = headers.get("CPlace"),
+    instructor = headers.get("CInstructor"),
+    note = headers.get("CNote"),
+    price = headers.get("CPrice"),
+    span = headers.get("CSpan"),
+    slots = headers.get("CSlots")
     if (!sessionID || !date || !title || !place || !instructor || !note || !price || !span || !slots) { return badRequest }
     const db = await getDatabase(req)
     const validatedUser = await validateSession(db, sessionID)
