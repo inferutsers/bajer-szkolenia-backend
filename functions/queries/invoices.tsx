@@ -26,5 +26,5 @@ export async function getCustomInvoiceFile(db: Pool, invoiceRecordID: string | n
 }
 
 export function formatAsCustomInvoiceElement(row: any): customInvoice{
-    return { id: row.id, signup: row.signup, number: row.number }
+    return { id: row.id, number: row.number }
 }
