@@ -6,5 +6,6 @@ export default interface administrationAccount{
     status: Number,
     sessionID?: String,
     sessionValidity?: Date,
-    passwordResetToken?: String
+    passwordResetToken?: String,
+    tfaSecret: String 
 }
