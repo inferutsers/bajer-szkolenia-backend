@@ -6,7 +6,7 @@ import utf8 from "utf8"
 import sendSignupConfirmation from "@/functions/sendSignupConfirmation"
 import { getCourse } from "@/functions/queries/course"
 import getCourseSignupCount from "@/functions/getCourseSignupCount"
-import { getCurrentDateLong } from "@/functions/dates"
+import { getDateLong } from "@/functions/dates"
 import { formatAsSignupElement } from "@/functions/queries/signups"
 
 export async function POST(req: Request, res: Response){
@@ -26,7 +26,7 @@ export async function POST(req: Request, res: Response){
     if (!course) { return notFound }
     const courseSignupsAmount = await getCourseSignupCount(db, courseID)
     if (courseSignupsAmount >= course.slots || course.available == false){ return notAcceptable }
-    const response = await db.query('INSERT INTO signups("id", "name", "surname", "email", "phoneNumber", "isCompany", "companyName", "companyAdress", "companyNIP", "date", "courseID", "supPrice") VALUES (DEFAULT, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *', [utf8.decode(sname), utf8.decode(ssurname), utf8.decode(semail), sphonenumber, siscompany, utf8.decode(scompanyname as string), utf8.decode(scompanyadress as string), scompanynip, getCurrentDateLong(), course.id, course.price])
+    const response = await db.query('INSERT INTO signups("id", "name", "surname", "email", "phoneNumber", "isCompany", "companyName", "companyAdress", "companyNIP", "date", "courseID", "supPrice") VALUES (DEFAULT, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *', [utf8.decode(sname), utf8.decode(ssurname), utf8.decode(semail), sphonenumber, siscompany, utf8.decode(scompanyname as string), utf8.decode(scompanyadress as string), scompanynip, getDateLong(), course.id, course.price])
     if (!response || response.rowCount == 0) { return badRequest }
     const returnedSignup: signupElement = await formatAsSignupElement(response.rows[0], db)
     const signupConfirmation = await sendSignupConfirmation(db, returnedSignup, course)

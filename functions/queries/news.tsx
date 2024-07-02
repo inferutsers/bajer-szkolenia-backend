@@ -1,6 +1,6 @@
 import newsElement from "@/interfaces/newsElement";
 import { Pool } from "pg";
-import { getCurrentDateShort } from "../dates";
+import { getDateShort } from "../dates";
 
 export async function ADMgetNews(db: Pool): Promise<newsElement[] | undefined>{
     const news = await db.query('SELECT * FROM news ORDER BY date DESC')
@@ -10,21 +10,21 @@ export async function ADMgetNews(db: Pool): Promise<newsElement[] | undefined>{
 }
 
 export async function getNews(db: Pool): Promise<newsElement[] | undefined>{
-    const news = await db.query('SELECT * FROM news WHERE date <= $1 ORDER BY date DESC', [getCurrentDateShort()])
+    const news = await db.query('SELECT * FROM news WHERE date <= $1 ORDER BY date DESC', [getDateShort()])
     if (!news || news.rowCount == 0) { return undefined }
     const formattedNews = news.rows.map((result) => formatAsNewsElement(result))
     return formattedNews
 }
 
 export async function getPinnedNews(db: Pool): Promise<newsElement[] | undefined>{
-    const news = await db.query('SELECT * FROM news WHERE pin = true AND date <= $1 ORDER BY date DESC LIMIT 4', [getCurrentDateShort()])
+    const news = await db.query('SELECT * FROM news WHERE pin = true AND date <= $1 ORDER BY date DESC LIMIT 4', [getDateShort()])
     if (!news || news.rowCount == 0) { return undefined }
     const formattedNews = news.rows.map((result) => formatAsNewsElement(result))
     return formattedNews
 }
 
 export async function getNewsData(db: Pool, id: number | string): Promise<newsElement | undefined>{
-    const newsData = await db.query('SELECT * FROM news WHERE id = $1 AND date <= $2 LIMIT 1', [id, getCurrentDateShort()])
+    const newsData = await db.query('SELECT * FROM news WHERE id = $1 AND date <= $2 LIMIT 1', [id, getDateShort()])
     if (!newsData || newsData.rowCount == 0) { return undefined }
     const formattedNewsData = formatAsNewsElement(newsData.rows[0])
     return formattedNewsData

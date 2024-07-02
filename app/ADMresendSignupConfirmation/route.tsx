@@ -19,9 +19,6 @@ export async function POST(req: Request, res: Response){
     const course = await getCourse(db, signup.courseID)
     if (!course) { return gone}
     const signupConfirmation = await sendSignupConfirmation(db, signup, course)
-    if(signupConfirmation.mailSent == true) {
-        return NextResponse.json(null, {status: 200})
-    } else {
-        return unprocessableContent
-    }
+    if(signupConfirmation.mailSent == true) { return NextResponse.json(null, {status: 200}) }
+    return unprocessableContent
 }

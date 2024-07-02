@@ -3,31 +3,31 @@ import courseElement from "@/interfaces/courseElement";
 import { Pool } from "pg";
 import getSlotAvailability from "../getSlotAvailability";
 import getCourseSignupCount from "../getCourseSignupCount";
-import { getCurrentDateLong } from "../dates";
+import { getDateLong } from "../dates";
 
 export async function getCourses(db: Pool): Promise<courseElement[] | undefined>{
-    const courses = await db.query('SELECT * FROM "courses" WHERE date > $1 ORDER BY date', [getCurrentDateLong()])
+    const courses = await db.query('SELECT * FROM "courses" WHERE date > $1 ORDER BY date', [getDateLong()])
     if (!courses || courses.rowCount == 0) { return undefined }
     const coursesFormatted: courseElement[] = await Promise.all(courses.rows.map(async (result) => await formatAsCourseElement(result, db)))
     return coursesFormatted
 }
 
 export async function getRecentCourses(db: Pool): Promise<courseElement[] | undefined>{
-    const courses = await db.query('SELECT * FROM courses WHERE date > $1 ORDER BY date DESC LIMIT 4', [getCurrentDateLong()])
+    const courses = await db.query('SELECT * FROM courses WHERE date > $1 ORDER BY date DESC LIMIT 4', [getDateLong()])
     if (!courses || courses.rowCount == 0) { return undefined }
     const coursesFormatted: courseElement[] = await Promise.all(courses.rows.map(async (result) => await formatAsCourseElement(result, db)))
     return coursesFormatted
 }
 
 export async function getCourse(db: Pool, id: number | string): Promise<courseElement | undefined>{
-    const courses = await db.query('SELECT * FROM "courses" WHERE date > $1 AND id = $2 LIMIT 1', [getCurrentDateLong(), id])
+    const courses = await db.query('SELECT * FROM "courses" WHERE date > $1 AND id = $2 LIMIT 1', [getDateLong(), id])
     if (!courses || courses.rowCount == 0) { return undefined}
     const courseFormatted: courseElement = await formatAsCourseElement(courses.rows[0], db)
     return courseFormatted
 }
 
 export async function ADMgetCourse(db: Pool, id: number | string): Promise<ADMcourseElement | undefined>{
-    const course = await db.query('SELECT * FROM "courses" WHERE date > $1 AND id = $2 LIMIT 1', [getCurrentDateLong(), id])
+    const course = await db.query('SELECT * FROM "courses" WHERE date > $1 AND id = $2 LIMIT 1', [getDateLong(), id])
     if (!course || course.rowCount == 0) { return undefined }
     const courseFormatted: ADMcourseElement = await formatAsADMCourseElement(course.rows[0], db)
     return courseFormatted
@@ -35,7 +35,7 @@ export async function ADMgetCourse(db: Pool, id: number | string): Promise<ADMco
 
 
 export async function ADMgetCourses(db: Pool): Promise<ADMcourseElement[] | undefined>{
-    const courses = await db.query('SELECT * FROM "courses" WHERE date > $1 ORDER BY date', [getCurrentDateLong()])
+    const courses = await db.query('SELECT * FROM "courses" WHERE date > $1 ORDER BY date', [getDateLong()])
     if (!courses || courses.rowCount == 0) { return undefined }
     const coursesFormatted: ADMcourseElement[] = await Promise.all(courses.rows.map(async (result) => await formatAsADMCourseElement(result, db)))
     return coursesFormatted

@@ -5,6 +5,7 @@ import bcrypt from 'bcrypt'
 import { NextResponse } from "next/server";
 import { v4 as uuidv4 } from 'uuid';
 import speakeasy from "speakeasy"
+import { getDateLong } from "@/functions/dates";
 
 export async function GET(req: Request, res: Response){
     const headers = req.headers,
@@ -22,15 +23,13 @@ export async function GET(req: Request, res: Response){
     const isTFAMatching = speakeasy.totp.verify({
         secret: accountFound.tfaSecret as string,
         token: tfaKey,
-        step: 20,
-        digits: 8
+        step: Number(process.env.TFAPERIOD),
+        digits: Number(process.env.TFADIGITS)
     })
-    if (!isTFAMatching) {console.log("code missmatch"); return unauthorized }
+    if (!isTFAMatching) { return unauthorized }
     const newSessionID = uuidv4();
-    const currentDate = new Date()
-    const adjustedDate = new Date(currentDate.getTime() + 30*60000);
-    const adjustedDateFormatted = `${adjustedDate.getFullYear()}-${adjustedDate.getMonth() + 1}-${adjustedDate.getDate()} ${adjustedDate.getHours()}:${adjustedDate.getMinutes()}:${adjustedDate.getSeconds()}+${adjustedDate.getTimezoneOffset()}`
-    await db.query('UPDATE "administration" SET "sessionID" = $1, "sessionValidity" = $2 WHERE "id" = $3', [newSessionID, adjustedDateFormatted, accountFound.id])
+    const adjustedDate = getDateLong(new Date((new Date).getTime() + Number(process.env.PANELSESSIONVALIDITY)*60000))
+    await db.query('UPDATE "administration" SET "sessionID" = $1, "sessionValidity" = $2 WHERE "id" = $3', [newSessionID, adjustedDate, accountFound.id])
     await db.query('INSERT INTO "log_sessions"("session", "administrator") VALUES ($1, $2)', [newSessionID, accountFound.id])
     return NextResponse.json(newSessionID, {status: 200})
 }

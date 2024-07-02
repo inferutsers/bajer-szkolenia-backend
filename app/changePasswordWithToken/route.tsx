@@ -3,7 +3,6 @@ import administrationAccount from "@/interfaces/administrationAccount"
 import { badRequest, notFound } from "@/responses/responses"
 import { NextResponse } from "next/server"
 import bcrypt from "bcrypt"
-import { v4 as uuidv4 } from 'uuid';
 import speakeasy from "speakeasy"
 
 export async function POST(req: Request, res: Response){
@@ -19,11 +18,11 @@ export async function POST(req: Request, res: Response){
     const tfasecret = speakeasy.generateSecret().base32
     const tfaSetupLink = speakeasy.otpauthURL({
         secret: tfasecret,
-        label: 'BAJEREXPERT Panel Administracyjny',
+        label: process.env.TFALABEL as string,
         type: 'totp',
-        issuer: 'inferutsers Mateusz Zalewski',
-        digits: 8,
-        period: 20
+        issuer: process.env.TFAISSUER as string,
+        digits: Number(process.env.TFADIGITS),
+        period: Number(process.env.TFAPERIOD)
     })
     await db.query('UPDATE "administration" SET "password" = $1, "passwordResetToken" = NULL, "sessionID" = NULL, "sessionValidity" = NULL, "tfaSecret" = $2 WHERE "id" = $3', [String(newPasswordHashed), tfasecret, accountFound.id])
     return NextResponse.json(tfaSetupLink, {status: 200})
