@@ -7,12 +7,13 @@ import { Attachment } from "nodemailer/lib/mailer";
 import mailFormatAsInvoice from "./mailFormatAsInvoice";
 import sendSingleEmailWithAttachment from "./sendSingleEmailWithAttachment";
 import mailStructure from "@/interfaces/mailStructure";
+import { getDateLong } from "./dates";
 
 export default async function generateSignupInvoice(db: Pool, signup: signupElement, course: ADMcourseElement): Promise<{mailSent: boolean}>{
     const invoiceNumber = `${(await db.query('SELECT "integerValue" FROM "options" WHERE "id" = 0 LIMIT 1')).rows[0].integerValue}/${(new Date).getFullYear()}`
-    const invoiceString = generateInvoicePDF(0, invoiceNumber, signup.name, signup.surname, signup.isCompany, signup.supPrice, course.title, signup.paidIn, course.span, signup.id, signup.phoneNumber, signup.email, signup.companyAdress, signup.companyName, signup.companyNIP)
+    const invoiceString = generateInvoicePDF(0, invoiceNumber, signup.isCompany, signup.supPrice, course.title, signup.paidIn, signup.name, signup.surname, course.span, signup.id, signup.phoneNumber, signup.email, signup.companyAdress, signup.companyName, signup.companyNIP)
     const invoiceBuffer = Buffer.from(invoiceString, 'binary')
-    await db.query('INSERT INTO "invoices"("signup", "number", "file") VALUES ($1, $2, $3)', [signup.id, invoiceNumber, invoiceBuffer])
+    await db.query('INSERT INTO "invoices"("signup", "number", "file", "date") VALUES ($1, $2, $3, $4)', [signup.id, invoiceNumber, invoiceBuffer, getDateLong()])
     await db.query('UPDATE "options" SET "integerValue" = "integerValue" + 1 WHERE "id" = 0')
     const mailAttachment: Attachment = {
         content: invoiceBuffer,

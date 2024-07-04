@@ -17,11 +17,11 @@ export async function POST(req: Request, res: Response){
     price = headers.get("CPrice"),
     span = headers.get("CSpan"),
     slots = headers.get("CSlots")
-    if (!sessionID || !date || !title || !place || !instructor || !note || !price || !span || !slots) { return badRequest }
+    if (!sessionID || !date || !title || !place || !instructor || !price || !span || !slots) { return badRequest }
     const db = await getDatabase(req)
     const validatedUser = await validateSession(db, sessionID)
     if (!validatedUser) { return unauthorized }
-    const insteredCourseArray = await db.query('INSERT INTO "courses"("date", "title", "place", "instructor", "note", "price", "span", "slots", "available") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, true) RETURNING *', [date, utf8.decode(title), utf8.decode(place), utf8.decode(instructor), utf8.decode(note), price, span, slots])
+    const insteredCourseArray = await db.query('INSERT INTO "courses"("date", "title", "place", "instructor", "note", "price", "span", "slots", "available") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, true) RETURNING *', [date, utf8.decode(title), utf8.decode(place), utf8.decode(instructor), note ? utf8.decode(note) : undefined, price, span, slots])
     if (!insteredCourseArray || insteredCourseArray.rowCount == 0) { return badRequest }
     var insertedCourse: ADMcourseElement = await formatAsADMCourseElement(insteredCourseArray.rows[0], db)
     return NextResponse.json(insertedCourse, {status: 200})

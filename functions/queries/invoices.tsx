@@ -25,6 +25,12 @@ export async function getCustomInvoiceFile(db: Pool, invoiceRecordID: string | n
     return invoice.rows[0].file as Buffer
 }
 
+export async function getCustomInvoice(db: Pool, invoiceRecordID: string | number): Promise<customInvoice | undefined>{
+    const invoice = await db.query('SELECT * FROM "invoices" WHERE "signup" IS NULL AND "id" = $1 LIMIT 1', [invoiceRecordID])
+    if (!invoice || invoice.rowCount == 0) { return undefined }
+    return formatAsCustomInvoiceElement(invoice.rows[0])
+}
+
 export function formatAsCustomInvoiceElement(row: any): customInvoice{
-    return { id: row.id, number: row.number }
+    return { id: row.id, number: row.number, email: row.email }
 }
