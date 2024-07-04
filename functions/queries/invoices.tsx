@@ -32,5 +32,5 @@ export async function getCustomInvoice(db: Pool, invoiceRecordID: string | numbe
 }
 
 export function formatAsCustomInvoiceElement(row: any): customInvoice{
-    return { id: row.id, number: row.number, email: row.email }
+    return { id: row.id, number: row.number, email: row.email, date: row.date }
 }
