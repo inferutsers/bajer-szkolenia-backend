@@ -1,10 +1,10 @@
 import getDatabase from "@/connection/database"
-import mailFormatAsNewsletterCancel from "@/functions/mailFormatAsNewsletterCancel"
+import mailFormatAsNewsletterCancel from "@/functions/formattings/mailFormatAsNewsletterCancel"
 import { getNewsletterUserPresenceByConfirmationKey } from "@/functions/queries/newsletter"
 import { badRequest, notFound } from "@/responses/responses"
 import { NextResponse } from "next/server"
 import fs from 'fs'
-import sendSingleEmail from "@/functions/sendSingleEmail"
+import sendSingleEmail from "@/functions/emails/processor/sendSingleEmail"
 
 export async function POST(req: Request, res: Response){
     const headers = req.headers,

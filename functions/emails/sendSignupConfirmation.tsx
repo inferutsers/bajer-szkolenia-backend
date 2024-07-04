@@ -1,9 +1,9 @@
 import courseElement from "@/interfaces/courseElement";
 import signupElement from "@/interfaces/signupElement";
 import { Pool } from "pg";
-import mailFormatAsConfirmation from "./mailFormatAsConfirmation";
+import mailFormatAsConfirmation from "../formattings/mailFormatAsConfirmation";
 import fs from "fs"
-import sendSingleEmail from "./sendSingleEmail";
+import sendSingleEmail from "./processor/sendSingleEmail";
 import mailStructure from "@/interfaces/mailStructure";
 
 export default async function sendSignupConfirmation(db: Pool, signup: signupElement, course: courseElement): Promise<{mailSent: boolean}>{

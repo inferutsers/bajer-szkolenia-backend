@@ -2,7 +2,7 @@ import getDatabase from "@/connection/database";
 import validateSession from "@/functions/validateSession";
 import { badRequest, conflict, gone, notFound, serviceUnavailable, unauthorized } from "@/responses/responses";
 import { NextRequest, NextResponse } from "next/server";
-import generateSignupInvoice from "@/functions/generateSignupInvoice";
+import generateSignupInvoice from "@/functions/invoices/generateSignupInvoice";
 import { getSignup } from "@/functions/queries/signups";
 import { getSignupInvoiceCount } from "@/functions/queries/invoices";
 import { ADMgetCourse } from "@/functions/queries/course";

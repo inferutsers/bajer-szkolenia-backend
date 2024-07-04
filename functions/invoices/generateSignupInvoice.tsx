@@ -4,10 +4,10 @@ import fs from "fs";
 import { Pool } from "pg";
 import generateInvoicePDF from "./generateInvoicePDF";
 import { Attachment } from "nodemailer/lib/mailer";
-import mailFormatAsInvoice from "./mailFormatAsInvoice";
-import sendSingleEmailWithAttachment from "./sendSingleEmailWithAttachment";
+import mailFormatAsInvoice from "../formattings/mailFormatAsInvoice";
+import sendSingleEmailWithAttachment from "../emails/processor/sendSingleEmailWithAttachment";
 import mailStructure from "@/interfaces/mailStructure";
-import { getDateLong } from "./dates";
+import { getDateLong } from "../dates";
 
 export default async function generateSignupInvoice(db: Pool, signup: signupElement, course: ADMcourseElement): Promise<{mailSent: boolean}>{
     const invoiceNumber = `${(await db.query('SELECT "integerValue" FROM "options" WHERE "id" = 0 LIMIT 1')).rows[0].integerValue}/${(new Date).getFullYear()}`

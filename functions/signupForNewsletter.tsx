@@ -1,7 +1,7 @@
 import { Pool } from "pg";
 import { getNewsletterUserPresenceByEmail } from "./queries/newsletter";
 import { v4 as uuidv4 } from 'uuid';
-import sendNewsletterInvitation from "./sendNewsletterInvitation";
+import sendNewsletterInvitation from "./emails/sendNewsletterInvitation";
 
 export default async function signupForNewsletter(db: Pool, email: string): Promise<{success: boolean}>{
     const isThereEmailLikeThis = await getNewsletterUserPresenceByEmail(db, email)

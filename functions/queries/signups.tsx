@@ -1,7 +1,7 @@
 import signupElement from "@/interfaces/signupElement";
 import { Pool } from "pg";
 import getCourseName from "../getCourseName";
-import getInvoiceNumber from "../getInvoiceNumber";
+import getInvoiceNumber from "../invoices/getInvoiceNumber";
 
 export async function getSignups(db: Pool): Promise<signupElement[] | undefined>{
     const signups = await db.query('SELECT * FROM "signups" WHERE "invalidated" = false ORDER BY "date" DESC')

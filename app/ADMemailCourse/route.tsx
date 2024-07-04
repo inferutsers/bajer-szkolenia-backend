@@ -1,7 +1,7 @@
 import getDatabase from "@/connection/database"
 import { ADMgetCourse } from "@/functions/queries/course"
 import { getCourseSignups } from "@/functions/queries/signups"
-import sendCourseEmail from "@/functions/sendCourseEmail"
+import sendCourseEmail from "@/functions/emails/sendCourseEmail"
 import validateSession from "@/functions/validateSession"
 import { bulkEmailReceiver } from "@/interfaces/newsletterReceiver"
 import { badRequest, notFound, unauthorized, unprocessableContent } from "@/responses/responses"

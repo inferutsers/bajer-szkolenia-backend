@@ -1,7 +1,7 @@
 import getDatabase from "@/connection/database"
 import { getCourse } from "@/functions/queries/course"
 import { getSignup } from "@/functions/queries/signups"
-import sendSignupConfirmation from "@/functions/sendSignupConfirmation"
+import sendSignupConfirmation from "@/functions/emails/sendSignupConfirmation"
 import validateSession from "@/functions/validateSession"
 import { badRequest, gone, notFound, unauthorized, unprocessableContent } from "@/responses/responses"
 import { NextResponse } from "next/server"

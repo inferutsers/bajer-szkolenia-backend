@@ -1,5 +1,5 @@
 import ADMcourseElement from "@/interfaces/ADMcourseElement";
-import { getDateLongGMT2Readable } from "./dates";
+import { getDateLongGMT2Readable } from "../dates";
 
 export default function mailFormatAsCourseEmail(input: string, message: string, courseData: ADMcourseElement): string{
     return input

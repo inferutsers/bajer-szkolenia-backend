@@ -1,9 +1,9 @@
 import { Pool } from "pg";
 import fs from 'fs'
 import mailStructure from "@/interfaces/mailStructure";
-import sendBulkBCCEmail from "./sendBulkBCCEmail";
+import sendBulkBCCEmail from "./processor/sendBulkBCCEmail";
 import ADMcourseElement from "@/interfaces/ADMcourseElement";
-import mailFormatAsCourseEmail from "./mailFormatAsCourseEmail";
+import mailFormatAsCourseEmail from "../formattings/mailFormatAsCourseEmail";
 import { bulkEmailReceiver } from "@/interfaces/newsletterReceiver";
 
 export default async function sendCourseEmail(db: Pool, course: ADMcourseElement, subject: string, message: string, receivers: bulkEmailReceiver[]): Promise<{mailSent: boolean}>{

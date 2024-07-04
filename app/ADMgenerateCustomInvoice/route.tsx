@@ -1,6 +1,6 @@
 import getDatabase from "@/connection/database"
 import { getDateLong } from "@/functions/dates"
-import generateInvoicePDF from "@/functions/generateInvoicePDF"
+import generateInvoicePDF from "@/functions/invoices/generateInvoicePDF"
 import validateSession from "@/functions/validateSession"
 import { badRequest, unauthorized } from "@/responses/responses"
 import { NextResponse } from "next/server"

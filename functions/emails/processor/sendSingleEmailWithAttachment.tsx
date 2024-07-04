@@ -1,7 +1,7 @@
 import getMailer from "@/connection/mailer";
 import mailStructure from "@/interfaces/mailStructure";
 import { Attachment } from "nodemailer/lib/mailer";
-import { getDateLong } from "./dates";
+import { getDateLong } from "../../dates";
 
 export default async function sendSingleEmailWithAttachment(receiver: String, subject: String, text: String, html: String, attachment: Attachment): Promise<mailStructure>{
     const mailer = await getMailer()

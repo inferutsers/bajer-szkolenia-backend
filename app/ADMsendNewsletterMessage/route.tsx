@@ -1,6 +1,6 @@
 import getDatabase from "@/connection/database"
 import { gatherNewsletterEmails } from "@/functions/queries/newsletter"
-import sendNewsletterEmail from "@/functions/sendNewsletterEmail"
+import sendNewsletterEmail from "@/functions/emails/sendNewsletterEmail"
 import validateSession from "@/functions/validateSession"
 import { badRequest, notFound, unauthorized, unprocessableContent } from "@/responses/responses"
 import { NextResponse } from "next/server"

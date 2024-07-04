@@ -1,7 +1,7 @@
 import getDatabase from "@/connection/database"
-import mailFormatAsNewsletterConfirmation from "@/functions/mailFormatAsNewsletterConfirmation"
+import mailFormatAsNewsletterConfirmation from "@/functions/formattings/mailFormatAsNewsletterConfirmation"
 import { getNewsletterUserPresenceByConfirmationKey } from "@/functions/queries/newsletter"
-import sendSingleEmail from "@/functions/sendSingleEmail"
+import sendSingleEmail from "@/functions/emails/processor/sendSingleEmail"
 import { badRequest, notFound, unprocessableContent } from "@/responses/responses"
 import { NextResponse } from "next/server"
 import fs from 'fs'

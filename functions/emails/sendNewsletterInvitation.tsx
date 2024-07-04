@@ -1,8 +1,8 @@
 import { Pool } from "pg"
-import mailFormatAsNewsletterInvitation from "./mailFormatAsNewsletterInvitation"
+import mailFormatAsNewsletterInvitation from "../formattings/mailFormatAsNewsletterInvitation"
 import fs from 'fs'
 import mailStructure from "@/interfaces/mailStructure"
-import sendSingleEmail from "./sendSingleEmail"
+import sendSingleEmail from "./processor/sendSingleEmail"
 
 export default async function sendNewsletterInvitation(db: Pool, id: number, email: string, confirmationKey: string): Promise<{mailSent: boolean}>{
     const url = `https://bajerszkolenia.pl/confirmNewsletter/${confirmationKey}`

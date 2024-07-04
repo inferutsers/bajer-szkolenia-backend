@@ -1,5 +1,5 @@
 import getDatabase from "@/connection/database"
-import generateSignupInvoice from "@/functions/generateSignupInvoice"
+import generateSignupInvoice from "@/functions/invoices/generateSignupInvoice"
 import { ADMgetCourse } from "@/functions/queries/course"
 import { formatAsSignupElement, getSignup } from "@/functions/queries/signups"
 import validateSession from "@/functions/validateSession"

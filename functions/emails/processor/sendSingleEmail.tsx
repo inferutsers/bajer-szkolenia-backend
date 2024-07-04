@@ -1,6 +1,6 @@
 import getMailer from "@/connection/mailer";
 import mailStructure from "@/interfaces/mailStructure";
-import { getDateLong } from "./dates";
+import { getDateLong } from "../../dates";
 
 export default async function sendSingleEmail(receiver: String, subject: String, text: String, html: String): Promise<mailStructure>{
     const mailer = await getMailer()

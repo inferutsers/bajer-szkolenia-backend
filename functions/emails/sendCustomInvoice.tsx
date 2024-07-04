@@ -1,8 +1,8 @@
 import { Pool } from "pg";
-import mailFormatAsCustomInvoice from "./mailFormatAsCustomInvoice";
+import mailFormatAsCustomInvoice from "../formattings/mailFormatAsCustomInvoice";
 import fs from 'fs'
 import mailStructure from "@/interfaces/mailStructure";
-import sendSingleEmailWithAttachment from "./sendSingleEmailWithAttachment";
+import sendSingleEmailWithAttachment from "./processor/sendSingleEmailWithAttachment";
 import { Attachment } from "nodemailer/lib/mailer";
 
 export async function sendCustomInvoice(db: Pool, email: string, invoiceNumber: string, file: Buffer): Promise<{mailSent: boolean}>{
