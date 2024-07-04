@@ -2,7 +2,7 @@ import jsPDF from "jspdf";
 import fs from "fs"
 import PriceFormater from "price-to-words-pl"
 
-export default function generateInvoicePDF(vat: number, invoiceNumber: string, isCompany: boolean, supPrice: number, courseTitle: string, paidIn: Number, name?: string, surname?: string, courseSpan?: number, signupID?: number, phoneNumber?: string, email?: string, adress?: string, companyName?: string, companyNIP?: string ): String{
+export default function generateInvoicePDF(vat: number, invoiceNumber: string, isCompany: boolean, supPrice: number, courseTitle: string, paidIn: Number, name?: string, surname?: string, signupID?: number, phoneNumber?: string, email?: string, adress?: string, companyName?: string, companyNIP?: string ): String{
     const pdf = new jsPDF()
     const priceFormatter = new PriceFormater()
     const regularFont = fs.readFileSync("/home/ubuntu/backend/fonts/Arial-Unicode-Regular.ttf", 'binary')
@@ -85,11 +85,7 @@ export default function generateInvoicePDF(vat: number, invoiceNumber: string, i
     //TABELA USLUGA
     pdf.setFont("ArialUTF", "normal")
     pdf.text("1", 25, 105)
-    if (!courseSpan){
-        pdf.text(`${courseTitle}`, 45, 105, { maxWidth: 40 })
-    } else {
-        pdf.text(`${courseTitle} (${courseSpan} minut)`, 45, 105, { maxWidth: 40 })
-    }
+    pdf.text(`${courseTitle}`, 45, 105, { maxWidth: 40 })
     pdf.text("1 szt", 85, 105)
     const netto = (supPrice as number / (1 + (vat / 100)))
     const vatAmount = supPrice - netto
@@ -101,7 +97,7 @@ export default function generateInvoicePDF(vat: number, invoiceNumber: string, i
     }
     pdf.text(`${vatAmount.toFixed(2)} PLN`, 130, 105)
     pdf.text(`${(supPrice as number).toFixed(2)} PLN`, 155, 105)
-    const heightOffset = pdf.getTextDimensions(!courseSpan ? `${courseTitle}` : `${courseTitle} (${courseSpan} minut)`, {maxWidth: 40}).h - pdf.getTextDimensions("x").h
+    const heightOffset = pdf.getTextDimensions(`${courseTitle}`, {maxWidth: 40}).h - pdf.getTextDimensions("x").h
     pdf.line(25, 107 + heightOffset, 185, 107 + heightOffset)
     pdf.setFontSize(11)
     pdf.setFont("ArialUTF", "bold")
