@@ -14,7 +14,7 @@ export async function getSignupInvoiceFile(db: Pool, signupID: string | number):
 }
 
 export async function getCustomInvoices(db: Pool): Promise<customInvoice[]>{
-    const invoices = await db.query('SELECT * FROM "invoices" WHERE "signup" IS NULL')
+    const invoices = await db.query('SELECT * FROM "invoices" WHERE "signup" IS NULL ORDER BY "date" DESC')
     if (!invoices || invoices.rowCount == 0) { return [] }
     return invoices.rows.map((result) => formatAsCustomInvoiceElement(result))
 }

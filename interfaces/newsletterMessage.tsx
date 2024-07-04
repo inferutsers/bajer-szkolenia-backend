@@ -1,5 +1,6 @@
 export interface newsletterMessage{
     id: number
     receiversAmount: number,
-    message: string
+    message: string,
+    date: Date
 }
