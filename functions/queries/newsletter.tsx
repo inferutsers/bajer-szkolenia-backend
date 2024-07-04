@@ -1,5 +1,5 @@
 import { newsletterMessage } from "@/interfaces/newsletterMessage";
-import { newsletterReceiver } from "@/interfaces/newsletterReceiver";
+import { bulkEmailReceiver } from "@/interfaces/newsletterReceiver";
 import { Pool } from "pg";
 
 export async function getNewsletterUserPresenceByEmail(db: Pool, email: string): Promise<Boolean>{
@@ -12,7 +12,7 @@ export async function getNewsletterUserPresenceByConfirmationKey(db: Pool, key: 
     if (!newsletterUser || newsletterUser.rowCount == 0) { return false }
     return true
 }
-export async function gatherNewsletterEmails(db: Pool): Promise<newsletterReceiver[] | undefined>{
+export async function gatherNewsletterEmails(db: Pool): Promise<bulkEmailReceiver[] | undefined>{
     const newsletterUsers = await db.query('SELECT "id", "email" FROM "newsletterUsers" WHERE "confirmed" = TRUE')
     if (!newsletterUsers || newsletterUsers.rowCount == 0) { return undefined }
     return newsletterUsers.rows.map((result) => ({id: result.id, email: result.email}))

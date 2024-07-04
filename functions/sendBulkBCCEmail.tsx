@@ -12,9 +12,9 @@ export default async function sendBulkBCCEmail(receivers: string[], subject: Str
             text: text as string,
             html: html as string
         });
-        if(info.rejected.length > 0) { return { date: getDateLong(), receivers: receivers, subject: subject, text: text, html: html, failure: true } }
-        return { date: getDateLong(), messageID: info.messageId, response: info.response, receivers: receivers, subject: subject, text: text, html: html, failure: false }
+        if(info.rejected.length > 0) { return { date: getDateLong(), receivers: [], subject: subject, text: text, html: html, failure: true } }
+        return { date: getDateLong(), messageID: info.messageId, response: info.response, receivers: [], subject: subject, text: text, html: html, failure: false }
     } catch {
-        return { date: getDateLong(), receivers: receivers, subject: subject, text: text, html: html, failure: true }
+        return { date: getDateLong(), receivers: [], subject: subject, text: text, html: html, failure: true }
     }
 }
