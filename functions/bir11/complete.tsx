@@ -6,6 +6,7 @@ export default async function BIR11NipSearch(nip: string): Promise<string | unde
     const sid = await BIR11Login()
     if (!sid) { return undefined }
     const data = await BIR11DataQuery(sid, nip)
+    if (data.ErrorCode) { return undefined }
     await BIR11Logout(sid)
     return data
 }

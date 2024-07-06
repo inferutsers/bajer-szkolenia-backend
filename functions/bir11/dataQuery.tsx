@@ -1,7 +1,7 @@
 import fs from 'fs'
 import BIR11SendRequest from './sendRequest'
 import { parseStringPromise } from 'xml2js'
-export default async function BIR11DataQuery(sid: string, nip: string): Promise<string | undefined>{
+export default async function BIR11DataQuery(sid: string, nip: string): Promise<any>{
     const url = process.env.BIRURL
     const action = "http://CIS/BIR/PUBL/2014/07/IUslugaBIRzewnPubl/DaneSzukajPodmioty"
     if (!url) { return undefined }
