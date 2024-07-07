@@ -61,16 +61,15 @@ export default function generateInvoicePDF(vat: number, invoiceNumber: string, i
     } else {
         if (clientPesel){
             pdf.text(`Pesel: ${clientPesel}`, 135, 64 + nameHeightOffset)
-            nameHeightOffset + 3
         }
         if (phoneNumber){
-            pdf.text(`Tel: ${phoneNumber}`, 135, 64 + nameHeightOffset)
+            pdf.text(`Tel: ${phoneNumber}`, 135, 64 + nameHeightOffset + (clientPesel ? 3 : 0))
         }
         if (email){
             if (phoneNumber){
-                pdf.text(`Email: ${email}`, 135, 67 + nameHeightOffset)
+                pdf.text(`Email: ${email}`, 135, 67 + nameHeightOffset + (clientPesel ? 3 : 0))
             } else {
-                pdf.text(`Email: ${email}`, 135, 64 + nameHeightOffset)
+                pdf.text(`Email: ${email}`, 135, 64 + nameHeightOffset + (clientPesel ? 3 : 0))
             }
         }
     }

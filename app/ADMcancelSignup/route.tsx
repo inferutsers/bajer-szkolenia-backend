@@ -1,4 +1,5 @@
 import getDatabase from "@/connection/database"
+import { getSignupInvoiceCount } from "@/functions/queries/invoices"
 import { getSignup, invalidateSignup } from "@/functions/queries/signups"
 import validateSession from "@/functions/validateSession"
 import { badRequest, notFound, unauthorized, unprocessableContent } from "@/responses/responses"
@@ -14,6 +15,8 @@ export async function DELETE(req: Request, res: Response){
     if (!validatedUser) { return unauthorized }
     const signup = await getSignup(db, signupID)
     if (!signup) { return notFound }
+    const signupInvoiceCount = await getSignupInvoiceCount(db, signupID)
+    if (signupInvoiceCount > 0) { return unprocessableContent }
     const signupInvalidated = await invalidateSignup(db, signupID)
     if (!signupInvalidated) { return unprocessableContent }
     return NextResponse.json(null, {status: 200})

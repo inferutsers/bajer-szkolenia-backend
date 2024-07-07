@@ -1,7 +1,8 @@
 import getDatabase from "@/connection/database"
+import { getSignupInvoiceCount } from "@/functions/queries/invoices"
 import { getSignup, updateSignup } from "@/functions/queries/signups"
 import validateSession from "@/functions/validateSession"
-import { badRequest, notFound, unauthorized } from "@/responses/responses"
+import { badRequest, notFound, unauthorized, unprocessableContent } from "@/responses/responses"
 import { NextResponse } from "next/server"
 import utf8 from "utf8"
 
@@ -25,6 +26,8 @@ export async function PATCH(req: Request, res: Response){
     if (!validatedUser) { return unauthorized }
     const signup = await getSignup(db, signupID)
     if (!signup) { return notFound }
+    const signupInvoiceCount = await getSignupInvoiceCount(db, signupID)
+    if (signupInvoiceCount > 0) { return unprocessableContent }
     const changedSignup = await updateSignup(db, signupID, utf8.decode(suName), utf8.decode(suSurname), utf8.decode(suEmail), suPhonenumber, utf8.decode(suAdress), suPesel ? suPesel : undefined, suIscompany, suCompanyname ? utf8.decode(suCompanyname): undefined, suCompanyNIP ? suCompanyNIP : undefined, suSupprice)
     if (!changedSignup) { return badRequest }
     return NextResponse.json(changedSignup, {status: 200})

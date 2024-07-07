@@ -2,6 +2,7 @@ import getDatabase from '@/connection/database';
 import { getAllInvoicesRamzesData } from '@/functions/queries/invoices';
 import validateSession from '@/functions/validateSession';
 import { badRequest, unauthorized } from '@/responses/responses';
+import { NextResponse } from 'next/server';
 import builder from 'xmlbuilder'
 export async function GET(req: Request, res: Response){
     const headers = req.headers,
@@ -43,7 +44,6 @@ export async function GET(req: Request, res: Response){
         dekrety.ele("dod_PozSvt", invoice.dekret.dod_PozSvt)
     })
     const xml = baza.end({ pretty: true});
-    const buffer = Buffer.from(xml, 'utf-8')
-    const blob = new Blob([buffer], {type: 'application/xml'})
-    return new Response(blob)
+    const xmlbuffer = Buffer.from(xml, 'utf-8')
+    return NextResponse.json(xmlbuffer, {status: 200})
 }

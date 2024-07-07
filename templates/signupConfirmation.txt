@@ -24,9 +24,10 @@ Imie: {name}
 Nazwisko: {surname}
 Numer telefonu: {signupphonenumber}
 Email: {signupemail}
+Adres: {signupadress}
+Pesel: {signuppesel}
 
 Nazwa firmy: {signupcompanyname}
-Adres firmy: {signupcompanyadress}
 NIP firmy: {signupcompanynip}
 
 WAŻNE: Jeżeli którekolwiek z powyższych informacji jest nieprawidłowa, prosimy o jaknajszybszy kontakt drogą mailową. Wszystkie błędy postaramy się jak najszybciej poprawić.

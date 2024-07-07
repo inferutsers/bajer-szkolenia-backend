@@ -10,8 +10,8 @@ export async function invoiceNumberingGetNumber(db: Pool): Promise<string>{
     return `${(await db.query('SELECT "integerValue" FROM "options" WHERE "id" = 0 LIMIT 1')).rows[0].integerValue}/${(new Date).getFullYear()}`
 }
 
-export async function insertInvoice(db: Pool, signupID: number | undefined = undefined, invoiceNumber: string, invoicePDF: Buffer | null): Promise<string | undefined>{
-    const invoice = await db.query('INSERT INTO "invoices"("signup", "number", "file", "date") VALUES ($1, $2, $3, $4) RETURNING "id"', [signupID, invoiceNumber, invoicePDF, getDateLong()])
+export async function insertInvoice(db: Pool, signupID: number | undefined = undefined, invoiceNumber: string, invoicePDF: Buffer | null, email?: string): Promise<string | undefined>{
+    const invoice = await db.query('INSERT INTO "invoices"("signup", "number", "file", "date", "email") VALUES ($1, $2, $3, $4, $5) RETURNING "id"', [signupID, invoiceNumber, invoicePDF, getDateLong(), email])
     if (!invoice || invoice.rowCount == 0) { return undefined }
     return invoice.rows[0].id
 }

@@ -20,6 +20,7 @@ export async function POST(req: Request, res: Response){
     scompanynip = headers.get("sCompanyNIP"),
     spesel = headers.get("sPesel")
     if (!courseID || !sname || !ssurname || !semail || !sphonenumber || !siscompany || !sadress) { return badRequest }
+    if (siscompany == 'true' && scompanynip!.length != 10) { return unprocessableContent }
     const db = await getDatabase(req)
     const course = await getCourse(db, courseID)
     if (!course) { return notFound }
@@ -34,8 +35,8 @@ export async function POST(req: Request, res: Response){
         utf8.decode(sadress),
         (spesel ? spesel : undefined),
         siscompany,
-        (siscompany ? utf8.decode(scompanyname!) : undefined),
-        (siscompany ? scompanynip! : undefined),
+        (siscompany == 'true' ? utf8.decode(scompanyname!) : undefined),
+        (siscompany == 'true' ? scompanynip! : undefined),
         courseID,
         course.price
     )
