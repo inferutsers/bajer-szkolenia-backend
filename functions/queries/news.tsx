@@ -2,6 +2,24 @@ import newsElement from "@/interfaces/newsElement";
 import { Pool } from "pg";
 import { getDateShort } from "../dates";
 
+export async function createNews(db: Pool, title: string, description: string, date: string, pin: string, imgbuffer: Buffer | null): Promise<newsElement | undefined>{
+    const news = await db.query('INSERT INTO "news"("title", "description", "date", "pin", "image") VALUES ($1, $2, $3, $4, $5) RETURNING *', [title, description, date, pin, imgbuffer])
+    if (!news || news.rowCount == 0) { return undefined }
+    return formatAsNewsElement(news.rows[0])
+}
+
+export async function deleteNews(db: Pool, id: string): Promise<boolean>{
+    const news = await db.query('DELETE FROM "news" WHERE "id" = $1', [id])
+    if (!news || news.rowCount == 0) { return false }
+    return true
+}
+
+export async function updateNews(db: Pool, id: string, title: string, description: string, date: string, pin: string, imgbuffer: Buffer | null): Promise<newsElement | undefined>{
+    const news = await db.query('UPDATE "news" SET "title" = $1, "description" = $2, "date" = $3, "pin" = $4, "image" = $5 WHERE "id" = $6 RETURNING *', [title, description, date, pin, imgbuffer, id])
+    if (!news || news.rowCount == 0) { return undefined }
+    return formatAsNewsElement(news.rows[0])
+}
+
 export async function ADMgetNews(db: Pool): Promise<newsElement[] | undefined>{
     const news = await db.query('SELECT * FROM news ORDER BY date DESC')
     if (!news || news.rowCount == 0) { return undefined }

@@ -1,9 +1,8 @@
 import getDatabase from "@/connection/database"
 import getBufferFromImage from "@/functions/getBufferFromImage"
 import processBody from "@/functions/processBody"
-import { formatAsNewsElement, getNewsData } from "@/functions/queries/news"
+import { getNewsData, updateNews } from "@/functions/queries/news"
 import validateSession from "@/functions/validateSession"
-import newsElement from "@/interfaces/newsElement"
 import { badRequest, notFound, unauthorized } from "@/responses/responses"
 import { NextRequest, NextResponse } from "next/server"
 import utf8 from "utf8"
@@ -24,8 +23,7 @@ export async function PATCH(req: NextRequest, res: Response){
     const news = await getNewsData(db, newsID)
     if (!news) { return notFound }
     const imgbufer = await getBufferFromImage(image)
-    const changedNewsArray = await db.query('UPDATE "news" SET "title" = $1, "description" = $2, "date" = $3, "pin" = $4, "image" = $5 WHERE "id" = $6 RETURNING *', [utf8.decode(title), utf8.decode(description), date, pin, imgbufer, newsID])
-    if (!changedNewsArray || changedNewsArray.rowCount == 0) { return badRequest }
-    var changedNews: newsElement = formatAsNewsElement(changedNewsArray.rows[0])
+    const changedNews = await updateNews(db, newsID, utf8.decode(title), utf8.decode(description), date, pin, imgbufer)
+    if (!changedNews) { return badRequest }
     return NextResponse.json(changedNews, {status: 200})
 }

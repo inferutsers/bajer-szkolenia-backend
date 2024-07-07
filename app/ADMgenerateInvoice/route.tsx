@@ -19,7 +19,7 @@ export async function POST(req: NextRequest, res: Response){
     if (!signup) { return notFound }
     const signupInvoicesCount = await getSignupInvoiceCount(db, signupID)
     if (signupInvoicesCount > 0) { return conflict }
-    if (signup.isCompany && (!signup.companyAdress || !signup.companyNIP || !signup.companyName)) { return serviceUnavailable }
+    if (signup.isCompany && (!signup.companyNIP || !signup.companyName)) { return serviceUnavailable }
     const course = await ADMgetCourse(db, signup.courseID)
     if (!course) { return gone }
     const result = await generateSignupInvoice(db, signup, course)

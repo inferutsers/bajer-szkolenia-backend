@@ -1,3 +1,4 @@
+import mailStructure from "@/interfaces/mailStructure";
 import { newsletterMessage } from "@/interfaces/newsletterMessage";
 import { bulkEmailReceiver } from "@/interfaces/newsletterReceiver";
 import { Pool } from "pg";
@@ -21,6 +22,26 @@ export async function getNewsletterMessages(db: Pool): Promise<newsletterMessage
     const newsletterMessages = await db.query('SELECT * FROM "newsletterMessages" ORDER BY "date" DESC')
     if (!newsletterMessages || newsletterMessages.rowCount == 0) { return undefined }
     return newsletterMessages.rows.map((result) => ({id: result.id, receiversAmount: result.receivers.length, message: removeMessageHeader(result.message.html), date: result.date}))
+}
+
+export async function confirmNewsletterUser(db: Pool, confirmationKey: string): Promise<string | undefined>{
+    const user = await db.query('UPDATE "newsletterUsers" SET "confirmed" = true WHERE "confirmationKey" = $1 RETURNING "email"', [confirmationKey])
+    if (!user || user.rowCount == 0) { return undefined }
+    return user.rows[0].email
+}
+
+export async function getNewsletterUserEmail(db: Pool, confirmationKey: string): Promise<string | undefined>{
+    const user = await db.query('SELECT "email" FROM "newsletterUsers" WHERE "confirmationKey" = $1 LIMIT 1', [confirmationKey])
+    if (!user || user.rowCount == 0) { return undefined }
+    return user.rows[0].email
+}
+
+export async function deleteNewsletterUser(db: Pool, confirmationKey: string, email: string) {
+    await db.query('DELETE FROM "newsletterUsers" WHERE "confirmationKey" = $1 AND "email" = $2', [confirmationKey, email])
+}
+
+export async function addEmailSentToNewsletterUser(db: Pool, confirmationKey: string | number, email: string, mailSent: mailStructure){
+    await db.query('UPDATE "newsletterUsers" SET "emailsSent" = ARRAY_APPEND("emailsSent", $1) WHERE "confirmationKey" = $2 AND "email" = $3', [mailSent, confirmationKey, email])
 }
 
 function removeMessageHeader(input: string): string{

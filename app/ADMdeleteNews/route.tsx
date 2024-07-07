@@ -1,5 +1,5 @@
 import getDatabase from "@/connection/database";
-import { getNewsData } from "@/functions/queries/news";
+import { deleteNews, getNewsData } from "@/functions/queries/news";
 import validateSession from "@/functions/validateSession";
 import { badRequest, notFound, unauthorized } from "@/responses/responses";
 import { NextResponse } from "next/server";
@@ -14,6 +14,6 @@ export async function DELETE(req: Request, res: Response){
     if (!validatedUser) { return unauthorized }
     const news = await getNewsData(db, newsID)
     if (!news) { return notFound }
-    await db.query('DELETE FROM "news" WHERE "id" = $1', [newsID])
+    await deleteNews(db, newsID)
     return NextResponse.json(null, {status: 200})
 }

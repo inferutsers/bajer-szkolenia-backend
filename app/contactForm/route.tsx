@@ -1,5 +1,5 @@
 import getDatabase from "@/connection/database"
-import { getDateLong } from "@/functions/dates"
+import { insertContactMessage } from "@/functions/queries/contact"
 import { badRequest } from "@/responses/responses"
 import { NextResponse } from "next/server"
 
@@ -9,6 +9,6 @@ export async function POST(req: Request, res: Response){
     message = headers.get("message")
     if (!email || !message) { return badRequest }
     const db = await getDatabase(req)
-    await db.query('INSERT INTO "contact"("email", "message", "date") VALUES ($1, $2, $3)', [email, message, getDateLong()])
+    await insertContactMessage(db, message, email)
     return NextResponse.json(null, {status: 200})
 }

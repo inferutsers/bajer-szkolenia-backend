@@ -14,7 +14,7 @@ export default function mailFormatAsConfirmation(input: String, signup: signupEl
     .replaceAll("{signupphonenumber}", signup.phoneNumber as string)
     .replaceAll("{signupemail}", signup.email as string)
     .replaceAll("{signupcompanyname}", signup.companyName as string)
-    .replaceAll("{signupcompanyadress}", (signup.companyAdress as string).replaceAll("|=|", " "))
+    .replaceAll("{signupcompanyadress}", signup.adress.replaceAll("|=|", " "))
     .replaceAll("{signupcompanynip}", signup.companyNIP as string)
     .replaceAll("{paymenttitle}", `${signup.id}${signup.name}${signup.surname}`)
     .replaceAll("{paymentamount}", (signup.supPrice as number).toFixed(2))

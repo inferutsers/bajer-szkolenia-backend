@@ -1,4 +1,3 @@
-'use server'
 import getDatabase from "@/connection/database";
 import { getCourses } from "@/functions/queries/course";
 import { noContent } from "@/responses/responses";

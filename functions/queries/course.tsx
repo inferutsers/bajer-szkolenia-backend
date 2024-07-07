@@ -5,6 +5,24 @@ import getSlotAvailability from "../getSlotAvailability";
 import getCourseSignupCount from "../getCourseSignupCount";
 import { getDateLong } from "../dates";
 
+export async function createCourse(db: Pool, date: string, title: string, place: string, instructor: string, note: string | undefined = undefined, price: string, span: string, slots: string): Promise<ADMcourseElement | undefined>{
+    const course = await db.query('INSERT INTO "courses"("date", "title", "place", "instructor", "note", "price", "span", "slots", "available") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, true) RETURNING *', [date, title, place, instructor, note, price, span, slots])
+    if (!course || course.rowCount == 0) { return undefined }
+    return await formatAsADMCourseElement(course.rows[0], db)
+}
+
+export async function deleteCourse(db: Pool, id: string): Promise<boolean>{
+    const course = await db.query('DELETE FROM "courses" WHERE "id" = $1', [id])
+    if (!course || course.rowCount == 0) { return false }
+    return true 
+}
+
+export async function updateCourse(db: Pool, id: string, date: string, title: string, place: string, instructor: string, note: string | undefined = undefined, price: string, span: string, slots: string): Promise<ADMcourseElement | undefined>{
+    const course = await db.query('UPDATE "courses" SET "date" = $1, "title" = $2, "place" = $3, "instructor" = $4, "note" = $5, "price" = $6, "span" = $7, "slots" = $8 WHERE "id" = $9 RETURNING *', [date, title, place, instructor, note, price, span, slots, id])
+    if (!course || course.rowCount == 0) { return undefined }
+    return await formatAsADMCourseElement(course.rows[0], db)
+}
+
 export async function getCourses(db: Pool): Promise<courseElement[] | undefined>{
     const courses = await db.query('SELECT * FROM "courses" WHERE date > $1 ORDER BY date', [getDateLong()])
     if (!courses || courses.rowCount == 0) { return undefined }

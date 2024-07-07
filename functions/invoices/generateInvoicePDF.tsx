@@ -2,7 +2,7 @@ import jsPDF from "jspdf";
 import fs from "fs"
 import PriceFormater from "price-to-words-pl"
 
-export default function generateInvoicePDF(vat: number, invoiceNumber: string, isCompany: boolean, supPrice: number, courseTitle: string, paidIn: Number, name?: string, surname?: string, signupID?: number, phoneNumber?: string, email?: string, adress?: string, companyName?: string, companyNIP?: string ): String{
+export default function generateInvoicePDF(vat: number, invoiceNumber: string, isCompany: boolean, adress: string, supPrice: number, courseTitle: string, paidIn: Number, name?: string, surname?: string, signupID?: number, phoneNumber?: string, email?: string, companyName?: string, companyNIP?: string, clientPesel?: string): String{
     const pdf = new jsPDF()
     const priceFormatter = new PriceFormater()
     const regularFont = fs.readFileSync("/home/ubuntu/backend/fonts/Arial-Unicode-Regular.ttf", 'binary')
@@ -37,36 +37,40 @@ export default function generateInvoicePDF(vat: number, invoiceNumber: string, i
     pdf.text("Tel: +48 728816495", 25, 73)
     pdf.text("Email: info@bajerszkolenia.pl", 25, 76)
     //NABYWCA
+    const adressSliced = adress!.split("|=|")
+    const adressStreet = adressSliced[0]
+    const adressPostCode = adressSliced[1]
+    const adressCity = adressSliced[2]
+    const buyerName = (isCompany ? companyName as string : `${name} ${surname}`)
+    pdf.text(buyerName, 135, 55, {maxWidth: 50})
+    var nameHeightOffset = pdf.getTextDimensions(buyerName, {maxWidth: 50}).h - pdf.getTextDimensions("x").h
+    pdf.text(adressStreet, 135, 58 + nameHeightOffset)
+    pdf.text(`${adressPostCode} ${adressCity}`, 135, 61 + nameHeightOffset)
     if (isCompany){
-        const companyAdressSliced = adress!.split("|=|")
-        const companyAdressStreet = companyAdressSliced[0]
-        const companyAdressPostCode = companyAdressSliced[1]
-        const companyAdressCity = companyAdressSliced[2]
-        pdf.text(companyName as string, 135, 55, {maxWidth: 50})
-        const heightOffset = pdf.getTextDimensions(companyName as string, {maxWidth: 50}).h - pdf.getTextDimensions("x").h
-        pdf.text(companyAdressStreet, 135, 58 + heightOffset)
-        pdf.text(`${companyAdressPostCode} ${companyAdressCity}`, 135, 61 + heightOffset)
-        pdf.text(`NIP: ${companyNIP}`, 135, 64 + heightOffset)
+        pdf.text(`NIP: ${companyNIP}`, 135, 64 + nameHeightOffset)
         if (phoneNumber){
-        pdf.text(`Tel: ${phoneNumber}`, 135, 67 + heightOffset)
+        pdf.text(`Tel: ${phoneNumber}`, 135, 67 + nameHeightOffset)
         }
         if (email){
             if (phoneNumber){
-                pdf.text(`Email: ${email}`, 135, 70 + heightOffset)
+                pdf.text(`Email: ${email}`, 135, 70 + nameHeightOffset)
             } else {
-                pdf.text(`Email: ${email}`, 135, 67 + heightOffset)
+                pdf.text(`Email: ${email}`, 135, 67 + nameHeightOffset)
             }
         }
     } else {
-        pdf.text(`${name} ${surname}`, 135, 55)
+        if (clientPesel){
+            pdf.text(`Pesel: ${clientPesel}`, 135, 64 + nameHeightOffset)
+            nameHeightOffset + 3
+        }
         if (phoneNumber){
-        pdf.text(`Tel: ${phoneNumber}`, 135, 58)
+            pdf.text(`Tel: ${phoneNumber}`, 135, 64 + nameHeightOffset)
         }
         if (email){
             if (phoneNumber){
-                pdf.text(`Email: ${email}`, 135, 61)
+                pdf.text(`Email: ${email}`, 135, 67 + nameHeightOffset)
             } else {
-                pdf.text(`Email: ${email}`, 135, 58)
+                pdf.text(`Email: ${email}`, 135, 64 + nameHeightOffset)
             }
         }
     }

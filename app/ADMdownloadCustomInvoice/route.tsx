@@ -1,5 +1,5 @@
 import getDatabase from "@/connection/database"
-import { getCustomInvoiceFile, getSignupInvoiceFile } from "@/functions/queries/invoices"
+import { getCustomInvoiceFile } from "@/functions/queries/invoices"
 import validateSession from "@/functions/validateSession"
 import { badRequest, notFound, unauthorized } from "@/responses/responses"
 import { NextResponse } from "next/server"

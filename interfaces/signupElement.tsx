@@ -8,7 +8,7 @@ export default interface signupElement{
     phoneNumber: string,
     isCompany: boolean,
     companyName?: string,
-    companyAdress?: string,
+    adress: string,
     companyNIP?: string,
     date: Date,
     courseID: number,
@@ -16,5 +16,6 @@ export default interface signupElement{
     emailsSent?: mailStructure[],
     paidIn: number,
     invoiceNumber?: string,
-    courseName?: string
+    courseName?: string,
+    pesel?: string
 }
