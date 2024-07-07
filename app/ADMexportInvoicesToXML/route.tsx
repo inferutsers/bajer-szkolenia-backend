@@ -1,17 +1,19 @@
 import getDatabase from '@/connection/database';
-import { getAllInvoicesRamzesData } from '@/functions/queries/invoices';
+import { getInvoicesRamzesData } from '@/functions/queries/invoices';
 import validateSession from '@/functions/validateSession';
 import { badRequest, unauthorized } from '@/responses/responses';
 import { NextResponse } from 'next/server';
 import builder from 'xmlbuilder'
 export async function GET(req: Request, res: Response){
     const headers = req.headers,
-    sessionID = headers.get("sessionID")
-    if (!sessionID) { return badRequest }
+    sessionID = headers.get("sessionID"),
+    dateStart = headers.get("dateStart"),
+    dateEnd = headers.get("dateEnd")
+    if (!sessionID || !dateStart || !dateEnd) { return badRequest }
     const db = await getDatabase(req),
     validatedUser = await validateSession(db, sessionID)
     if (!validatedUser) { return unauthorized }
-    const invoices = await getAllInvoicesRamzesData(db)
+    const invoices = await getInvoicesRamzesData(db, dateStart, dateEnd)
     const baza = builder.create('Baza', {version: '1.0', encoding: 'UTF-8', standalone: true})
     invoices!.forEach((invoice) => {
         const kontrahenci = baza.ele("knt_Kontrahenci")
