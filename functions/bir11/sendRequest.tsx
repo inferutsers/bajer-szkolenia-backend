@@ -12,7 +12,7 @@ export default async function BIR11SendRequest(xml: string, action: string, url:
         headers: sampleHeaders,
         xml: xml
     })
-    const string = String(response.response.body).slice(201).replaceAll(":", "")
+    const string = String(response.response.body).slice(202).replaceAll(":", "")
     const responseBody = await parseStringPromise(string)
     return responseBody
 }
