@@ -18,7 +18,6 @@ export async function PATCH(req: Request, res: Response){
     span = headers.get("CSpan"),
     slots = headers.get("CSlots")
     if (!sessionID || !courseID || !date || !title || !place || !instructor || !price || !span || !slots) { return badRequest }
-    console.log(note)
     const db = await getDatabase(req)
     const validatedUser = await validateSession(db, sessionID)
     if (!validatedUser) { return unauthorized }
