@@ -6,7 +6,7 @@ import getCourseSignupCount from "../getCourseSignupCount";
 import { getDateLong } from "../dates";
 
 export async function createCourse(db: Pool, date: string, title: string, place: string, instructor: string, note: string | undefined = undefined, price: string, span: string, slots: string): Promise<ADMcourseElement | undefined>{
-    const course = await db.query('INSERT INTO "courses"("date", "title", "place", "instructor", "note", "price", "span", "slots", "available") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, true) RETURNING *', [date, title, place, instructor, note, price, span, slots])
+    const course = await db.query('INSERT INTO "courses"("date", "title", "place", "instructor", "note", "price", "span", "slots", "available", "dateCreated") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, true, $9) RETURNING *', [date, title, place, instructor, note, price, span, slots, getDateLong()])
     if (!course || course.rowCount == 0) { return undefined }
     return await formatAsADMCourseElement(course.rows[0], db)
 }
@@ -31,7 +31,7 @@ export async function getCourses(db: Pool): Promise<courseElement[] | undefined>
 }
 
 export async function getRecentCourses(db: Pool): Promise<courseElement[] | undefined>{
-    const courses = await db.query('SELECT * FROM courses WHERE date > $1 ORDER BY date DESC LIMIT 4', [getDateLong()])
+    const courses = await db.query('SELECT * FROM courses WHERE date > $1 ORDER BY "dateCreated" DESC LIMIT 4', [getDateLong()])
     if (!courses || courses.rowCount == 0) { return undefined }
     const coursesFormatted: courseElement[] = await Promise.all(courses.rows.map(async (result) => await formatAsCourseElement(result, db)))
     return coursesFormatted
@@ -60,9 +60,9 @@ export async function ADMgetCourses(db: Pool): Promise<ADMcourseElement[] | unde
 }
 
 export async function formatAsCourseElement(row: any, db: Pool): Promise<courseElement>{
-    return { id: row.id, date: row.date, span: row.span, price: row.price, title: row.title, place: row.place, instructor: row.instructor, note: row.note, slots: row.slots, slotAvailable: await getSlotAvailability(db, row.id, row.slots), available: row.available }
+    return { id: row.id, date: row.date, span: row.span, price: row.price, title: row.title, place: row.place, instructor: row.instructor, note: row.note, slots: row.slots, slotAvailable: await getSlotAvailability(db, row.id, row.slots), available: row.available, dateCreated: row.dateCreated }
 }
 
 export async function formatAsADMCourseElement(row: any, db: Pool): Promise<ADMcourseElement>{
-    return { id: row.id, date: row.date, span: row.span, price: row.price, title: row.title, place: row.place, instructor: row.instructor, note: row.note, slots: row.slots, slotsUsed: await getCourseSignupCount(db, row.id), available: row.available }
+    return { id: row.id, date: row.date, span: row.span, price: row.price, title: row.title, place: row.place, instructor: row.instructor, note: row.note, slots: row.slots, slotsUsed: await getCourseSignupCount(db, row.id), available: row.available, dateCreated: row.dateCreated }
 }

@@ -9,5 +9,6 @@ export default interface ADMcourseElement{
     note?: string,
     slots: number,
     slotsUsed: number,
-    available: boolean
+    available: boolean,
+    dateCreated: Date
 }

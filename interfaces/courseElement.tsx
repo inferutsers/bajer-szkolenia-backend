@@ -9,5 +9,6 @@ export default interface courseElement{
     note?: string,
     slots: number,
     slotAvailable?: boolean,
-    available: boolean
+    available: boolean,
+    dateCreated: Date
 }
