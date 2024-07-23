@@ -10,5 +10,6 @@ export default interface ADMcourseElement{
     slots: number,
     slotsUsed: number,
     available: boolean,
-    dateCreated: Date
+    dateCreated: Date,
+    fileName?: string
 }

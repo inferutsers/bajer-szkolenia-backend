@@ -10,5 +10,6 @@ export default interface courseElement{
     slots: number,
     slotAvailable?: boolean,
     available: boolean,
-    dateCreated: Date
+    dateCreated: Date,
+    fileName?: string
 }
