@@ -1,5 +1,5 @@
 import getDatabase from "@/connection/database"
-import getBufferFromImage from "@/functions/getBufferFromImage"
+import getBufferFromString from "@/functions/getBufferFromString"
 import processBody from "@/functions/processBody"
 import { getNewsData, updateNews } from "@/functions/queries/news"
 import validateSession from "@/functions/validateSession"
@@ -22,7 +22,7 @@ export async function PATCH(req: NextRequest, res: Response){
     if (!validatedUser) { return unauthorized }
     const news = await getNewsData(db, newsID)
     if (!news) { return notFound }
-    const imgbufer = await getBufferFromImage(image)
+    const imgbufer = await getBufferFromString(image)
     const changedNews = await updateNews(db, newsID, utf8.decode(title), utf8.decode(description), date, pin, imgbufer)
     if (!changedNews) { return badRequest }
     return NextResponse.json(changedNews, {status: 200})

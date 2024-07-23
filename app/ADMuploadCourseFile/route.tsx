@@ -1,4 +1,5 @@
 import getDatabase from "@/connection/database";
+import getBufferFromString from "@/functions/getBufferFromString";
 import processBody from "@/functions/processBody";
 import { ADMgetCourse, uploadFile } from "@/functions/queries/course";
 import validateSession from "@/functions/validateSession";
@@ -17,7 +18,9 @@ export async function POST(req: NextRequest, res: Response){
     if (!validatedUser) { return unauthorized }
     const course = await ADMgetCourse(db, courseID)
     if (!course || course.fileName != undefined) { return notFound }
-    const courseUpdated = await uploadFile(db, course.id, file, fileName)
+    const buffer = await getBufferFromString(file)
+    if (!buffer) { return unprocessableContent }
+    const courseUpdated = await uploadFile(db, course.id, buffer, fileName)
     if (courseUpdated == false) { return unprocessableContent }
     return NextResponse.json(null, {status: 200})
 }

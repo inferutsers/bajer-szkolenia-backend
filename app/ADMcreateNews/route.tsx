@@ -1,5 +1,5 @@
 import getDatabase from "@/connection/database"
-import getBufferFromImage from "@/functions/getBufferFromImage"
+import getBufferFromString from "@/functions/getBufferFromString"
 import processBody from "@/functions/processBody"
 import { createNews, formatAsNewsElement } from "@/functions/queries/news"
 import validateSession from "@/functions/validateSession"
@@ -19,7 +19,7 @@ export async function POST(req: NextRequest, res: Response){
     const db = await getDatabase(req)
     const validatedUser = await validateSession(db, sessionID)
     if (!validatedUser) { return unauthorized }
-    const imgbufer = await getBufferFromImage(image)
+    const imgbufer = await getBufferFromString(image)
     const insertedNews = await createNews(db, utf8.decode(title), utf8.decode(description), date, pin, imgbufer)
     if (!insertedNews) { return badRequest }
     return NextResponse.json(insertedNews, {status: 200})
