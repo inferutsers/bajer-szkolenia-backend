@@ -11,5 +11,6 @@ export default interface courseElement{
     slotAvailable?: boolean,
     available: boolean,
     dateCreated: Date,
-    fileName?: string
+    fileName?: string,
+    customURL: string
 }

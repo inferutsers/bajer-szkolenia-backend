@@ -23,7 +23,7 @@ export async function POST(req: Request, res: Response){
     if (siscompany == 'true' && scompanynip!.length != 10) { return unprocessableContent }
     const db = await getDatabase(req)
     const course = await getCourse(db, courseID)
-    if (!course) { return notFound }
+    if (!course || course.customURL != undefined) { return notFound }
     const courseSignupsAmount = await getCourseSignupCount(db, courseID)
     if (courseSignupsAmount >= course.slots || course.available == false){ return notAcceptable }
     const signup = await createSignup(

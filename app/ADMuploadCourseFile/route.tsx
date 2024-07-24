@@ -5,6 +5,7 @@ import { ADMgetCourse, uploadFile } from "@/functions/queries/course";
 import validateSession from "@/functions/validateSession";
 import { badRequest, notFound, unauthorized, unprocessableContent } from "@/responses/responses";
 import { NextRequest, NextResponse } from "next/server";
+import utf8 from 'utf8'
 
 export async function POST(req: NextRequest, res: Response){
     const headers = req.headers,
@@ -20,7 +21,7 @@ export async function POST(req: NextRequest, res: Response){
     if (!course || course.fileName != undefined) { return notFound }
     const buffer = await getBufferFromString(file)
     if (!buffer) { return unprocessableContent }
-    const courseUpdated = await uploadFile(db, course.id, buffer, fileName)
+    const courseUpdated = await uploadFile(db, course.id, buffer, utf8.decode(fileName))
     if (courseUpdated == false) { return unprocessableContent }
     return NextResponse.json(null, {status: 200})
 }

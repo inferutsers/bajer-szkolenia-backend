@@ -16,14 +16,15 @@ export async function PATCH(req: Request, res: Response){
     note = headers.get("CNote"),
     price = headers.get("CPrice"),
     span = headers.get("CSpan"),
-    slots = headers.get("CSlots")
+    slots = headers.get("CSlots"),
+    customURL = headers.get("CCustomURL")
     if (!sessionID || !courseID || !date || !title || !place || !instructor || !price || !span || !slots) { return badRequest }
     const db = await getDatabase(req)
     const validatedUser = await validateSession(db, sessionID)
     if (!validatedUser) { return unauthorized }
     const course = await getCourse(db, courseID)
     if (!course) { return notFound }
-    const changedCourse = await updateCourse(db, courseID, date, utf8.decode(title), utf8.decode(place), utf8.decode(instructor), note ? utf8.decode(note) : undefined, price, span, slots)
+    const changedCourse = await updateCourse(db, courseID, date, utf8.decode(title), utf8.decode(place), utf8.decode(instructor), note ? utf8.decode(note) : undefined, price, span, (customURL ? utf8.decode(customURL) : undefined), slots)
     if (!changedCourse) { return badRequest }
     return NextResponse.json(changedCourse, {status: 200})
 }

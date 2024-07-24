@@ -9,6 +9,6 @@ export async function GET(req: Request, res: Response){
     if (!courseID) { return badRequest }
     const db = await getDatabase(req)
     const course = await getCourse(db, courseID)
-    if (!course) { return notFound }
+    if (!course || course.customURL != undefined) { return notFound }
     return NextResponse.json(course, {status: 200})
 }

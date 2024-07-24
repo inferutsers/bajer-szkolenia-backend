@@ -15,7 +15,8 @@ export async function POST(req: Request, res: Response){
     note = headers.get("CNote"),
     price = headers.get("CPrice"),
     span = headers.get("CSpan"),
-    slots = headers.get("CSlots")
+    slots = headers.get("CSlots"),
+    customURL = headers.get("CCustomURL")
     if (!sessionID || !date || !title || !place || !instructor || !price || !span || !slots) { return badRequest }
     const db = await getDatabase(req)
     const validatedUser = await validateSession(db, sessionID)
@@ -29,7 +30,8 @@ export async function POST(req: Request, res: Response){
         (note ? utf8.decode(note) : undefined), 
         price, 
         span, 
-        slots
+        slots,
+        (customURL ? utf8.decode(customURL) : undefined)
     )
     if (!insertedCourse) { return badRequest }
     return NextResponse.json(insertedCourse, {status: 200})
