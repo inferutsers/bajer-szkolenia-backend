@@ -1,8 +1,8 @@
 import { Pool } from "pg"
+import getCourseSignupCount from "./getCourseSignupCount"
 
-export default async function getSlotAvailability(db: Pool, id: Number, slots: Number): Promise<boolean>{
-    const courseSignupsArray = await db.query('SELECT "id" from "signups" WHERE "courseID" = $1 AND "invalidated" = false', [id])
-    const courseSignupsAmount = courseSignupsArray.rowCount as Number
+export default async function getSlotAvailability(db: Pool, id: string, slots: number): Promise<boolean>{
+    const courseSignupsAmount = await getCourseSignupCount(db, id)
     if (courseSignupsAmount < slots) { return true }
     return false
 }

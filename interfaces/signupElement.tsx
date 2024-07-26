@@ -17,5 +17,6 @@ export default interface signupElement{
     paidIn: number,
     invoiceNumber?: string,
     courseName?: string,
-    pesel?: string
+    pesel?: string,
+    attendees: string[]
 }

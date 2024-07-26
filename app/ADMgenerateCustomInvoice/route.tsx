@@ -31,7 +31,7 @@ export async function POST(req: Request, res: Response){
     const validatedUser = await validateSession(db, sessionID)
     if (!validatedUser) { return unauthorized }
     const invoiceNumber = await invoiceNumberingGetNumber(db)
-    const invoiceString = generateInvoicePDF(Number(invoiceVat), invoiceNumber, Boolean(JSON.parse(isCompany)), utf8.decode(clientAdress), Number(servicePrice), utf8.decode(serviceName), Number(clientPayment), clientName ? utf8.decode(clientName) : undefined, clientSurname ? utf8.decode(clientSurname) : undefined, undefined, !clientPhonenumber ? undefined : clientPhonenumber, !clientEmail ? undefined : utf8.decode(clientEmail), !clientCompanyName ? undefined : utf8.decode(clientCompanyName), !clientCompanyNIP ? undefined : clientCompanyNIP, !clientPesel ? undefined : clientPesel)
+    const invoiceString = generateInvoicePDF(Number(invoiceVat), invoiceNumber, Boolean(JSON.parse(isCompany)), utf8.decode(clientAdress), Number(servicePrice), utf8.decode(serviceName), Number(clientPayment), 1, clientName ? utf8.decode(clientName) : undefined, clientSurname ? utf8.decode(clientSurname) : undefined, undefined, !clientPhonenumber ? undefined : clientPhonenumber, !clientEmail ? undefined : utf8.decode(clientEmail), !clientCompanyName ? undefined : utf8.decode(clientCompanyName), !clientCompanyNIP ? undefined : clientCompanyNIP, !clientPesel ? undefined : clientPesel)
     const invoiceBuffer = Buffer.from(invoiceString, 'binary')
     const invoiceID = await insertInvoice(db, undefined, invoiceNumber, invoiceBuffer, clientEmail ? clientEmail : undefined)
     if (!invoiceID) { return undefined }

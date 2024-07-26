@@ -1,4 +1,5 @@
 import getDatabase from "@/connection/database"
+import formatAttendees from "@/functions/attendeesFormatting"
 import { getSignupInvoiceCount } from "@/functions/queries/invoices"
 import { getSignup, updateSignup } from "@/functions/queries/signups"
 import validateSession from "@/functions/validateSession"
@@ -19,8 +20,9 @@ export async function PATCH(req: Request, res: Response){
     suAdress = headers.get("suAdress"),
     suCompanyNIP = headers.get("suCompanyNIP"),
     suSupprice = headers.get("suSupprice"),
-    suPesel = headers.get("suPesel")
-    if (!sessionID || !signupID || !suName || !suSurname || !suEmail || !suPhonenumber || !suIscompany || !suSupprice || !suAdress) { return badRequest }
+    suPesel = headers.get("suPesel"),
+    suAttendees = formatAttendees(suName, suSurname, suIscompany === "true", headers.get("suAttendees"))
+    if (!sessionID || !signupID || !suName || !suSurname || !suEmail || !suPhonenumber || !suIscompany || !suSupprice || !suAdress || !suAttendees) { return badRequest }
     const db = await getDatabase(req)
     const validatedUser = await validateSession(db, sessionID)
     if (!validatedUser) { return unauthorized }
@@ -28,7 +30,7 @@ export async function PATCH(req: Request, res: Response){
     if (!signup) { return notFound }
     const signupInvoiceCount = await getSignupInvoiceCount(db, signupID)
     if (signupInvoiceCount > 0) { return unprocessableContent }
-    const changedSignup = await updateSignup(db, signupID, utf8.decode(suName), utf8.decode(suSurname), utf8.decode(suEmail), suPhonenumber, utf8.decode(suAdress), suPesel ? suPesel : undefined, suIscompany, suCompanyname ? utf8.decode(suCompanyname): undefined, suCompanyNIP ? suCompanyNIP : undefined, suSupprice)
+    const changedSignup = await updateSignup(db, signupID, utf8.decode(suName), utf8.decode(suSurname), utf8.decode(suEmail), suPhonenumber, utf8.decode(suAdress), suPesel ? suPesel : undefined, suIscompany, suCompanyname ? utf8.decode(suCompanyname): undefined, suCompanyNIP ? suCompanyNIP : undefined, suSupprice, suAttendees)
     if (!changedSignup) { return badRequest }
     return NextResponse.json(changedSignup, {status: 200})
 }

@@ -2,7 +2,7 @@ import jsPDF from "jspdf";
 import fs from "fs"
 import PriceFormater from "price-to-words-pl"
 
-export default function generateInvoicePDF(vat: number, invoiceNumber: string, isCompany: boolean, adress: string, supPrice: number, courseTitle: string, paidIn: Number, name?: string, surname?: string, signupID?: number, phoneNumber?: string, email?: string, companyName?: string, companyNIP?: string, clientPesel?: string): String{
+export default function generateInvoicePDF(vat: number, invoiceNumber: string, isCompany: boolean, adress: string, supPrice: number, courseTitle: string, amount: number, paidIn: Number, name?: string, surname?: string, signupID?: number, phoneNumber?: string, email?: string, companyName?: string, companyNIP?: string, clientPesel?: string): String{
     const pdf = new jsPDF()
     const priceFormatter = new PriceFormater()
     const regularFont = fs.readFileSync("/home/ubuntu/backend/fonts/Arial-Unicode-Regular.ttf", 'binary')
@@ -77,9 +77,10 @@ export default function generateInvoicePDF(vat: number, invoiceNumber: string, i
     //TABELA HEADER
     pdf.setFont("ArialUTF", "bold")
     pdf.text("LP", 25, 100)
-    pdf.text("Nazwa usługi", 45, 100)
-    pdf.text("Ilość", 85, 100)
-    pdf.text("Wartość netto", 95, 100)
+    pdf.text("Nazwa usługi", 30, 100)
+    pdf.text("Ilość", 70, 100)
+    pdf.text("Cena netto", 80, 100)
+    pdf.text("Wartość netto", 100, 100)
     pdf.text("VAT", 120, 100)
     pdf.text("Wartość VAT", 130, 100)
     pdf.text("Wartość brutto", 155, 100)
@@ -88,11 +89,12 @@ export default function generateInvoicePDF(vat: number, invoiceNumber: string, i
     //TABELA USLUGA
     pdf.setFont("ArialUTF", "normal")
     pdf.text("1", 25, 105)
-    pdf.text(`${courseTitle}`, 45, 105, { maxWidth: 40 })
-    pdf.text("1 szt", 85, 105)
+    pdf.text(`${courseTitle}`, 30, 105, { maxWidth: 40 })
+    pdf.text(`${amount} szt`, 70, 105)
     const netto = (supPrice as number / (1 + (vat / 100)))
     const vatAmount = supPrice - netto
-    pdf.text(`${netto.toFixed(2)} PLN`, 95, 105)
+    pdf.text(`${(netto / amount).toFixed(2)} PLN`, 80, 105)
+    pdf.text(`${netto.toFixed(2)} PLN`, 100, 105)
     if (vat > 0){
         pdf.text(`${vat}%`, 120, 105)
     } else {
@@ -104,11 +106,12 @@ export default function generateInvoicePDF(vat: number, invoiceNumber: string, i
     pdf.line(25, 107 + heightOffset, 185, 107 + heightOffset)
     pdf.setFontSize(11)
     pdf.setFont("ArialUTF", "bold")
-    pdf.text(`Razem: ${supPrice.toFixed(2)} PLN`, 140, 112 + heightOffset, { maxWidth: 35 })
-    pdf.text(`Do zapłaty pozostało: ${(supPrice as number - (paidIn as number)).toFixed(2)} PLN`, 25, 130)
+    pdf.text(`Razem: ${supPrice.toFixed(2)} PLN`, 135, 112 + heightOffset, { maxWidth: 45 })
+    pdf.text(`Zapłacono: ${(paidIn as number).toFixed(2)} PLN`, 25, 130)
+    pdf.text(`Do zapłaty pozostało: ${(supPrice as number - (paidIn as number)).toFixed(2)} PLN`, 25, 135)
     pdf.setFontSize(8)
     pdf.setFont("ArialUTF", "normal")
-    pdf.text(`Slownie: ${priceFormatter.convert((supPrice as number - (paidIn as number)))}`, 25, 135)
+    pdf.text(`Slownie: ${priceFormatter.convert((supPrice as number - (paidIn as number)))}`, 25, 140)
     var notes = ""
     if (vat == 0){ 
         notes = notes + "Podstawa zwolnienia - Art. 113 ustawy VAT; "
@@ -117,9 +120,9 @@ export default function generateInvoicePDF(vat: number, invoiceNumber: string, i
         notes = notes + `Numer identyfikacyjny zapisu - #${signupID}`
     } 
     if (notes != ""){
-        pdf.text(`Uwagi: ${notes}`, 25, 145)
+        pdf.text(`Uwagi: ${notes}`, 25, 150)
     }
-    pdf.text(`Rachunek bankowy nr: PL37 1240 2731 1111 0011 3946 7964`, 25, 155)
+    pdf.text(`Rachunek bankowy nr: PL37 1240 2731 1111 0011 3946 7964`, 25, 160)
     pdf.setLineWidth(0.2)
     pdf.line(25, 270, 75, 270)
     pdf.text("Osoba upoważniona", 37, 273)

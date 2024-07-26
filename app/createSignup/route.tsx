@@ -6,6 +6,7 @@ import sendSignupConfirmation from "@/functions/emails/sendSignupConfirmation"
 import { getCourse } from "@/functions/queries/course"
 import getCourseSignupCount from "@/functions/getCourseSignupCount"
 import { createSignup, deleteSignup } from "@/functions/queries/signups"
+import formatAttendees from "@/functions/attendeesFormatting"
 
 export async function POST(req: Request, res: Response){
     const headers = req.headers,
@@ -18,14 +19,15 @@ export async function POST(req: Request, res: Response){
     scompanyname = headers.get("sCompanyName"),
     sadress = headers.get("sAdress"),
     scompanynip = headers.get("sCompanyNIP"),
-    spesel = headers.get("sPesel")
-    if (!courseID || !sname || !ssurname || !semail || !sphonenumber || !siscompany || !sadress) { return badRequest }
+    spesel = headers.get("sPesel"),
+    sattendees = formatAttendees(sname, ssurname, siscompany === "true", headers.get("sAttendees"))
+    if (!courseID || !sname || !ssurname || !semail || !sphonenumber || !siscompany || !sadress || !sattendees) { return badRequest }
     if (siscompany == 'true' && scompanynip!.length != 10) { return unprocessableContent }
     const db = await getDatabase(req)
     const course = await getCourse(db, courseID)
     if (!course || course.customURL != undefined) { return notFound }
     const courseSignupsAmount = await getCourseSignupCount(db, courseID)
-    if (courseSignupsAmount >= course.slots || course.available == false){ return notAcceptable }
+    if (courseSignupsAmount + sattendees.length > course.slots || course.available == false){ return notAcceptable }
     const signup = await createSignup(
         db, 
         utf8.decode(sname), 
@@ -38,7 +40,8 @@ export async function POST(req: Request, res: Response){
         (siscompany == 'true' ? utf8.decode(scompanyname!) : undefined),
         (siscompany == 'true' ? scompanynip! : undefined),
         courseID,
-        course.price
+        course.price * sattendees.length,
+        sattendees
     )
     if (!signup) { return unprocessableContent }
     const signupConfirmation = await sendSignupConfirmation(db, signup, course)
