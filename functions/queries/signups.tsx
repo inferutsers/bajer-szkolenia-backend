@@ -4,6 +4,7 @@ import getCourseName from "../getCourseName";
 import getInvoiceNumber from "../invoices/getInvoiceNumber";
 import mailStructure from "@/interfaces/mailStructure";
 import { getDateLong } from "../dates";
+import getCoursePrice from "../getCoursePrice";
 
 export async function addPaymentToSignup(db: Pool, id: string | number, amount: string | number): Promise<signupElement | undefined>{
     const signup = await db.query('UPDATE "signups" SET "paidIn" = "paidIn" + $1 WHERE "id" = $2 AND "invalidated" = false RETURNING *', [amount, id])
@@ -59,5 +60,5 @@ export async function deleteSignup(db: Pool, id: number | string){
 }
 
 export async function formatAsSignupElement(row: any, db: Pool): Promise<signupElement>{
-    return {id: row.id, name: row.name, surname: row.surname, email: row.email, phoneNumber: row.phoneNumber, isCompany: row.isCompany, companyName: row.companyName, adress: row.adress, companyNIP: row.companyNIP, date: row.date, courseID: row.courseID, supPrice: row.supPrice, emailsSent: row.emailsSent, paidIn: row.paidIn, invoiceNumber: await getInvoiceNumber(db, row.id), courseName: await getCourseName(db, row.courseID), pesel: row.pesel, attendees: row.attendees}
+    return {id: row.id, name: row.name, surname: row.surname, email: row.email, phoneNumber: row.phoneNumber, isCompany: row.isCompany, companyName: row.companyName, adress: row.adress, companyNIP: row.companyNIP, date: row.date, courseID: row.courseID, supPrice: row.supPrice, emailsSent: row.emailsSent, paidIn: row.paidIn, invoiceNumber: await getInvoiceNumber(db, row.id), courseName: await getCourseName(db, row.courseID), pesel: row.pesel, attendees: row.attendees, coursePrice: await getCoursePrice(db, row.courseID)}
 }
