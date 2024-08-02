@@ -7,6 +7,7 @@ import { getCourse } from "@/functions/queries/course"
 import getCourseSignupCount from "@/functions/getCourseSignupCount"
 import { createSignup, deleteSignup } from "@/functions/queries/signups"
 import formatAttendees from "@/functions/attendeesFormatting"
+import signupForNewsletter from "@/functions/signupForNewsletter"
 
 export async function POST(req: Request, res: Response){
     const headers = req.headers,
@@ -20,8 +21,9 @@ export async function POST(req: Request, res: Response){
     sadress = headers.get("sAdress"),
     scompanynip = headers.get("sCompanyNIP"),
     spesel = headers.get("sPesel"),
+    snewsletter = headers.get("sNewsletter"),
     sattendees = formatAttendees(sname, ssurname, siscompany === "true", headers.get("sAttendees"))
-    if (!courseID || !sname || !ssurname || !semail || !sphonenumber || !siscompany || !sadress || !sattendees) { return badRequest }
+    if (!courseID || !sname || !ssurname || !semail || !sphonenumber || !siscompany || !sadress || !sattendees || !snewsletter) { return badRequest }
     if (siscompany == 'true' && scompanynip!.length != 10) { return unprocessableContent }
     const db = await getDatabase(req)
     const course = await getCourse(db, courseID)
@@ -46,6 +48,9 @@ export async function POST(req: Request, res: Response){
     if (!signup) { return unprocessableContent }
     const signupConfirmation = await sendSignupConfirmation(db, signup, course)
     if(signupConfirmation.mailSent == true) {
+        if (snewsletter === "true"){
+            await signupForNewsletter(db, semail)
+        }
         return NextResponse.json({id: signup.id}, {status: 200})
     } else {
         await deleteSignup(db, signup.id)
