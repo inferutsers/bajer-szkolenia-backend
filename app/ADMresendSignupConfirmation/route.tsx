@@ -16,7 +16,7 @@ export async function POST(req: Request, res: Response){
     if (!validatedUser) { return unauthorized }
     const signup = await getSignup(db, signupID)
     if (!signup) { return notFound }
-    const course = await getCourse(db, signup.courseID)
+    const course = await getCourse(db, signup.courseID!)
     if (!course) { return gone}
     const signupConfirmation = await sendSignupConfirmation(db, signup, course)
     if(signupConfirmation.mailSent == true) { return NextResponse.json(null, {status: 200}) }

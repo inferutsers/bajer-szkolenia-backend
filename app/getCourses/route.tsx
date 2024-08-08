@@ -8,5 +8,6 @@ export async function GET(req: Request, res: Response){
     db = await getDatabase(req),
     courses = await getCourses(db)
     if (!courses) { return noContent }
+    console.log(courses[0].offers)
     return NextResponse.json(courses, {status: 200})
 }

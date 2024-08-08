@@ -20,7 +20,7 @@ export async function POST(req: NextRequest, res: Response){
     const signupInvoicesCount = await getSignupInvoiceCount(db, signupID)
     if (signupInvoicesCount > 0) { return conflict }
     if (signup.isCompany && (!signup.companyNIP || !signup.companyName)) { return serviceUnavailable }
-    const course = await ADMgetCourse(db, signup.courseID)
+    const course = await ADMgetCourse(db, signup.courseID!)
     if (!course) { return gone }
     const result = await generateSignupInvoice(db, signup, course)
     return NextResponse.json(result, {status: 200})

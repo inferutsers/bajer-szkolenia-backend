@@ -1,3 +1,5 @@
+import offerElement from "./offerElement";
+
 export default interface courseElement{
     id: number,
     date: Date,
@@ -12,5 +14,6 @@ export default interface courseElement{
     available: boolean,
     dateCreated: Date,
     fileName?: string,
-    customURL: string
+    customURL: string,
+    offers?: offerElement[]
 }

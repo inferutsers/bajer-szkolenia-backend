@@ -16,8 +16,8 @@ export async function addEmailSentToSignup(db: Pool, id: string | number, mailSe
     await db.query('UPDATE signups SET "emailsSent" = ARRAY_APPEND("emailsSent", $1) WHERE "id" = $2', [mailSent, id])
 }
 
-export async function createSignup(db: Pool, name: string, surname: string, email: string, phoneNumber: string, adress: string, pesel: string | undefined = undefined, isCompany: string, companyName: string | undefined = undefined, companyNIP: string | undefined = undefined, courseID: string | number, coursePrice: string | number, attendees: string[]): Promise<signupElement | undefined>{
-    const signup = await db.query('INSERT INTO signups("id", "name", "surname", "email", "phoneNumber", "isCompany", "companyName", "adress", "companyNIP", "date", "courseID", "supPrice", "pesel", "attendees") VALUES (DEFAULT, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *', [name, surname, email, phoneNumber, isCompany, companyName, adress, companyNIP, getDateLong(), courseID, coursePrice, pesel, attendees])
+export async function createSignup(db: Pool, name: string, surname: string, email: string, phoneNumber: string, adress: string, pesel: string | undefined = undefined, isCompany: string, companyName: string | undefined = undefined, companyNIP: string | undefined = undefined, courseID: string | number | undefined, offerID: string | number | undefined, price: string | number, attendees: string[]): Promise<signupElement | undefined>{
+    const signup = await db.query('INSERT INTO signups("id", "name", "surname", "email", "phoneNumber", "isCompany", "companyName", "adress", "companyNIP", "date", "courseID", "supPrice", "pesel", "attendees", "offerID") VALUES (DEFAULT, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *', [name, surname, email, phoneNumber, isCompany, companyName, adress, companyNIP, getDateLong(), courseID, price, pesel, attendees, offerID])
     if (!signup || signup.rowCount == 0) { return undefined }
     return await formatAsSignupElement(signup.rows[0], db)
 }
@@ -60,5 +60,5 @@ export async function deleteSignup(db: Pool, id: number | string){
 }
 
 export async function formatAsSignupElement(row: any, db: Pool): Promise<signupElement>{
-    return {id: row.id, name: row.name, surname: row.surname, email: row.email, phoneNumber: row.phoneNumber, isCompany: row.isCompany, companyName: row.companyName, adress: row.adress, companyNIP: row.companyNIP, date: row.date, courseID: row.courseID, supPrice: row.supPrice, emailsSent: row.emailsSent, paidIn: row.paidIn, invoiceNumber: await getInvoiceNumber(db, row.id), courseName: await getCourseName(db, row.courseID), pesel: row.pesel, attendees: row.attendees, coursePrice: await getCoursePrice(db, row.courseID)}
+    return {id: row.id, name: row.name, surname: row.surname, email: row.email, phoneNumber: row.phoneNumber, isCompany: row.isCompany, companyName: row.companyName, adress: row.adress, companyNIP: row.companyNIP, date: row.date, courseID: row.courseID, offerID: row.offerID, supPrice: row.supPrice, emailsSent: row.emailsSent, paidIn: row.paidIn, invoiceNumber: await getInvoiceNumber(db, row.id), courseName: await getCourseName(db, row.courseID), pesel: row.pesel, attendees: row.attendees, coursePrice: await getCoursePrice(db, row.courseID)}
 }

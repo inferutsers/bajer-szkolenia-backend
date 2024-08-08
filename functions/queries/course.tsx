@@ -4,6 +4,7 @@ import { Pool } from "pg";
 import getSlotAvailability from "../getSlotAvailability";
 import getCourseSignupCount from "../getCourseSignupCount";
 import { getDateLong } from "../dates";
+import { getCourseOffers } from "./offer";
 
 export async function uploadFile(db: Pool, id: string | number, file: Buffer, fileName: string): Promise<boolean>{
     const course = await db.query('UPDATE "courses" SET "file" = $1, "fileName" = $2 WHERE "id" = $3', [file, fileName, id])
@@ -49,10 +50,10 @@ export async function getRecentCourses(db: Pool): Promise<courseElement[] | unde
     return coursesFormatted
 }
 
-export async function getCourse(db: Pool, id: number | string): Promise<courseElement | undefined>{
+export async function getCourse(db: Pool, id: number | string, withOffers: boolean = true): Promise<courseElement | undefined>{
     const courses = await db.query('SELECT "id", "date", "title", "place", "instructor", "note", "price", "span", "slots", "available", "dateCreated", "fileName", "customURL" FROM "courses" WHERE date > $1 AND id = $2 LIMIT 1', [getDateLong(), id])
     if (!courses || courses.rowCount == 0) { return undefined}
-    const courseFormatted: courseElement = await formatAsCourseElement(courses.rows[0], db)
+    const courseFormatted: courseElement = await formatAsCourseElement(courses.rows[0], db, withOffers)
     return courseFormatted
 }
 
@@ -77,8 +78,8 @@ export async function ADMgetCourses(db: Pool): Promise<ADMcourseElement[] | unde
     return coursesFormatted
 }
 
-export async function formatAsCourseElement(row: any, db: Pool): Promise<courseElement>{
-    return { id: row.id, date: row.date, span: row.span, price: row.price, title: row.title, place: row.place, instructor: row.instructor, note: row.note, slots: row.customURL == undefined ? row.slots : 0, slotAvailable: row.customURL == undefined ? (await getSlotAvailability(db, row.id, row.slots)) : true, available: row.customURL == undefined ? row.available : true, dateCreated: row.dateCreated, fileName: row.fileName, customURL: row.customURL }
+export async function formatAsCourseElement(row: any, db: Pool, withOffers: boolean = true): Promise<courseElement>{
+    return { id: row.id, date: row.date, span: row.span, price: row.price, title: row.title, place: row.place, instructor: row.instructor, note: row.note, slots: row.customURL == undefined ? row.slots : 0, slotAvailable: row.customURL == undefined ? (await getSlotAvailability(db, row.id, row.slots)) : true, available: row.customURL == undefined ? row.available : true, dateCreated: row.dateCreated, fileName: row.fileName, customURL: row.customURL, offers: withOffers ? (await getCourseOffers(db, row.id)) : undefined }
 }
 
 export async function formatAsADMCourseElement(row: any, db: Pool): Promise<ADMcourseElement>{

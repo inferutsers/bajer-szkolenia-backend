@@ -2,8 +2,10 @@ import getDatabase from "@/connection/database"
 import formatAttendees from "@/functions/attendeesFormatting"
 import { ADMgetCourse } from "@/functions/queries/course"
 import { getSignupInvoiceCount } from "@/functions/queries/invoices"
+import { getOffer } from "@/functions/queries/offer"
 import { getSignup, updateSignup } from "@/functions/queries/signups"
 import validateSession from "@/functions/validateSession"
+import ADMcourseElement from "@/interfaces/ADMcourseElement"
 import { badRequest, gone, notAcceptable, notFound, unauthorized, unprocessableContent } from "@/responses/responses"
 import { NextResponse } from "next/server"
 import utf8 from "utf8"
@@ -32,9 +34,18 @@ export async function PATCH(req: Request, res: Response){
     const signupInvoiceCount = await getSignupInvoiceCount(db, signupID)
     if (signupInvoiceCount > 0) { return unprocessableContent }
     if (signup.attendees.length < suAttendees.length){
-        const course = await ADMgetCourse(db, signup.courseID)
-        if (!course) { return gone }
-        if (course.slotsUsed - signup.attendees.length + suAttendees.length > course.slots) { return notAcceptable }
+        if (signup.courseID && !signup.offerID) { //COURSE
+            const course = await ADMgetCourse(db, signup.courseID)
+            if (!course) { return gone }
+            if (course.slotsUsed - signup.attendees.length + suAttendees.length > course.slots) { return notAcceptable }
+        } else if (signup.offerID && !signup.courseID) {
+            const courses = (await getOffer(db, signup.offerID))?.courses
+            if (!courses) { return gone }
+            const ADMcourses = await Promise.all(courses.map(course => ADMgetCourse(db, course.id))) as ADMcourseElement[]
+            ADMcourses.forEach(course => {
+                if (course.slotsUsed - signup.attendees.length + suAttendees.length > course.slots) { return notAcceptable }
+            })
+        }
     }
     const changedSignup = await updateSignup(db, signupID, utf8.decode(suName), utf8.decode(suSurname), utf8.decode(suEmail), suPhonenumber, utf8.decode(suAdress), suPesel ? suPesel : undefined, suIscompany, suCompanyname ? utf8.decode(suCompanyname): undefined, suCompanyNIP ? suCompanyNIP : undefined, suSupprice, suAttendees)
     if (!changedSignup) { return badRequest }

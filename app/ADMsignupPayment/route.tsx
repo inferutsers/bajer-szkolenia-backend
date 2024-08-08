@@ -21,7 +21,7 @@ export async function POST(req: Request, res: Response){
     const updatedSignup = await addPaymentToSignup(db, signupID, paymentAmount)
     if (!updatedSignup) { return unprocessableContent }
     if (updatedSignup.paidIn >= updatedSignup.supPrice) { 
-        const course = await ADMgetCourse(db, updatedSignup.courseID)
+        const course = await ADMgetCourse(db, updatedSignup.courseID!)
         if (course != undefined){
             await generateSignupInvoice(db, updatedSignup, course)
         }
