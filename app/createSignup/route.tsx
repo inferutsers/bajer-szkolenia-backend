@@ -4,11 +4,11 @@ import { NextResponse } from "next/server"
 import utf8 from "utf8"
 import sendSignupConfirmation from "@/functions/emails/sendSignupConfirmation"
 import { getCourse } from "@/functions/queries/course"
-import getCourseSignupCount from "@/functions/getCourseSignupCount"
 import { createSignup, deleteSignup } from "@/functions/queries/signups"
 import formatAttendees from "@/functions/attendeesFormatting"
 import signupForNewsletter from "@/functions/signupForNewsletter"
 import { getOffer } from "@/functions/queries/offer"
+import { getCourseSignupsCount } from "@/functions/getCourseSignups"
 
 export async function POST(req: Request, res: Response){
     const headers = req.headers,
@@ -31,7 +31,7 @@ export async function POST(req: Request, res: Response){
     if ((!offerID || offerID == "") && courseID && courseID != ""){ //COURSE
         const course = await getCourse(db, courseID)
         if (!course || course.customURL != undefined) { return notFound }
-        const courseSignupsAmount = await getCourseSignupCount(db, courseID)
+        const courseSignupsAmount = await getCourseSignupsCount(db, courseID)
         if (courseSignupsAmount + sattendees.length > course.slots || course.available == false){ return notAcceptable }
         const signup = await createSignup(
             db, 
@@ -64,7 +64,7 @@ export async function POST(req: Request, res: Response){
         const offer = await getOffer(db, offerID)
         if (!offer || !offer.courses) { return notFound }
         offer.courses!.forEach(async course => {
-            const courseSignupsAmount = await getCourseSignupCount(db, course.id)
+            const courseSignupsAmount = await getCourseSignupsCount(db, course.id)
             if (courseSignupsAmount + sattendees.length > course.slots || course.available == false){ return notAcceptable }
         });
         const signup = await createSignup(

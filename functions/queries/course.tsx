@@ -2,9 +2,9 @@ import ADMcourseElement from "@/interfaces/ADMcourseElement";
 import courseElement from "@/interfaces/courseElement";
 import { Pool } from "pg";
 import getSlotAvailability from "../getSlotAvailability";
-import getCourseSignupCount from "../getCourseSignupCount";
 import { getDateLong } from "../dates";
 import { getCourseOffers } from "./offer";
+import { getCourseSignupsCount } from "../getCourseSignups";
 
 export async function uploadFile(db: Pool, id: string | number, file: Buffer, fileName: string): Promise<boolean>{
     const course = await db.query('UPDATE "courses" SET "file" = $1, "fileName" = $2 WHERE "id" = $3', [file, fileName, id])
@@ -83,5 +83,5 @@ export async function formatAsCourseElement(row: any, db: Pool, withOffers: bool
 }
 
 export async function formatAsADMCourseElement(row: any, db: Pool): Promise<ADMcourseElement>{
-    return { id: row.id, date: row.date, span: row.span, price: row.price, title: row.title, place: row.place, instructor: row.instructor, note: row.note, slots: row.customURL == undefined ? row.slots : 0, slotsUsed: row.customURL == undefined ? (await getCourseSignupCount(db, row.id)) : 0, available: row.customURL == undefined ? row.available : true, dateCreated: row.dateCreated, fileName: row.fileName, customURL: row.customURL }
+    return { id: row.id, date: row.date, span: row.span, price: row.price, title: row.title, place: row.place, instructor: row.instructor, note: row.note, slots: row.customURL == undefined ? row.slots : 0, slotsUsed: row.customURL == undefined ? (await getCourseSignupsCount(db, row.id)) : 0, available: row.customURL == undefined ? row.available : true, dateCreated: row.dateCreated, fileName: row.fileName, customURL: row.customURL }
 }

@@ -57,7 +57,6 @@ export async function getOfferFile(db: Pool, id: number | string): Promise<Buffe
     return course.rows[0].file
 }
 
-
 export async function formatAsOfferElement(row: any, db: Pool, withCourses: boolean): Promise<offerElement>{
     return { id: row.id, name: row.name, courses: withCourses ? (await getOfferCourses(db, row.courses)) : undefined, price: row.price, note: row.note, available: row.available, dateCreated: row.dateCreated, fileName: row.fileName}
 }

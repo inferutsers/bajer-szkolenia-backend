@@ -2,7 +2,8 @@ import getDatabase from "@/connection/database"
 import validateSession from "@/functions/validateSession"
 import { badRequest, noContent, unauthorized } from "@/responses/responses"
 import { NextResponse } from "next/server"
-import { getCourseSignups, getSignups } from "@/functions/queries/signups"
+import { getSignups } from "@/functions/queries/signups"
+import { getCourseSignups } from "@/functions/getCourseSignups"
 
 export async function GET(req: Request, res: Response){
     const headers = req.headers,
