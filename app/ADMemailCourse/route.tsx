@@ -1,12 +1,12 @@
 import getDatabase from "@/connection/database"
 import { ADMgetCourse } from "@/functions/queries/course"
-import { getCourseSignups } from "@/functions/queries/signups"
 import sendCourseEmail from "@/functions/emails/sendCourseEmail"
 import validateSession from "@/functions/validateSession"
 import { bulkEmailReceiver } from "@/interfaces/newsletterReceiver"
 import { badRequest, notFound, unauthorized, unprocessableContent } from "@/responses/responses"
 import { NextResponse } from "next/server"
 import utf8 from 'utf8'
+import { getCourseSignups } from "@/functions/getCourseSignups"
 
 export async function POST(req: Request, res: Response){
     const headers = req.headers,
