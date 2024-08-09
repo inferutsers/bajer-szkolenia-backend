@@ -42,9 +42,11 @@ export async function PATCH(req: Request, res: Response){
             const courses = (await getOffer(db, signup.offerID))?.courses
             if (!courses) { return gone }
             const ADMcourses = await Promise.all(courses.map(course => ADMgetCourse(db, course.id))) as ADMcourseElement[]
+            var courseFull: boolean = false
             ADMcourses.forEach(course => {
-                if (course.slotsUsed - signup.attendees.length + suAttendees.length > course.slots) { return notAcceptable }
+                if (course.slotsUsed - signup.attendees.length + suAttendees.length > course.slots) { courseFull = true }
             })
+            if (courseFull) { return notAcceptable }
         } else { return serviceUnavailable }
     }
     const changedSignup = await updateSignup(db, signupID, utf8.decode(suName), utf8.decode(suSurname), utf8.decode(suEmail), suPhonenumber, utf8.decode(suAdress), suPesel ? suPesel : undefined, suIscompany, suCompanyname ? utf8.decode(suCompanyname): undefined, suCompanyNIP ? suCompanyNIP : undefined, suSupprice, suAttendees)

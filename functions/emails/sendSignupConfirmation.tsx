@@ -11,7 +11,7 @@ import offerElement from "@/interfaces/offerElement";
 // TO DO
 
 export default async function sendSignupConfirmation(db: Pool, signup: signupElement, course?: courseElement, offer?: offerElement): Promise<{mailSent: boolean}>{
-    if (!course) { return {mailSent: false}}
+    if (!course) { return {mailSent: true}}
     const mailContentHTML = mailFormatAsConfirmation(fs.readFileSync("/home/ubuntu/backend/templates/signupConfirmation.html", 'utf-8'), signup, course)
     const mailContentRaw = mailFormatAsConfirmation(fs.readFileSync("/home/ubuntu/backend/templates/signupConfirmation.txt", 'utf-8'), signup, course)
     const mailSent: mailStructure = await sendSingleEmail(signup.email, "Potwierdzenie zapisu", mailContentRaw, mailContentHTML)

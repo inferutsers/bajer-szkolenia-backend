@@ -1,8 +1,9 @@
 import getDatabase from "@/connection/database"
 import generateSignupInvoice from "@/functions/invoices/generateSignupInvoice"
 import { ADMgetCourse } from "@/functions/queries/course"
+import { getSignupInvoiceCount } from "@/functions/queries/invoices"
 import { getOffer } from "@/functions/queries/offer"
-import { addPaymentToSignup, formatAsSignupElement, getSignup } from "@/functions/queries/signups"
+import { addPaymentToSignup, getSignup } from "@/functions/queries/signups"
 import validateSession from "@/functions/validateSession"
 import { badRequest, notAcceptable, notFound, serviceUnavailable, unauthorized, unprocessableContent } from "@/responses/responses"
 import { NextResponse } from "next/server"
@@ -21,7 +22,7 @@ export async function POST(req: Request, res: Response){
     if ((signup.supPrice - signup.paidIn) < (Number(paymentAmount))) { return notAcceptable }
     const updatedSignup = await addPaymentToSignup(db, signupID, paymentAmount)
     if (!updatedSignup) { return unprocessableContent }
-    if (updatedSignup.paidIn >= updatedSignup.supPrice) { 
+    if (updatedSignup.paidIn >= updatedSignup.supPrice && (await getSignupInvoiceCount(db, updatedSignup.id)) == 0) { 
         if (updatedSignup.courseID && !updatedSignup.offerID) { //COURSE
             const course = await ADMgetCourse(db, updatedSignup.courseID)
             if (course != undefined){
