@@ -12,10 +12,11 @@ import BIR11NipSearch from "../bir11/complete";
 import checkIfTaxPayer from "../taxPayerList/checkIfTaxPayer";
 import { insertInvoice, insertRamzesDataToInvoice, invoiceNumberingGetNumber, invoiceNumberingPlusOne } from "../queries/invoices";
 import { addEmailSentToSignup } from "../queries/signups";
+import offerElement from "@/interfaces/offerElement";
 
-export default async function generateSignupInvoice(db: Pool, signup: signupElement, course: ADMcourseElement): Promise<{mailSent: boolean} | undefined>{
+export default async function generateSignupInvoice(db: Pool, signup: signupElement, course?: ADMcourseElement, offer?: offerElement): Promise<{mailSent: boolean} | undefined>{
     const invoiceNumber = await invoiceNumberingGetNumber(db)
-    const invoiceString = generateInvoicePDF(0, invoiceNumber, signup.isCompany, signup.adress, signup.supPrice, course.title, signup.attendees.length, signup.paidIn, signup.name, signup.surname, signup.id, signup.phoneNumber, signup.email, signup.companyName, signup.companyNIP, signup.pesel)
+    const invoiceString = generateInvoicePDF(0, invoiceNumber, signup.isCompany, signup.adress, signup.supPrice, course ? course.title : (offer ? offer.name : "Nieznana usluga"), signup.attendees.length, signup.paidIn, signup.name, signup.surname, signup.id, signup.phoneNumber, signup.email, signup.companyName, signup.companyNIP, signup.pesel)
     const invoiceBuffer = Buffer.from(invoiceString, 'binary')
     const invoiceID = await insertInvoice(db, signup.id, invoiceNumber, invoiceBuffer)
     if (!invoiceID) { return undefined }

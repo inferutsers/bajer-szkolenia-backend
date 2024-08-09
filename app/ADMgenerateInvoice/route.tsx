@@ -6,6 +6,7 @@ import generateSignupInvoice from "@/functions/invoices/generateSignupInvoice";
 import { getSignup } from "@/functions/queries/signups";
 import { getSignupInvoiceCount } from "@/functions/queries/invoices";
 import { ADMgetCourse } from "@/functions/queries/course";
+import { getOffer } from "@/functions/queries/offer";
 
 export async function POST(req: NextRequest, res: Response){
     const headers = req.headers,
@@ -20,8 +21,15 @@ export async function POST(req: NextRequest, res: Response){
     const signupInvoicesCount = await getSignupInvoiceCount(db, signupID)
     if (signupInvoicesCount > 0) { return conflict }
     if (signup.isCompany && (!signup.companyNIP || !signup.companyName)) { return serviceUnavailable }
-    const course = await ADMgetCourse(db, signup.courseID!)
-    if (!course) { return gone }
-    const result = await generateSignupInvoice(db, signup, course)
-    return NextResponse.json(result, {status: 200})
+    if (signup.courseID && !signup.offerID){ //COURSE
+        const course = await ADMgetCourse(db, signup.courseID)
+        if (!course) { return gone }
+        const result = await generateSignupInvoice(db, signup, course)
+        return NextResponse.json(result, {status: 200})
+    } else if (!signup.courseID && signup.offerID) { //OFFER
+        const offer = await getOffer(db, signup.offerID)
+        if (!offer) { return gone }
+        const result = await generateSignupInvoice(db, signup, undefined, offer)
+        return NextResponse.json(result, {status: 200})
+    } else { return serviceUnavailable }
 }
