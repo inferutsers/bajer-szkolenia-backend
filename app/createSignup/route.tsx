@@ -63,12 +63,12 @@ export async function POST(req: Request, res: Response){
     } else if (offerID && offerID != "" && (!courseID || courseID == "")){ //OFFER
         const offer = await getOffer(db, offerID)
         if (!offer || !offer.courses) { return notFound }
-        var courseFull: boolean = false
-        offer.courses!.forEach(async course => {
+        const coursesState = await Promise.all(offer.courses!.map(async course => {
             const courseSignupsAmount = await getCourseSignupsCount(db, course.id)
-            if (courseSignupsAmount + sattendees.length > course.slots || course.available == false){ courseFull = true }
-        });
-        if (courseFull) { return notAcceptable }
+            if (courseSignupsAmount + sattendees.length > course.slots || course.available == false){ return false; }
+            return true
+        }));
+        if (coursesState.includes(false)) { return notAcceptable }
         const signup = await createSignup(
             db, 
             utf8.decode(sname), 
