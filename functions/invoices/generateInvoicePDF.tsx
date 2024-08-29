@@ -26,7 +26,9 @@ export default function generateInvoicePDF(vat: number, invoiceNumber: string, i
     pdf.setFontSize(8)
     const currentDate = new Date()
     const currentDateFormatted = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`
-    pdf.text(`Węgrów, dn. ${currentDateFormatted}`, 140, 24)
+    pdf.text(`Miejsce wystawienia: Węgrów`, 140, 24)
+    pdf.text(`Data wystawienia: ${currentDateFormatted}`, 140, 27)
+    pdf.text(`Data sprzedaży: ${currentDateFormatted}`, 140, 30)
     //SPRZEDAWCA
     pdf.text("BAJER EXPERT", 25, 55)
     pdf.text("Centrum Szkoleniowe Spółdzielni", 25, 58)

@@ -48,6 +48,13 @@ export async function getNewsData(db: Pool, id: number | string): Promise<newsEl
     return formattedNewsData
 }
 
+export async function getAllNewsData(db: Pool, id: number | string): Promise<newsElement | undefined>{
+    const newsData = await db.query('SELECT * FROM news WHERE id = $1 LIMIT 1', [id])
+    if (!newsData || newsData.rowCount == 0) { return undefined }
+    const formattedNewsData = formatAsNewsElement(newsData.rows[0])
+    return formattedNewsData
+}
+
 export function formatAsNewsElement(row: any): newsElement{
     return { id: row.id, title: row.title, description: row.description, date: row.date, pin: row.pin, image: row.image }
 }

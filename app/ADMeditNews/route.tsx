@@ -1,7 +1,7 @@
 import getDatabase from "@/connection/database"
 import getBufferFromString from "@/functions/getBufferFromString"
 import processBody from "@/functions/processBody"
-import { getNewsData, updateNews } from "@/functions/queries/news"
+import { getAllNewsData, updateNews } from "@/functions/queries/news"
 import validateSession from "@/functions/validateSession"
 import { badRequest, notFound, unauthorized } from "@/responses/responses"
 import { NextRequest, NextResponse } from "next/server"
@@ -20,7 +20,7 @@ export async function PATCH(req: NextRequest, res: Response){
     const db = await getDatabase(req)
     const validatedUser = await validateSession(db, sessionID)
     if (!validatedUser) { return unauthorized }
-    const news = await getNewsData(db, newsID)
+    const news = await getAllNewsData(db, newsID)
     if (!news) { return notFound }
     const imgbufer = await getBufferFromString(image)
     const changedNews = await updateNews(db, newsID, utf8.decode(title), utf8.decode(description), date, pin, imgbufer)
