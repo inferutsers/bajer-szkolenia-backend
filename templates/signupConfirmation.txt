@@ -29,6 +29,8 @@ Pesel: {signuppesel}
 
 Nazwa firmy: {signupcompanyname}
 NIP firmy: {signupcompanynip}
+Uczestnicy:
+{attendeelist}
 
 WAŻNE: Jeżeli którekolwiek z powyższych informacji jest nieprawidłowa, prosimy o jaknajszybszy kontakt drogą mailową. Wszystkie błędy postaramy się jak najszybciej poprawić.
 

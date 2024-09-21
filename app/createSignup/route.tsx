@@ -33,6 +33,8 @@ export async function POST(req: Request, res: Response){
         if (!course || course.customURL != undefined) { return notFound }
         const courseSignupsAmount = await getCourseSignupsCount(db, courseID)
         if (courseSignupsAmount + sattendees.length > course.slots || course.available == false){ return notAcceptable }
+        const price = course.price * sattendees.length
+        const adjustedPrice = price - (sattendees.length == 2 ? price * 0.05 : (sattendees.length > 2 ? price * 0.1 : 0))
         const signup = await createSignup(
             db, 
             utf8.decode(sname), 
@@ -46,7 +48,7 @@ export async function POST(req: Request, res: Response){
             (siscompany == 'true' ? scompanynip! : undefined),
             courseID == "" ? undefined : courseID,
             undefined,
-            course.price * sattendees.length,
+            Math.round(adjustedPrice),
             sattendees
         )
         if (!signup) { return unprocessableContent }
