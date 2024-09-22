@@ -78,6 +78,11 @@ export async function ADMgetCourses(db: Pool): Promise<ADMcourseElement[] | unde
     return coursesFormatted
 }
 
+export async function ADMlockDueCourses(db: Pool): Promise<number>{
+    const locked = await db.query('UPDATE "courses" SET "available" = false WHERE "date" <= $1 AND "available" = true', [getDateLong(new Date((new Date).getTime() + 86400000))])
+    return locked.rowCount ? locked.rowCount : 0
+}
+
 export async function formatAsCourseElement(row: any, db: Pool, withOffers: boolean = true): Promise<courseElement>{
     return { id: row.id, date: row.date, span: row.span, price: row.price, title: row.title, place: row.place, instructor: row.instructor, note: row.note, slots: row.customURL == undefined ? row.slots : 0, slotAvailable: row.customURL == undefined ? (await getSlotAvailability(db, row.id, row.slots)) : true, available: row.customURL == undefined ? row.available : true, dateCreated: row.dateCreated, fileName: row.fileName, customURL: row.customURL, offers: withOffers ? (await getCourseOffers(db, row.id)) : undefined }
 }
