@@ -7,6 +7,8 @@ import { getDateLong } from "../dates";
 import getCoursePrice from "../getCoursePrice";
 import getOfferPrice from "../getOfferPrice";
 import getOfferName from "../getOfferName";
+import getCourseDate from "../getCourseDate";
+import getOfferDate from "../getOfferDate";
 
 export async function addPaymentToSignup(db: Pool, id: string | number, amount: string | number): Promise<signupElement | undefined>{
     const signup = await db.query('UPDATE "signups" SET "paidIn" = "paidIn" + $1 WHERE "id" = $2 AND "invalidated" = false RETURNING *', [amount, id])
@@ -57,5 +59,6 @@ export async function deleteSignup(db: Pool, id: number | string){
 export async function formatAsSignupElement(row: any, db: Pool): Promise<signupElement>{
     const price = row.courseID ? (await getCoursePrice(db, row.courseID)) : (row.offerID ? (await getOfferPrice(db, row.offerID)) : -1)
     const servicename = row.courseID ? (await getCourseName(db, row.courseID)) : (row.offerID ? (await getOfferName(db, row.offerID)) : "nieznana usluga")
-    return {id: row.id, name: row.name, surname: row.surname, email: row.email, phoneNumber: row.phoneNumber, isCompany: row.isCompany, companyName: row.companyName, adress: row.adress, companyNIP: row.companyNIP, date: row.date, courseID: row.courseID, offerID: row.offerID, supPrice: row.supPrice, emailsSent: row.emailsSent, paidIn: row.paidIn, invoiceNumber: await getInvoiceNumber(db, row.id), serviceName: servicename, pesel: row.pesel, attendees: row.attendees, servicePrice: price}
+    const servicedate = row.courseID ? (await getCourseDate(db, row.courseID)) : (row.offerID? (await getOfferDate(db, row.offerID)): new Date)
+    return {id: row.id, name: row.name, surname: row.surname, email: row.email, phoneNumber: row.phoneNumber, isCompany: row.isCompany, companyName: row.companyName, adress: row.adress, companyNIP: row.companyNIP, date: row.date, courseID: row.courseID, offerID: row.offerID, supPrice: row.supPrice, emailsSent: row.emailsSent, paidIn: row.paidIn, invoiceNumber: await getInvoiceNumber(db, row.id), serviceName: servicename, pesel: row.pesel, attendees: row.attendees, servicePrice: price, serviceDate: servicedate}
 }

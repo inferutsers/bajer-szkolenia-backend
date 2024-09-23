@@ -20,5 +20,6 @@ export default interface signupElement{
     serviceName?: string,
     pesel?: string,
     attendees: string[],
-    servicePrice?: number
+    servicePrice?: number,
+    serviceDate?: Date
 }
