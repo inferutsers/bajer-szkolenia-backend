@@ -1,5 +1,7 @@
 import getDatabase from "@/connection/database"
 import getBufferFromString from "@/functions/getBufferFromString"
+import { dumpObject, systemAction, systemActionStatus } from "@/functions/logging/actions"
+import { systemLog } from "@/functions/logging/log"
 import processBody from "@/functions/processBody"
 import { createNews } from "@/functions/queries/news"
 import validateSession from "@/functions/validateSession"
@@ -22,6 +24,7 @@ export async function POST(req: NextRequest, res: Response){
     if (!validatedUser) { return unauthorized(rm001000) }
     const imgbufer = await getBufferFromString(image)
     const insertedNews = await createNews(db, utf8.decode(title), utf8.decode(description), date, pin, imgbufer)
-    if (!insertedNews) { return unprocessableContent(rm031006) }
+    if (!insertedNews) { systemLog(systemAction.ADMcreateNews, systemActionStatus.error, rm031006, validatedUser, db); return unprocessableContent(rm031006) }
+    systemLog(systemAction.ADMcreateNews, systemActionStatus.success, `Stworzono aktualność\n${dumpObject(insertedNews)}`, validatedUser, db)
     return NextResponse.json(insertedNews, {status: 200})
 }

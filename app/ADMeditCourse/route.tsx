@@ -1,4 +1,6 @@
 import getDatabase from "@/connection/database"
+import { compareObjects, systemAction, systemActionStatus } from "@/functions/logging/actions"
+import { systemLog } from "@/functions/logging/log"
 import { getCourse, updateCourse } from "@/functions/queries/course"
 import validateSession from "@/functions/validateSession"
 import { rm001001, rm011000, rm011005 } from "@/responses/messages"
@@ -24,8 +26,9 @@ export async function PATCH(req: Request, res: Response){
     const validatedUser = await validateSession(db, sessionID)
     if (!validatedUser) { return unauthorized(rm001001) }
     const course = await getCourse(db, courseID)
-    if (!course) { return notFound(rm011000) }
+    if (!course) { systemLog(systemAction.ADMeditCourse, systemActionStatus.error, rm011000, validatedUser, db); return notFound(rm011000) }
     const changedCourse = await updateCourse(db, courseID, date, utf8.decode(title), utf8.decode(place), utf8.decode(instructor), note ? utf8.decode(note) : undefined, price, span, (customURL ? utf8.decode(customURL) : undefined), slots)
-    if (!changedCourse) { return unprocessableContent(rm011005) }
+    if (!changedCourse) { systemLog(systemAction.ADMeditCourse, systemActionStatus.error, rm011005, validatedUser, db); return unprocessableContent(rm011005) }
+    systemLog(systemAction.ADMeditCourse, systemActionStatus.success, `Zmieniono szkolenie\n${compareObjects(course, changedCourse)}`, validatedUser, db);
     return NextResponse.json(changedCourse, {status: 200})
 }

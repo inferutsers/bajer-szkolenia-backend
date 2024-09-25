@@ -1,4 +1,5 @@
 import getDatabase from "@/connection/database";
+import { dumpObject } from "@/functions/logging/actions";
 import { ADMgetNews } from "@/functions/queries/news";
 import validateSession from "@/functions/validateSession";
 import { rm001000, rm001001, rm031100 } from "@/responses/messages";

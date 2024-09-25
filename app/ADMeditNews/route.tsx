@@ -1,5 +1,7 @@
 import getDatabase from "@/connection/database"
 import getBufferFromString from "@/functions/getBufferFromString"
+import { compareObjects, systemAction, systemActionStatus } from "@/functions/logging/actions"
+import { systemLog } from "@/functions/logging/log"
 import processBody from "@/functions/processBody"
 import { getAllNewsData, updateNews } from "@/functions/queries/news"
 import validateSession from "@/functions/validateSession"
@@ -22,9 +24,10 @@ export async function PATCH(req: NextRequest, res: Response){
     const validatedUser = await validateSession(db, sessionID)
     if (!validatedUser) { return unauthorized(rm001000) }
     const news = await getAllNewsData(db, newsID)
-    if (!news) { return notFound(rm031000) }
+    if (!news) { systemLog(systemAction.ADMeditNews, systemActionStatus.error, rm031000, validatedUser, db); return notFound(rm031000) }
     const imgbufer = await getBufferFromString(image)
     const changedNews = await updateNews(db, newsID, utf8.decode(title), utf8.decode(description), date, pin, imgbufer)
-    if (!changedNews) { return unprocessableContent(rm031005) }
+    if (!changedNews) { systemLog(systemAction.ADMeditNews, systemActionStatus.error, rm031005, validatedUser, db); return unprocessableContent(rm031005) }
+    systemLog(systemAction.ADMeditNews, systemActionStatus.success, `Zmieniono aktualność\n${compareObjects(news, changedNews)}`, validatedUser, db);
     return NextResponse.json(changedNews, {status: 200})
 }

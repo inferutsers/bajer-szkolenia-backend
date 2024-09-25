@@ -1,4 +1,6 @@
 import getDatabase from "@/connection/database"
+import { systemAction, systemActionStatus } from "@/functions/logging/actions"
+import { systemLog } from "@/functions/logging/log"
 import validateSession from "@/functions/validateSession"
 import { rm001001, rm001004, rm001005, rm001007 } from "@/responses/messages"
 import { badRequest, unauthorized, unprocessableContent } from "@/responses/responses"
@@ -20,7 +22,7 @@ export async function POST(req: Request, res: Response){
         step: Number(process.env.TFAPERIOD),
         digits: Number(process.env.TFADIGITS)
     })
-    if (!isTFAMatching) { return unauthorized(rm001005) }
+    if (!isTFAMatching) { systemLog(systemAction.ADMchangeTfa, systemActionStatus.error, rm001005, validatedUser, db); return unauthorized(rm001005) }
     const tfasecret = speakeasy.generateSecret().base32
     const tfaSetupLink = speakeasy.otpauthURL({
         secret: tfasecret,
@@ -31,6 +33,7 @@ export async function POST(req: Request, res: Response){
         period: Number(process.env.TFAPERIOD)
     })
     const changes = await db.query('UPDATE "administration" SET "tfaSecret" = $1, "sessionID" = NULL, "sessionValidity" = NULL WHERE "id" = $2', [tfasecret, validatedUser.id])
-    if (!changes || changes.rowCount == 0) { return unprocessableContent(rm001007) }
+    if (!changes || changes.rowCount == 0) { systemLog(systemAction.ADMchangeTfa, systemActionStatus.error, rm001007, validatedUser, db); return unprocessableContent(rm001007) }
+    systemLog(systemAction.ADMchangeTfa, systemActionStatus.success, `Zmieniono token weryfikacji dwuetapowej`, validatedUser, db);
     return NextResponse.json(tfaSetupLink, {status: 200})
 }

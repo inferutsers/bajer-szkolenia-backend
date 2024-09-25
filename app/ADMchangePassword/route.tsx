@@ -1,4 +1,6 @@
 import getDatabase from "@/connection/database"
+import { systemAction, systemActionStatus } from "@/functions/logging/actions"
+import { systemLog } from "@/functions/logging/log"
 import validateAndHashPassword from "@/functions/passwordValidator"
 import validateSession from "@/functions/validateSession"
 import { rm001001, rm001004, rm001005, rm001006, rm001007 } from "@/responses/messages"
@@ -22,10 +24,11 @@ export async function POST(req: Request, res: Response){
         step: Number(process.env.TFAPERIOD),
         digits: Number(process.env.TFADIGITS)
     })
-    if (!isTFAMatching) { return unauthorized(rm001005) }
+    if (!isTFAMatching) { systemLog(systemAction.ADMchangePassowrd, systemActionStatus.error, rm001005, validatedUser, db); return unauthorized(rm001005) }
     const hashedPassword = await validateAndHashPassword(newPassword)
-    if (!hashedPassword) { return unprocessableContent(rm001006) }
+    if (!hashedPassword) { systemLog(systemAction.ADMchangePassowrd, systemActionStatus.error, rm001006, validatedUser, db); return unprocessableContent(rm001006) }
     const changes = await db.query('UPDATE "administration" SET "password" = $1, "sessionID" = NULL, "sessionValidity" = NULL WHERE "id" = $2', [hashedPassword, validatedUser.id])
-    if (!changes || changes.rowCount == 0) { return unprocessableContent(rm001007) }
+    if (!changes || changes.rowCount == 0) { systemLog(systemAction.ADMchangePassowrd, systemActionStatus.error, rm001007, validatedUser, db); return unprocessableContent(rm001007) }
+    systemLog(systemAction.ADMchangePassowrd, systemActionStatus.success, `Zmieniono hasło`, validatedUser, db);
     return NextResponse.json(null, {status: 200})
 }

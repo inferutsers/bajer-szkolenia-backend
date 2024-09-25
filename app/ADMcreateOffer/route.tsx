@@ -1,4 +1,6 @@
 import getDatabase from "@/connection/database"
+import { dumpObject, systemAction, systemActionStatus } from "@/functions/logging/actions"
+import { systemLog } from "@/functions/logging/log"
 import { getCourse } from "@/functions/queries/course"
 import { createOffer } from "@/functions/queries/offer"
 import validateSession from "@/functions/validateSession"
@@ -21,7 +23,7 @@ export async function POST(req: Request, res: Response){
     const coursesIDArray = JSON.parse(coursesID) as number[]
     coursesIDArray.forEach(async courseID => {
         const course = await getCourse(db, courseID)
-        if (!course) { return unprocessableContent(rm041001) }
+        if (!course) { systemLog(systemAction.ADMcreateOffer, systemActionStatus.error, rm041001, validatedUser, db); return unprocessableContent(rm041001) }
     })
     const insertedOffer = await createOffer(
         db, 
@@ -30,6 +32,7 @@ export async function POST(req: Request, res: Response){
         price, 
         coursesIDArray
     )
-    if (!insertedOffer) { return badRequest(rm041006) }
+    if (!insertedOffer) { systemLog(systemAction.ADMcreateOffer, systemActionStatus.error, rm041006, validatedUser, db); return badRequest(rm041006) }
+    systemLog(systemAction.ADMcreateOffer, systemActionStatus.success, `Stworzono pakiet\n${dumpObject(insertedOffer)}`, validatedUser, db);
     return NextResponse.json(insertedOffer, {status: 200})
 }

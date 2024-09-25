@@ -1,5 +1,7 @@
 import getDatabase from "@/connection/database"
 import formatAttendees from "@/functions/attendeesFormatting"
+import { compareObjects, systemAction, systemActionStatus } from "@/functions/logging/actions"
+import { systemLog } from "@/functions/logging/log"
 import { ADMgetCourse } from "@/functions/queries/course"
 import { getSignupInvoiceCount } from "@/functions/queries/invoices"
 import { getOffer } from "@/functions/queries/offer"
@@ -31,26 +33,27 @@ export async function PATCH(req: Request, res: Response){
     const validatedUser = await validateSession(db, sessionID)
     if (!validatedUser) { return unauthorized(rm001000) }
     const signup = await getSignup(db, signupID)
-    if (!signup) { return notFound(rm021000) }
+    if (!signup) { systemLog(systemAction.ADMeditSignup, systemActionStatus.error, rm021000, validatedUser, db); return notFound(rm021000) }
     const signupInvoiceCount = await getSignupInvoiceCount(db, signupID)
-    if (signupInvoiceCount > 0) { return unprocessableContent(rm021005) }
+    if (signupInvoiceCount > 0) { systemLog(systemAction.ADMeditSignup, systemActionStatus.error, rm021005, validatedUser, db); return unprocessableContent(rm021005) }
     if (signup.attendees.length < suAttendees.length){
         if (signup.courseID && !signup.offerID) { //COURSE
             const course = await ADMgetCourse(db, signup.courseID)
-            if (!course) { return gone(rm021008) }
-            if (course.slotsUsed - signup.attendees.length + suAttendees.length > course.slots) { return notAcceptable(rm021010) }
+            if (!course) { systemLog(systemAction.ADMeditSignup, systemActionStatus.error, rm021008, validatedUser, db); systemLog(systemAction.ADMeditSignup, systemActionStatus.error, rm021008, validatedUser, db); return gone(rm021008) }
+            if (course.slotsUsed - signup.attendees.length + suAttendees.length > course.slots) { systemLog(systemAction.ADMeditSignup, systemActionStatus.error, rm021010, validatedUser, db); return notAcceptable(rm021010) }
         } else if (signup.offerID && !signup.courseID) { //OFFER
             const courses = (await getOffer(db, signup.offerID))?.courses
-            if (!courses) { return gone(rm021009) }
+            if (!courses) { systemLog(systemAction.ADMeditSignup, systemActionStatus.error, rm021009, validatedUser, db); systemLog(systemAction.ADMeditSignup, systemActionStatus.error, rm021009, validatedUser, db); return gone(rm021009) }
             const ADMcourses = await Promise.all(courses.map(course => ADMgetCourse(db, course.id))) as ADMcourseElement[]
             const courseStates = await Promise.all(ADMcourses.map(course => {
                 if (course.slotsUsed - signup.attendees.length + suAttendees.length > course.slots) { return false }
                 return true
             }))
-            if (courseStates.includes(false)) { return notAcceptable(rm021010) }
-        } else { return serviceUnavailable(rm021011) }
+            if (courseStates.includes(false)) { systemLog(systemAction.ADMeditSignup, systemActionStatus.error, rm021010, validatedUser, db); return notAcceptable(rm021010) }
+        } else { systemLog(systemAction.ADMeditSignup, systemActionStatus.error, rm021011, validatedUser, db); return serviceUnavailable(rm021011) }
     }
     const changedSignup = await updateSignup(db, signupID, utf8.decode(suName), utf8.decode(suSurname), utf8.decode(suEmail), suPhonenumber, utf8.decode(suAdress), suPesel ? suPesel : undefined, suIscompany, suCompanyname ? utf8.decode(suCompanyname): undefined, suCompanyNIP ? suCompanyNIP : undefined, suSupprice, suAttendees)
-    if (!changedSignup) { return unprocessableContent(rm021006) }
+    if (!changedSignup) { systemLog(systemAction.ADMeditSignup, systemActionStatus.error, rm021006, validatedUser, db); return unprocessableContent(rm021006) }
+    systemLog(systemAction.ADMeditSignup, systemActionStatus.success, `Zmieniono szkolenie\n${compareObjects(signup, changedSignup)}`, validatedUser, db);
     return NextResponse.json(changedSignup, {status: 200})
 }

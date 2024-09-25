@@ -1,4 +1,6 @@
 import getDatabase from "@/connection/database"
+import { dumpObject, systemAction, systemActionStatus } from "@/functions/logging/actions"
+import { systemLog } from "@/functions/logging/log"
 import { getSignupInvoiceCount } from "@/functions/queries/invoices"
 import { getSignup, invalidateSignup } from "@/functions/queries/signups"
 import validateSession from "@/functions/validateSession"
@@ -15,10 +17,11 @@ export async function DELETE(req: Request, res: Response){
     const validatedUser = await validateSession(db, sessionID)
     if (!validatedUser) { return unauthorized(rm001000) }
     const signup = await getSignup(db, signupID)
-    if (!signup) { return notFound(rm021000) }
+    if (!signup) { systemLog(systemAction.ADMcancelSignup, systemActionStatus.error, rm021000, validatedUser, db); return notFound(rm021000) }
     const signupInvoiceCount = await getSignupInvoiceCount(db, signupID)
-    if (signupInvoiceCount > 0) { return unprocessableContent(rm021005) }
+    if (signupInvoiceCount > 0) { systemLog(systemAction.ADMcancelSignup, systemActionStatus.error, rm021005, validatedUser, db); return unprocessableContent(rm021005) }
     const signupInvalidated = await invalidateSignup(db, signupID)
-    if (!signupInvalidated) { return unprocessableContent(rm021004) }
+    if (!signupInvalidated) { systemLog(systemAction.ADMcancelSignup, systemActionStatus.error, rm021004, validatedUser, db); return unprocessableContent(rm021004) }
+    systemLog(systemAction.ADMcancelSignup, systemActionStatus.success, `Anulowano zapis\n${dumpObject(signup)}`, validatedUser, db)
     return NextResponse.json(null, {status: 200})
 } 
