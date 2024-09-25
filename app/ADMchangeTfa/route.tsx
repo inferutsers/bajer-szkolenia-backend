@@ -1,5 +1,6 @@
 import getDatabase from "@/connection/database"
 import validateSession from "@/functions/validateSession"
+import { rm001001, rm001004, rm001005, rm001007 } from "@/responses/messages"
 import { badRequest, unauthorized, unprocessableContent } from "@/responses/responses"
 import { NextResponse } from "next/server"
 import speakeasy from 'speakeasy'
@@ -9,17 +10,17 @@ export async function POST(req: Request, res: Response){
     sessionID = headers.get("sessionID"),
     password = headers.get("password"),
     tfaKey = headers.get("tfaKey")
-    if (!sessionID || !password || !tfaKey) { return badRequest }
+    if (!sessionID || !password || !tfaKey) { return badRequest(rm001001) }
     const db = await getDatabase(req)
     const validatedUser = await validateSession(db, sessionID, password)
-    if (!validatedUser) { return unauthorized }
+    if (!validatedUser) { return unauthorized(rm001004) }
     const isTFAMatching = speakeasy.totp.verify({
         secret: validatedUser.tfaSecret as string,
         token: tfaKey,
         step: Number(process.env.TFAPERIOD),
         digits: Number(process.env.TFADIGITS)
     })
-    if (!isTFAMatching) { return unauthorized }
+    if (!isTFAMatching) { return unauthorized(rm001005) }
     const tfasecret = speakeasy.generateSecret().base32
     const tfaSetupLink = speakeasy.otpauthURL({
         secret: tfasecret,
@@ -30,6 +31,6 @@ export async function POST(req: Request, res: Response){
         period: Number(process.env.TFAPERIOD)
     })
     const changes = await db.query('UPDATE "administration" SET "tfaSecret" = $1, "sessionID" = NULL, "sessionValidity" = NULL WHERE "id" = $2', [tfasecret, validatedUser.id])
-    if (!changes || changes.rowCount == 0) { return unprocessableContent }
+    if (!changes || changes.rowCount == 0) { return unprocessableContent(rm001007) }
     return NextResponse.json(tfaSetupLink, {status: 200})
 }

@@ -1,7 +1,8 @@
 import getDatabase from "@/connection/database"
-import { createCourse, formatAsADMCourseElement } from "@/functions/queries/course"
+import { createCourse } from "@/functions/queries/course"
 import validateSession from "@/functions/validateSession"
-import { badRequest, unauthorized } from "@/responses/responses"
+import { rm001000, rm001001, rm011006 } from "@/responses/messages"
+import { badRequest, unauthorized, unprocessableContent } from "@/responses/responses"
 import { NextResponse } from "next/server"
 import utf8 from "utf8"
 
@@ -17,10 +18,10 @@ export async function POST(req: Request, res: Response){
     span = headers.get("CSpan"),
     slots = headers.get("CSlots"),
     customURL = headers.get("CCustomURL")
-    if (!sessionID || !date || !title || !place || !instructor || !price || !span || !slots) { return badRequest }
+    if (!sessionID || !date || !title || !place || !instructor || !price || !span || !slots) { return badRequest(rm001001) }
     const db = await getDatabase(req)
     const validatedUser = await validateSession(db, sessionID)
-    if (!validatedUser) { return unauthorized }
+    if (!validatedUser) { return unauthorized(rm001000) }
     const insertedCourse = await createCourse(
         db, 
         date,
@@ -33,6 +34,6 @@ export async function POST(req: Request, res: Response){
         slots,
         (customURL ? utf8.decode(customURL) : undefined)
     )
-    if (!insertedCourse) { return badRequest }
+    if (!insertedCourse) { return unprocessableContent(rm011006) }
     return NextResponse.json(insertedCourse, {status: 200})
 }

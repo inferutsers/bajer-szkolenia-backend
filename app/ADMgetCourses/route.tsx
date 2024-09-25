@@ -1,17 +1,18 @@
 import getDatabase from "@/connection/database";
 import { ADMgetCourses } from "@/functions/queries/course";
 import validateSession from "@/functions/validateSession";
+import { rm001000, rm001001, rm011100 } from "@/responses/messages";
 import { badRequest, noContent, unauthorized } from "@/responses/responses";
 import { NextResponse } from "next/server";
 
 export async function GET(req: Request, res: Response){
     const headers = req.headers,
     sessionID = headers.get("sessionID")
-    if (!sessionID) { return badRequest }
+    if (!sessionID) { return badRequest(rm001001) }
     const db = await getDatabase(req)
     const validatedUser = await validateSession(db, sessionID)
-    if (!validatedUser) { return unauthorized }
+    if (!validatedUser) { return unauthorized(rm001000) }
     const courses = await ADMgetCourses(db)
-    if (!courses){ return noContent }
+    if (!courses){ return noContent(rm011100) }
     return NextResponse.json(courses, {status: 200})
 }

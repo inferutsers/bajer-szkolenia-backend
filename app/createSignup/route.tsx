@@ -9,6 +9,7 @@ import formatAttendees from "@/functions/attendeesFormatting"
 import signupForNewsletter from "@/functions/signupForNewsletter"
 import { getOffer } from "@/functions/queries/offer"
 import { getCourseSignupsCount } from "@/functions/getCourseSignups"
+import { rm001001, rm021011, rm021012, rm021013, rm021015, rm021016, rm021017, rm021018, rm021019, rm021020 } from "@/responses/messages"
 
 export async function POST(req: Request, res: Response){
     const headers = req.headers,
@@ -25,14 +26,15 @@ export async function POST(req: Request, res: Response){
     spesel = headers.get("sPesel"),
     snewsletter = headers.get("sNewsletter"),
     sattendees = formatAttendees(sname, ssurname, siscompany === "true", headers.get("sAttendees"))
-    if ((!courseID && !offerID) || !sname || !ssurname || !semail || !sphonenumber || !siscompany || !sadress || !sattendees || !snewsletter) { return badRequest }
-    if (siscompany == 'true' && scompanynip!.length != 10) { return unprocessableContent }
+    if ((!courseID && !offerID) || !sname || !ssurname || !semail || !sphonenumber || !siscompany || !sadress || !sattendees || !snewsletter) { return badRequest(rm001001) }
+    if (siscompany == 'true' && scompanynip!.length != 10) { return unprocessableContent(rm021013) }
     const db = await getDatabase(req)
     if ((!offerID || offerID == "") && courseID && courseID != ""){ //COURSE
         const course = await getCourse(db, courseID)
-        if (!course || course.customURL != undefined) { return notFound }
+        if (!course || course.customURL != undefined) { return notFound(rm021015) }
         const courseSignupsAmount = await getCourseSignupsCount(db, courseID)
-        if (courseSignupsAmount + sattendees.length > course.slots || course.available == false){ return notAcceptable }
+        if (courseSignupsAmount + sattendees.length > course.slots){ return notAcceptable(rm021017) }
+        if (course.available == false) { return notAcceptable(rm021018) }
         const price = course.price * sattendees.length
         const adjustedPrice = price - (sattendees.length == 2 ? price * 0.05 : (sattendees.length > 2 ? price * 0.1 : 0))
         const signup = await createSignup(
@@ -51,7 +53,7 @@ export async function POST(req: Request, res: Response){
             Math.round(adjustedPrice),
             sattendees
         )
-        if (!signup) { return unprocessableContent }
+        if (!signup) { return unprocessableContent(rm021019) }
         const signupConfirmation = await sendSignupConfirmation(db, signup, course)
         if(signupConfirmation.mailSent == true) {
             if (snewsletter === "true"){
@@ -60,17 +62,17 @@ export async function POST(req: Request, res: Response){
             return NextResponse.json({id: signup.id}, {status: 200})
         } else {
             await deleteSignup(db, signup.id)
-            return unprocessableContent
+            return unprocessableContent(rm021012)
         }
     } else if (offerID && offerID != "" && (!courseID || courseID == "")){ //OFFER
         const offer = await getOffer(db, offerID)
-        if (!offer || !offer.courses) { return notFound }
+        if (!offer || !offer.courses) { return notFound(rm021016) }
         const coursesState = await Promise.all(offer.courses!.map(async course => {
             const courseSignupsAmount = await getCourseSignupsCount(db, course.id)
             if (courseSignupsAmount + sattendees.length > course.slots || course.available == false){ return false; }
             return true
         }));
-        if (coursesState.includes(false)) { return notAcceptable }
+        if (coursesState.includes(false)) { return notAcceptable(rm021020) }
         const signup = await createSignup(
             db, 
             utf8.decode(sname), 
@@ -87,7 +89,7 @@ export async function POST(req: Request, res: Response){
             offer.price * sattendees.length,
             sattendees
         )
-        if (!signup) { return unprocessableContent }
+        if (!signup) { return unprocessableContent(rm021019) }
         const signupConfirmation = await sendSignupConfirmation(db, signup, undefined, offer)
         if(signupConfirmation.mailSent == true) {
             if (snewsletter === "true"){
@@ -96,7 +98,7 @@ export async function POST(req: Request, res: Response){
             return NextResponse.json({id: signup.id}, {status: 200})
         } else {
             await deleteSignup(db, signup.id)
-            return unprocessableContent
+            return unprocessableContent(rm021012)
         }
-    } else { return badRequest }
+    } else { return badRequest(rm021011) }
 }

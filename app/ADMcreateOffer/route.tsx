@@ -2,6 +2,7 @@ import getDatabase from "@/connection/database"
 import { getCourse } from "@/functions/queries/course"
 import { createOffer } from "@/functions/queries/offer"
 import validateSession from "@/functions/validateSession"
+import { rm001000, rm001001, rm041001, rm041006 } from "@/responses/messages"
 import { badRequest, unauthorized, unprocessableContent } from "@/responses/responses"
 import { NextResponse } from "next/server"
 import utf8 from "utf8"
@@ -13,14 +14,14 @@ export async function POST(req: Request, res: Response){
     coursesID = headers.get("OCoursesID"),
     note = headers.get("ONote"),
     price = headers.get("OPrice")
-    if (!sessionID || !name || !coursesID || !price) { return badRequest }
+    if (!sessionID || !name || !coursesID || !price) { return badRequest(rm001001) }
     const db = await getDatabase(req)
     const validatedUser = await validateSession(db, sessionID)
-    if (!validatedUser) { return unauthorized }
+    if (!validatedUser) { return unauthorized(rm001000) }
     const coursesIDArray = JSON.parse(coursesID) as number[]
     coursesIDArray.forEach(async courseID => {
         const course = await getCourse(db, courseID)
-        if (!course) { return unprocessableContent }
+        if (!course) { return unprocessableContent(rm041001) }
     })
     const insertedOffer = await createOffer(
         db, 
@@ -29,6 +30,6 @@ export async function POST(req: Request, res: Response){
         price, 
         coursesIDArray
     )
-    if (!insertedOffer) { return badRequest }
+    if (!insertedOffer) { return badRequest(rm041006) }
     return NextResponse.json(insertedOffer, {status: 200})
 }

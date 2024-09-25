@@ -1,7 +1,8 @@
 import getDatabase from "@/connection/database"
 import { getCourse, updateCourse } from "@/functions/queries/course"
 import validateSession from "@/functions/validateSession"
-import { badRequest, notFound, unauthorized } from "@/responses/responses"
+import { rm001001, rm011000, rm011005 } from "@/responses/messages"
+import { badRequest, notFound, unauthorized, unprocessableContent } from "@/responses/responses"
 import { NextResponse } from "next/server"
 import utf8 from "utf8"
 
@@ -18,13 +19,13 @@ export async function PATCH(req: Request, res: Response){
     span = headers.get("CSpan"),
     slots = headers.get("CSlots"),
     customURL = headers.get("CCustomURL")
-    if (!sessionID || !courseID || !date || !title || !place || !instructor || !price || !span || !slots) { return badRequest }
+    if (!sessionID || !courseID || !date || !title || !place || !instructor || !price || !span || !slots) { return badRequest(rm001001) }
     const db = await getDatabase(req)
     const validatedUser = await validateSession(db, sessionID)
-    if (!validatedUser) { return unauthorized }
+    if (!validatedUser) { return unauthorized(rm001001) }
     const course = await getCourse(db, courseID)
-    if (!course) { return notFound }
+    if (!course) { return notFound(rm011000) }
     const changedCourse = await updateCourse(db, courseID, date, utf8.decode(title), utf8.decode(place), utf8.decode(instructor), note ? utf8.decode(note) : undefined, price, span, (customURL ? utf8.decode(customURL) : undefined), slots)
-    if (!changedCourse) { return badRequest }
+    if (!changedCourse) { return unprocessableContent(rm011005) }
     return NextResponse.json(changedCourse, {status: 200})
 }

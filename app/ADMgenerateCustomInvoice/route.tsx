@@ -5,6 +5,7 @@ import generateInvoicePDF from "@/functions/invoices/generateInvoicePDF"
 import { insertInvoice, insertRamzesDataToInvoice, invoiceNumberingGetNumber, invoiceNumberingPlusOne } from "@/functions/queries/invoices"
 import checkIfTaxPayer from "@/functions/taxPayerList/checkIfTaxPayer"
 import validateSession from "@/functions/validateSession"
+import { rm001000, rm001001, rm051001, rm051006 } from "@/responses/messages"
 import { badRequest, unauthorized, unprocessableContent } from "@/responses/responses"
 import { NextResponse } from "next/server"
 import utf8 from "utf8"
@@ -25,16 +26,16 @@ export async function POST(req: Request, res: Response){
     clientCompanyNIP = headers.get("clientCompanyNIP"),
     invoiceVat = headers.get("invoiceVAT"),
     clientPesel = headers.get("clientPesel")
-    if (!sessionID || !isCompany || !serviceName || !servicePrice || !clientPayment || !invoiceVat || !clientAdress) { return badRequest }
-    if (isCompany == 'true' && clientCompanyNIP!.length != 10) { return unprocessableContent }
+    if (!sessionID || !isCompany || !serviceName || !servicePrice || !clientPayment || !invoiceVat || !clientAdress) { return badRequest(rm001001) }
+    if (isCompany == 'true' && clientCompanyNIP!.length != 10) { return unprocessableContent(rm051001) }
     const db = await getDatabase(req)
     const validatedUser = await validateSession(db, sessionID)
-    if (!validatedUser) { return unauthorized }
+    if (!validatedUser) { return unauthorized(rm001000) }
     const invoiceNumber = await invoiceNumberingGetNumber(db)
     const invoiceString = generateInvoicePDF(Number(invoiceVat), invoiceNumber, Boolean(JSON.parse(isCompany)), utf8.decode(clientAdress), Number(servicePrice), utf8.decode(serviceName), Number(clientPayment), 1, clientName ? utf8.decode(clientName) : undefined, clientSurname ? utf8.decode(clientSurname) : undefined, undefined, !clientPhonenumber ? undefined : clientPhonenumber, !clientEmail ? undefined : utf8.decode(clientEmail), !clientCompanyName ? undefined : utf8.decode(clientCompanyName), !clientCompanyNIP ? undefined : clientCompanyNIP, !clientPesel ? undefined : clientPesel)
     const invoiceBuffer = Buffer.from(invoiceString, 'binary')
     const invoiceID = await insertInvoice(db, undefined, invoiceNumber, invoiceBuffer, clientEmail ? clientEmail : undefined)
-    if (!invoiceID) { return undefined }
+    if (!invoiceID) { return unprocessableContent(rm051006) }
     const invoiceRamzesKontrahent = {
         knt_Id: invoiceID,
         knt_Nazwa: (isCompany == 'true' ? clientCompanyName! : `${clientName} ${clientSurname}`),
