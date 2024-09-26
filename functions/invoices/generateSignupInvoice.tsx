@@ -14,7 +14,7 @@ import { insertInvoice, insertRamzesDataToInvoice, invoiceNumberingGetNumber, in
 import { addEmailSentToSignup } from "../queries/signups";
 import offerElement from "@/interfaces/offerElement";
 
-export default async function generateSignupInvoice(db: Pool, signup: signupElement, course?: ADMcourseElement, offer?: offerElement): Promise<{mailSent: boolean} | undefined>{
+export default async function generateSignupInvoice(db: Pool, signup: signupElement, course?: ADMcourseElement, offer?: offerElement): Promise<{mailSent: boolean, invoiceNumber: string} | undefined>{
     const invoiceNumber = await invoiceNumberingGetNumber(db)
     const invoiceString = generateInvoicePDF(0, invoiceNumber, signup.isCompany, signup.adress, signup.supPrice, course ? course.title : (offer ? offer.name : "Nieznana usluga"), signup.attendees.length, signup.paidIn, signup.name, signup.surname, signup.id, signup.phoneNumber, signup.email, signup.companyName, signup.companyNIP, signup.pesel)
     const invoiceBuffer = Buffer.from(invoiceString, 'binary')
@@ -62,9 +62,9 @@ export default async function generateSignupInvoice(db: Pool, signup: signupElem
     const mailSent: mailStructure = await sendSingleEmailWithAttachment(signup.email, "Wystawiliśmy Fakturę", mailContentRaw, mailContentHTML, mailAttachment)
     if(mailSent.failure == false) {
         await addEmailSentToSignup(db, signup.id, mailSent)
-        return {mailSent: true}
+        return {mailSent: true, invoiceNumber: invoiceNumber}
     } else {
-        return {mailSent: false}
+        return {mailSent: false, invoiceNumber: invoiceNumber}
     }
 }
 

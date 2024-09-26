@@ -8,6 +8,8 @@ import { getSignupInvoiceCount } from "@/functions/queries/invoices";
 import { ADMgetCourse } from "@/functions/queries/course";
 import { getOffer } from "@/functions/queries/offer";
 import { rm001000, rm001001, rm021000, rm021003, rm021008, rm021009, rm021011, rm021013 } from "@/responses/messages";
+import { systemLog } from "@/functions/logging/log";
+import { systemAction, systemActionStatus } from "@/functions/logging/actions";
 
 export async function POST(req: NextRequest, res: Response){
     const headers = req.headers,
@@ -18,19 +20,21 @@ export async function POST(req: NextRequest, res: Response){
     const validatedUser = await validateSession(db, sessionID)
     if (!validatedUser) { return unauthorized(rm001000) }
     const signup = await getSignup(db, signupID)
-    if (!signup) { return notFound(rm021000) }
+    if (!signup) { systemLog(systemAction.ADMgenerateInvoice, systemActionStatus.error, rm021000, validatedUser, db); return notFound(rm021000) }
     const signupInvoicesCount = await getSignupInvoiceCount(db, signupID)
-    if (signupInvoicesCount > 0) { return conflict(rm021003) }
-    if (signup.isCompany && (!signup.companyNIP || !signup.companyName)) { return serviceUnavailable(rm021013) }
+    if (signupInvoicesCount > 0) { systemLog(systemAction.ADMgenerateInvoice, systemActionStatus.error, rm021003, validatedUser, db); return conflict(rm021003) }
+    if (signup.isCompany && (!signup.companyNIP || !signup.companyName)) { systemLog(systemAction.ADMgenerateInvoice, systemActionStatus.error, rm021013, validatedUser, db); return serviceUnavailable(rm021013) }
     if (signup.courseID && !signup.offerID){ //COURSE
         const course = await ADMgetCourse(db, signup.courseID)
-        if (!course) { return gone(rm021008) }
+        if (!course) { systemLog(systemAction.ADMgenerateInvoice, systemActionStatus.error, rm021008, validatedUser, db); return gone(rm021008) }
         const result = await generateSignupInvoice(db, signup, course)
+        systemLog(systemAction.ADMgenerateInvoice, systemActionStatus.success, `Wystawiono fakturę #${result?.invoiceNumber} do zapisu #${signup.id}`, validatedUser, db);
         return NextResponse.json(result, {status: 200})
     } else if (!signup.courseID && signup.offerID) { //OFFER
         const offer = await getOffer(db, signup.offerID)
-        if (!offer) { return gone(rm021009) }
+        if (!offer) { systemLog(systemAction.ADMgenerateInvoice, systemActionStatus.error, rm021009, validatedUser, db); return gone(rm021009) }
         const result = await generateSignupInvoice(db, signup, undefined, offer)
+        systemLog(systemAction.ADMgenerateInvoice, systemActionStatus.success, `Wystawiono fakturę #${result?.invoiceNumber} do zapisu #${signup.id}`, validatedUser, db);
         return NextResponse.json(result, {status: 200})
-    } else { return serviceUnavailable(rm021011) }
+    } else { systemLog(systemAction.ADMgenerateInvoice, systemActionStatus.error, rm021011, validatedUser, db); return serviceUnavailable(rm021011) }
 }

@@ -1,5 +1,7 @@
 import getDatabase from "@/connection/database";
 import getBufferFromString from "@/functions/getBufferFromString";
+import { systemAction, systemActionStatus } from "@/functions/logging/actions";
+import { systemLog } from "@/functions/logging/log";
 import processBody from "@/functions/processBody";
 import { getOffer, uploadFile } from "@/functions/queries/offer";
 import validateSession from "@/functions/validateSession";
@@ -19,10 +21,11 @@ export async function POST(req: NextRequest, res: Response){
     validatedUser = await validateSession(db, sessionID)
     if (!validatedUser) { return unauthorized(rm001000) }
     const offer = await getOffer(db, offerID)
-    if (!offer) { return notFound(rm041000) }
+    if (!offer) { systemLog(systemAction.ADMuploadOfferFile, systemActionStatus.error, rm041000, validatedUser, db); return notFound(rm041000) }
     const buffer = await getBufferFromString(file)
-    if (!buffer) { return unprocessableContent(rm041007) }
+    if (!buffer) { systemLog(systemAction.ADMuploadOfferFile, systemActionStatus.error, rm041007, validatedUser, db); return unprocessableContent(rm041007) }
     const updatedOffer = await uploadFile(db, offer.id, buffer, utf8.decode(fileName))
-    if (updatedOffer == false) { return unprocessableContent(rm041008) }
+    if (updatedOffer == false) { systemLog(systemAction.ADMuploadOfferFile, systemActionStatus.error, rm041008, validatedUser, db); return unprocessableContent(rm041008) }
+    systemLog(systemAction.ADMuploadOfferFile, systemActionStatus.success, `Załączono plik do pakietu #${offer.id}`, validatedUser, db);
     return NextResponse.json(null, {status: 200})
 }

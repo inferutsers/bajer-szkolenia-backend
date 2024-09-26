@@ -5,6 +5,8 @@ import { NextResponse } from "next/server"
 import bcrypt from "bcrypt"
 import speakeasy from "speakeasy"
 import { rm001001, rm001008 } from "@/responses/messages"
+import { systemLog } from "@/functions/logging/log"
+import { systemAction, systemActionStatus } from "@/functions/logging/actions"
 
 export async function POST(req: Request, res: Response){
     const headers = req.headers,
@@ -26,5 +28,6 @@ export async function POST(req: Request, res: Response){
         period: Number(process.env.TFAPERIOD)
     })
     await db.query('UPDATE "administration" SET "password" = $1, "passwordResetToken" = NULL, "sessionID" = NULL, "sessionValidity" = NULL, "tfaSecret" = $2 WHERE "id" = $3', [String(newPasswordHashed), tfasecret, accountFound.id])
+    systemLog(systemAction.changePasswordWithToken, systemActionStatus.success, `Użyto tokenu zmiany hasła`, accountFound, db)
     return NextResponse.json(tfaSetupLink, {status: 200})
 }

@@ -1,5 +1,7 @@
 import getDatabase from "@/connection/database"
 import generateSignupInvoice from "@/functions/invoices/generateSignupInvoice"
+import { systemAction, systemActionStatus } from "@/functions/logging/actions"
+import { systemLog } from "@/functions/logging/log"
 import { ADMgetCourse } from "@/functions/queries/course"
 import { getSignupInvoiceCount } from "@/functions/queries/invoices"
 import { getOffer } from "@/functions/queries/offer"
@@ -19,22 +21,29 @@ export async function POST(req: Request, res: Response){
     const validatedUser = await validateSession(db, sessionID)
     if (!validatedUser) { return unauthorized(rm001000) }
     const signup = await getSignup(db, signupID)
-    if (!signup) { return notFound(rm021000) }
-    if ((signup.supPrice - signup.paidIn) < (Number(paymentAmount))) { return notAcceptable(rm021014) }
+    if (!signup) { systemLog(systemAction.ADMsignupPayment, systemActionStatus.error, rm021000, validatedUser, db); return notFound(rm021000) }
+    if ((signup.supPrice - signup.paidIn) < (Number(paymentAmount))) { systemLog(systemAction.ADMsignupPayment, systemActionStatus.error, rm021014, validatedUser, db); return notAcceptable(rm021014) }
     const updatedSignup = await addPaymentToSignup(db, signupID, paymentAmount)
-    if (!updatedSignup) { return unprocessableContent(rm021006) }
+    if (!updatedSignup) { systemLog(systemAction.ADMsignupPayment, systemActionStatus.error, rm021006, validatedUser, db); return unprocessableContent(rm021006) }
     if (updatedSignup.paidIn >= updatedSignup.supPrice && (await getSignupInvoiceCount(db, updatedSignup.id)) == 0) { 
         if (updatedSignup.courseID && !updatedSignup.offerID) { //COURSE
             const course = await ADMgetCourse(db, updatedSignup.courseID)
             if (course != undefined){
-                await generateSignupInvoice(db, updatedSignup, course)
+                const result = await generateSignupInvoice(db, updatedSignup, course)
+                if (result) {
+                    systemLog(systemAction.ADMsignupPayment, systemActionStatus.success, `Wystawiono fakturę #${result.invoiceNumber} do zapisu #${signup.id}`, validatedUser, db);
+                }
             }
         } else if (!updatedSignup.courseID && updatedSignup.offerID) { //OFFER
             const offer = await getOffer(db, updatedSignup.offerID)
             if (offer != undefined){
-                await generateSignupInvoice(db, updatedSignup, undefined, offer)
+                const result = await generateSignupInvoice(db, updatedSignup, undefined, offer)
+                if (result) {
+                    systemLog(systemAction.ADMsignupPayment, systemActionStatus.success, `Wystawiono fakturę #${result.invoiceNumber} do zapisu #${signup.id}`, validatedUser, db);
+                }
             }
-        } else { return serviceUnavailable(rm021011) }
+        } else { systemLog(systemAction.ADMsignupPayment, systemActionStatus.error, rm021011, validatedUser, db); return serviceUnavailable(rm021011) }
     }
+    systemLog(systemAction.ADMsignupPayment, systemActionStatus.success, `Zarejestrowano płatność ${paymentAmount}PLN dla zapisu #${signup.id}`, validatedUser, db);
     return NextResponse.json(null, {status: 200})
 }

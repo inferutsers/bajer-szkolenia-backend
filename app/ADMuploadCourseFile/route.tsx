@@ -1,5 +1,7 @@
 import getDatabase from "@/connection/database";
 import getBufferFromString from "@/functions/getBufferFromString";
+import { systemAction, systemActionStatus } from "@/functions/logging/actions";
+import { systemLog } from "@/functions/logging/log";
 import processBody from "@/functions/processBody";
 import { ADMgetCourse, uploadFile } from "@/functions/queries/course";
 import validateSession from "@/functions/validateSession";
@@ -19,11 +21,12 @@ export async function POST(req: NextRequest, res: Response){
     validatedUser = await validateSession(db, sessionID)
     if (!validatedUser) { return unauthorized(rm001000) }
     const course = await ADMgetCourse(db, courseID)
-    if (!course) { return notFound(rm011000) }
-    if (course.fileName != undefined) { return notFound(rm011008) }
+    if (!course) { systemLog(systemAction.ADMuploadCourseFile, systemActionStatus.error, rm011000, validatedUser, db); return notFound(rm011000) }
+    if (course.fileName != undefined) { systemLog(systemAction.ADMuploadCourseFile, systemActionStatus.error, rm011008, validatedUser, db); return notFound(rm011008) }
     const buffer = await getBufferFromString(file)
-    if (!buffer) { return unprocessableContent(rm011009) }
+    if (!buffer) { systemLog(systemAction.ADMuploadCourseFile, systemActionStatus.error, rm011009, validatedUser, db); return unprocessableContent(rm011009) }
     const courseUpdated = await uploadFile(db, course.id, buffer, utf8.decode(fileName))
-    if (courseUpdated == false) { return unprocessableContent(rm011010) }
+    if (courseUpdated == false) { systemLog(systemAction.ADMuploadCourseFile, systemActionStatus.error, rm011010, validatedUser, db); return unprocessableContent(rm011010) }
+    systemLog(systemAction.ADMuploadCourseFile, systemActionStatus.success, `Załączono plik do szkolenia #${course.id}`, validatedUser, db);
     return NextResponse.json(null, {status: 200})
 }

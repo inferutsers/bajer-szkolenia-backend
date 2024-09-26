@@ -1,4 +1,6 @@
 import getDatabase from '@/connection/database';
+import { systemAction, systemActionStatus } from '@/functions/logging/actions';
+import { systemLog } from '@/functions/logging/log';
 import { getInvoicesRamzesData } from '@/functions/queries/invoices';
 import validateSession from '@/functions/validateSession';
 import { rm001000, rm001001, rm061000 } from '@/responses/messages';
@@ -15,7 +17,7 @@ export async function GET(req: Request, res: Response){
     validatedUser = await validateSession(db, sessionID)
     if (!validatedUser) { return unauthorized(rm001000) }
     const invoices = await getInvoicesRamzesData(db, dateStart, dateEnd)
-    if (!invoices) { return notFound(rm061000) }
+    if (!invoices) { systemLog(systemAction.ADMexportInvoicesToXML, systemActionStatus.error, rm061000, validatedUser, db); return notFound(rm061000) }
     const baza = builder.create('Baza', {version: '1.0', encoding: 'UTF-8', standalone: true})
     invoices!.forEach((invoice) => {
         const kontrahenci = baza.ele("knt_Kontrahenci")
@@ -49,5 +51,6 @@ export async function GET(req: Request, res: Response){
     })
     const xml = baza.end({ pretty: true});
     const xmlbuffer = Buffer.from(xml, 'utf-8')
+    systemLog(systemAction.ADMexportInvoicesToXML, systemActionStatus.success, `Eksport faktur\n${dateStart}\n${dateEnd}`)
     return NextResponse.json(xmlbuffer, {status: 200})
 }

@@ -2,6 +2,8 @@ import getDatabase from "@/connection/database"
 import BIR11NipSearch from "@/functions/bir11/complete"
 import { getDateShortReadable } from "@/functions/dates"
 import generateInvoicePDF from "@/functions/invoices/generateInvoicePDF"
+import { dumpObject, systemAction, systemActionStatus } from "@/functions/logging/actions"
+import { systemLog } from "@/functions/logging/log"
 import { insertInvoice, insertRamzesDataToInvoice, invoiceNumberingGetNumber, invoiceNumberingPlusOne } from "@/functions/queries/invoices"
 import checkIfTaxPayer from "@/functions/taxPayerList/checkIfTaxPayer"
 import validateSession from "@/functions/validateSession"
@@ -35,7 +37,7 @@ export async function POST(req: Request, res: Response){
     const invoiceString = generateInvoicePDF(Number(invoiceVat), invoiceNumber, Boolean(JSON.parse(isCompany)), utf8.decode(clientAdress), Number(servicePrice), utf8.decode(serviceName), Number(clientPayment), 1, clientName ? utf8.decode(clientName) : undefined, clientSurname ? utf8.decode(clientSurname) : undefined, undefined, !clientPhonenumber ? undefined : clientPhonenumber, !clientEmail ? undefined : utf8.decode(clientEmail), !clientCompanyName ? undefined : utf8.decode(clientCompanyName), !clientCompanyNIP ? undefined : clientCompanyNIP, !clientPesel ? undefined : clientPesel)
     const invoiceBuffer = Buffer.from(invoiceString, 'binary')
     const invoiceID = await insertInvoice(db, undefined, invoiceNumber, invoiceBuffer, clientEmail ? clientEmail : undefined)
-    if (!invoiceID) { return unprocessableContent(rm051006) }
+    if (!invoiceID) { systemLog(systemAction.ADMgenerateCustomInvoice, systemActionStatus.error, rm051006, validatedUser, db); return unprocessableContent(rm051006) }
     const invoiceRamzesKontrahent = {
         knt_Id: invoiceID,
         knt_Nazwa: (isCompany == 'true' ? clientCompanyName! : `${clientName} ${clientSurname}`),
@@ -70,5 +72,6 @@ export async function POST(req: Request, res: Response){
     }
     await insertRamzesDataToInvoice(db, invoiceID, invoiceRamzesKontrahent, invoiceRamzesNagdok, invoiceRamzesDekret)
     await invoiceNumberingPlusOne(db)
+    systemLog(systemAction.ADMgenerateCustomInvoice, systemActionStatus.success, `Wystawiono własną fakturę #${invoiceNumber}`, validatedUser, db);
     return NextResponse.json(invoiceBuffer, {status: 200})
 }
