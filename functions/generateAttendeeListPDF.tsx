@@ -9,7 +9,7 @@ import administrationAccount from "@/interfaces/administrationAccount";
 export default async function generateAttendeeListPDF(course: ADMcourseElement, signups: signupElement[], administrator: administrationAccount): Promise<Buffer>{
     const attendees = signups.map(signup => {
         const signupAttendees: RowInput[] = signup.attendees.map((attendee, index) => {
-            if (index == 0) { return [{content: signup.companyName ? signup.companyName : "OSOBA PRYWATNA", rowSpan: signup.attendees.length, styles: { valign: "middle" }}, {content: (signup.paidIn >= signup.supPrice ? (signup.invoiceNumber ? `F #${signup.invoiceNumber}` : "O") : "NO"), rowSpan: signup.attendees.length, styles: { valign: "middle", halign: "center", textColor: signup.paidIn >= signup.supPrice ? false : [255, 0, 0], fontStyle: signup.paidIn >= signup.supPrice ? "normal" : "bold" }}, attendee, " "]}
+            if (index == 0) { return [{content: signup.companyName ? signup.companyName : "OSOBA PRYWATNA", rowSpan: signup.attendees.length, styles: { valign: "middle" }}, {content: (signup.paidIn >= signup.supPrice ? (signup.invoiceNumber ? `F ${signup.invoiceNumber}` : "O") : "NO"), rowSpan: signup.attendees.length, styles: { valign: "middle", halign: "center", textColor: signup.paidIn >= signup.supPrice ? false : [255, 0, 0], fontStyle: signup.paidIn >= signup.supPrice ? "normal" : "bold" }}, attendee, " "]}
             return [attendee, " "]
         })
         return signupAttendees
@@ -27,7 +27,7 @@ export default async function generateAttendeeListPDF(course: ADMcourseElement, 
     pdf.setFontSize(30)
     pdf.text("BAJER EXPERT", 8, 16)
     pdf.setFontSize(20)
-    pdf.text(`Lista uczestników (${attendees.length})`, 95, 15)
+    pdf.text(`Lista uczestników`, 95, 15)
     pdf.setFont("ArialUTF", "normal")
     pdf.setFontSize(15)
     pdf.text(`Szkolenie: ${courseName}`, 8, 23)
