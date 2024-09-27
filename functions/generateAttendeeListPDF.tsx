@@ -9,8 +9,8 @@ import administrationAccount from "@/interfaces/administrationAccount";
 export default async function generateAttendeeListPDF(course: ADMcourseElement, signups: signupElement[], administrator: administrationAccount): Promise<Buffer>{
     const attendees = signups.map(signup => {
         const signupAttendees: RowInput[] = signup.attendees.map((attendee, index) => {
-            if (index == 0) { return [{content: signup.companyName ? signup.companyName : "OSOBA PRYWATNA", rowSpan: signup.attendees.length, styles: { valign: "middle" }}, {content: (signup.paidIn >= signup.supPrice ? (signup.invoiceNumber ? `F ${signup.invoiceNumber}` : "O") : "NO"), rowSpan: signup.attendees.length, styles: { valign: "middle", halign: "center", textColor: signup.paidIn >= signup.supPrice ? false : [255, 0, 0], fontStyle: signup.paidIn >= signup.supPrice ? "normal" : "bold" }}, attendee, " "]}
-            return [attendee, " "]
+            if (index == 0) { return [{content: signup.companyName ? signup.companyName : "OSOBA PRYWATNA", rowSpan: signup.attendees.length, styles: { valign: "middle" }}, {content: (signup.paidIn >= signup.supPrice ? (signup.invoiceNumber ? `F ${signup.invoiceNumber}` : "O") : "NO"), rowSpan: signup.attendees.length, styles: { valign: "middle", halign: "center", textColor: signup.paidIn >= signup.supPrice ? false : [255, 0, 0], fontStyle: signup.paidIn >= signup.supPrice ? "normal" : "bold" }}, {content: attendee, styles: { valign: "middle" }}, " "]}
+            return [{content: attendee, styles: { valign: "middle" }}, " "]
         })
         return signupAttendees
     }).flat()
@@ -35,7 +35,7 @@ export default async function generateAttendeeListPDF(course: ADMcourseElement, 
     pdf.setFontSize(6)
     pdf.text(footer, 8, 286)
     autoTable(pdf, {
-        head: [['Klient', 'Status', 'Uczestnicy', 'Podpis']],
+        head: [['Klient', 'Status', 'Uczestnik', 'Podpis']],
         body: attendees,
         margin: { top: 20, left: 8, right: 8, bottom: 20 },
         startY: 33,

@@ -19,7 +19,7 @@ export async function GET(req: Request, res: Response){
     const signups = await getCourseSignups(db, courseID)
     if (!signups){ return noContent(rm011001) }
     const attendees: {companyName: String, attendees: String, status: String}[] = (signups.map(result => 
-        ({companyName: (result.companyName ? result.companyName : "OSOBA PRYWATNA"), attendees: result.attendees.join(", "), status: (result.paidIn >= result.supPrice ? (result.invoiceNumber ? `Opłacone - Faktura #${result.invoiceNumber}` : "Opłacone") : "Nieopłacone")})
+        ({companyName: (result.companyName ? result.companyName : "OSOBA PRYWATNA"), attendees: result.attendees.join(", "), status: (result.paidIn >= result.supPrice ? (result.invoiceNumber ? `Opłacone - Faktura ${result.invoiceNumber}` : "Opłacone") : "Nieopłacone")})
     ))
     return NextResponse.json({attendees: attendees}, {status: 200})
 }
