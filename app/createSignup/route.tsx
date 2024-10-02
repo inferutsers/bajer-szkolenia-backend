@@ -10,6 +10,7 @@ import signupForNewsletter from "@/functions/signupForNewsletter"
 import { getOffer } from "@/functions/queries/offer"
 import { getCourseSignupsCount } from "@/functions/getCourseSignups"
 import { rm001001, rm021011, rm021012, rm021013, rm021015, rm021016, rm021017, rm021018, rm021019, rm021020 } from "@/responses/messages"
+import { capitalizeAdress, capitalizeWords } from "@/functions/capitalizeStrings"
 
 export async function POST(req: Request, res: Response){
     const headers = req.headers,
@@ -39,19 +40,19 @@ export async function POST(req: Request, res: Response){
         const adjustedPrice = price - (sattendees.length == 2 ? price * 0.05 : (sattendees.length > 2 ? price * 0.1 : 0))
         const signup = await createSignup(
             db, 
-            utf8.decode(sname), 
-            utf8.decode(ssurname),
+            capitalizeWords(utf8.decode(sname)), 
+            capitalizeWords(utf8.decode(ssurname)),
             semail,
-            sphonenumber,
-            utf8.decode(sadress),
+            sphonenumber.replaceAll(" ", ""),
+            capitalizeAdress(utf8.decode(sadress)),
             (spesel ? spesel : undefined),
             siscompany,
-            (siscompany == 'true' ? utf8.decode(scompanyname!) : undefined),
+            (siscompany == 'true' ? capitalizeWords(utf8.decode(scompanyname!)) : undefined),
             (siscompany == 'true' ? scompanynip! : undefined),
             courseID == "" ? undefined : courseID,
             undefined,
             Math.round(adjustedPrice),
-            sattendees
+            sattendees.map((attendee) => (capitalizeWords(attendee)))
         )
         if (!signup) { return unprocessableContent(rm021019) }
         const signupConfirmation = await sendSignupConfirmation(db, signup, course)
@@ -75,19 +76,19 @@ export async function POST(req: Request, res: Response){
         if (coursesState.includes(false)) { return notAcceptable(rm021020) }
         const signup = await createSignup(
             db, 
-            utf8.decode(sname), 
-            utf8.decode(ssurname),
+            capitalizeWords(utf8.decode(sname)), 
+            capitalizeWords(utf8.decode(ssurname)),
             semail,
-            sphonenumber,
-            utf8.decode(sadress),
+            sphonenumber.replaceAll(" ", ""),
+            capitalizeAdress(utf8.decode(sadress)),
             (spesel ? spesel : undefined),
             siscompany,
-            (siscompany == 'true' ? utf8.decode(scompanyname!) : undefined),
+            (siscompany == 'true' ? capitalizeWords(utf8.decode(scompanyname!)) : undefined),
             (siscompany == 'true' ? scompanynip! : undefined),
             undefined,
             offerID == "" ? undefined : offerID,
             offer.price * sattendees.length,
-            sattendees
+            sattendees.map((attendee) => (capitalizeWords(attendee)))
         )
         if (!signup) { return unprocessableContent(rm021019) }
         const signupConfirmation = await sendSignupConfirmation(db, signup, undefined, offer)

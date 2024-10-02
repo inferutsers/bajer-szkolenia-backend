@@ -37,7 +37,7 @@ export async function updateCourse(db: Pool, id: string, date: string, title: st
 }
 
 export async function getCourses(db: Pool): Promise<courseElement[] | undefined>{
-    const courses = await db.query('SELECT "id", "date", "title", "place", "instructor", "note", "price", "span", "slots", "available", "dateCreated", "fileName", "customURL" FROM "courses" WHERE date > $1 ORDER BY date', [getDateLong()])
+    const courses = await db.query('SELECT "id", "date", "title", "place", "instructor", "note", "price", "span", "slots", "available", "dateCreated", "fileName", "customURL" FROM "courses" WHERE date > $1 AND title != $2 ORDER BY date', [getDateLong(), "--##"])
     if (!courses || courses.rowCount == 0) { return undefined }
     const coursesFormatted: courseElement[] = await Promise.all(courses.rows.map(async (result) => await formatAsCourseElement(result, db)))
     return coursesFormatted
@@ -72,7 +72,7 @@ export async function ADMgetCourse(db: Pool, id: number | string): Promise<ADMco
 
 
 export async function ADMgetCourses(db: Pool): Promise<ADMcourseElement[] | undefined>{
-    const courses = await db.query('SELECT "id", "date", "title", "place", "instructor", "note", "price", "span", "slots", "available", "dateCreated", "fileName", "customURL" FROM "courses" WHERE date > $1 ORDER BY date', [getDateLong()])
+    const courses = await db.query('SELECT "id", "date", "title", "place", "instructor", "note", "price", "span", "slots", "available", "dateCreated", "fileName", "customURL" FROM "courses" WHERE date > $1 AND title != $2 ORDER BY date', [getDateLong(), "--##"])
     if (!courses || courses.rowCount == 0) { return undefined }
     const coursesFormatted: ADMcourseElement[] = await Promise.all(courses.rows.map(async (result) => await formatAsADMCourseElement(result, db)))
     return coursesFormatted

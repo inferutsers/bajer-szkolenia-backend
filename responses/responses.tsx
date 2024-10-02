@@ -1,5 +1,5 @@
 export function serviceUnavailable(error: String | null = null): Response { return Response.json({errorMessage: error}, {status: 503}) }
-export function noContent(error: String | null = null): Response { return Response.json({errorMessage: error}, {status: 204}) }
+export function noContent(error: String | null = null): Response { return Response.json({errorMessage: error}, {status: 404}) }
 export function badRequest(error: String | null = null): Response { return Response.json({errorMessage: error}, {status: 400}) }
 export function notFound(error: String | null = null): Response { return Response.json({errorMessage: error}, {status: 404}) }
 export function notAllowed(error: String | null = null): Response { return Response.json({errorMessage: error}, {status: 405}) }
