@@ -26,7 +26,7 @@ export async function POST(req: Request, res: Response){
     scompanynip = headers.get("sCompanyNIP"),
     spesel = headers.get("sPesel"),
     snewsletter = headers.get("sNewsletter"),
-    sattendees = formatAttendees(sname, ssurname, siscompany === "true", headers.get("sAttendees"))
+    sattendees = formatAttendees(utf8.decode(sname ? sname : ""), utf8.decode(ssurname ? ssurname : ""), siscompany === "true", headers.get("sAttendees"))
     if ((!courseID && !offerID) || !sname || !ssurname || !semail || !sphonenumber || !siscompany || !sadress || !sattendees || !snewsletter) { return badRequest(rm001001) }
     if (siscompany == 'true' && scompanynip!.length != 10) { return unprocessableContent(rm021013) }
     const db = await getDatabase(req)

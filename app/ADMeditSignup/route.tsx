@@ -27,7 +27,7 @@ export async function PATCH(req: Request, res: Response){
     suCompanyNIP = headers.get("suCompanyNIP"),
     suSupprice = headers.get("suSupprice"),
     suPesel = headers.get("suPesel"),
-    suAttendees = formatAttendees(suName, suSurname, suIscompany === "true", headers.get("suAttendees"))
+    suAttendees = formatAttendees(utf8.decode(suName ? suName : ""), utf8.decode(suSurname ? suSurname : ""), suIscompany === "true", headers.get("suAttendees"))
     if (!sessionID || !signupID || !suName || !suSurname || !suEmail || !suPhonenumber || !suIscompany || !suSupprice || !suAdress || !suAttendees) { return badRequest(rm001001) }
     const db = await getDatabase(req)
     const validatedUser = await validateSession(db, sessionID)
