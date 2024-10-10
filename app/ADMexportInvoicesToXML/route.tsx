@@ -51,6 +51,6 @@ export async function GET(req: Request, res: Response){
     })
     const xml = baza.end({ pretty: true});
     const xmlbuffer = Buffer.from(xml, 'utf-8')
-    systemLog(systemAction.ADMexportInvoicesToXML, systemActionStatus.success, `Eksport faktur\n${dateStart}\n${dateEnd}`)
+    systemLog(systemAction.ADMexportInvoicesToXML, systemActionStatus.success, `Eksport faktur\n${dateStart}\n${dateEnd}`, validatedUser, db)
     return NextResponse.json(xmlbuffer, {status: 200})
 }
