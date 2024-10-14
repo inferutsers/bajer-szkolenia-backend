@@ -36,6 +36,13 @@ export async function updateCourse(db: Pool, id: string, date: string, title: st
     return await formatAsADMCourseElement(course.rows[0], db)
 }
 
+export async function getUpcomingCourses(db: Pool): Promise<courseElement[] | undefined> {
+    const courses = await db.query('SELECT "id", "date", "title", "place", "instructor", "note", "price", "span", "slots", "available", "dateCreated", "fileName", "customURL" FROM "courses" WHERE date > $1 AND date < $2 AND title != $3 ORDER BY date', [getDateLong(), getDateLong(new Date((new Date).getTime() + 172800000)), "--##"])
+    if (!courses || courses.rowCount == 0) { return undefined }
+    const coursesFormatted: courseElement[] = await Promise.all(courses.rows.map(async (result) => await formatAsCourseElement(result, db)))
+    return coursesFormatted
+}
+
 export async function getCourses(db: Pool): Promise<courseElement[] | undefined>{
     const courses = await db.query('SELECT "id", "date", "title", "place", "instructor", "note", "price", "span", "slots", "available", "dateCreated", "fileName", "customURL" FROM "courses" WHERE date > $1 AND title != $2 ORDER BY date', [getDateLong(), "--##"])
     if (!courses || courses.rowCount == 0) { return undefined }

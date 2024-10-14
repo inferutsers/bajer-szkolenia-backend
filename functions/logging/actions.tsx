@@ -28,7 +28,8 @@ export enum systemAction{
     ADMsendCustomInvoice = 5.2,
     ADMexportInvoicesToXML = 6.1,
     ADMsendNewsletterMessage = 8.1,
-    AUTOCRONlockcourses = 90.1
+    AUTOCRONlockcourses = 90.1,
+    AUTOCRONcoursereminders = 90.2
 }
 
 export enum systemActionStatus{
@@ -50,7 +51,6 @@ export function compareObjects(old: Object, current: Object): String{
         if ((Object.prototype.toString.call(value) !== '[object Date]' && value != oldvalue) || (Object.prototype.toString.call(value) === '[object Date]' && (value as Date).getTime() != (oldvalue as Date).getTime())){
             if (!Buffer.isBuffer(value) && key != "emailsSent" && key != "slotsUsed"){
                 return `${key}: ${oldvalue} ===> ${value}`
-                console.log(`FOUND DIFF ${key}: ${oldvalue} ===> ${value}`)
             } else { return "" }
         } else { return "" }
     }).filter((value) => {return (value != "")}).join("\n")

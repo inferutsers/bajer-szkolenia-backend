@@ -1,0 +1,30 @@
+BAJER EXPERT
+
+Centrum Szkoleniowe Spółdzielni i Wspólnot Mieszkaniowych Jerzy Bajer
+ul. Zygmunta Krasińskiego 4/2 07-100 Węgrów
+NIP: 8240003999
+Tel: +48 728816495
+Email: info@bajerszkolenia.pl
+ 
+Dzień dobry, {name} {surname}
+ 
+Przypominamy o nadchodzącym szkoleniu
+ 
+Szkolenie: {coursename}
+Data: {coursedate}
+Godzina: {coursetime}
+Szkoleniowiec: {courseinstructor}
+Miejsce szkolenia: {courseplace}
+Dodatkowe informacje: {coursenote}
+Zgłoszeni uczestnicy:
+
+{attendeelist}
+ 
+WAŻNE: Jeżeli na szkoleniu miałaby zjawić się inna osoba w miejsce zgłoszonej, prosimy o kontakt mailowy.
+
+Status płatności: {paymentstatus}
+
+WAŻNE: W przypadku braku płatności prosimy o jaknajszybsze jej dokonanie. W razie problemów prosimy o kontakt mailowy celem wyjaśnienia sytuacji. 
+
+Pozdrawiamy,
+Zespół BAJER EXPERT

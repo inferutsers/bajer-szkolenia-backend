@@ -21,5 +21,6 @@ export default interface signupElement{
     pesel?: string,
     attendees: string[],
     servicePrice?: number,
-    serviceDate?: Date
+    serviceDate?: Date,
+    reminderSent: Boolean
 }
