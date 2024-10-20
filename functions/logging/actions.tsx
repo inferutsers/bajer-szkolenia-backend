@@ -29,7 +29,8 @@ export enum systemAction{
     ADMexportInvoicesToXML = 6.1,
     ADMsendNewsletterMessage = 8.1,
     AUTOCRONlockcourses = 90.1,
-    AUTOCRONcoursereminders = 90.2
+    AUTOCRONcoursereminders = 90.2,
+    AUTOCRONcoursearchive = 90.3
 }
 
 export enum systemActionStatus{
