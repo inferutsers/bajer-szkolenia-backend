@@ -93,8 +93,9 @@ export async function ADMgetCourses(db: Pool): Promise<ADMcourseElement[] | unde
 }
 
 export async function ADMlockDueCourses(db: Pool): Promise<number>{
-    const locked = await db.query('UPDATE "courses" SET "available" = false WHERE "date" <= $1 AND "available" = true', [getDateLong(new Date((new Date).getTime() + 86400000))])
-    return locked.rowCount ? locked.rowCount : 0
+    const locked = await db.query('UPDATE "courses" SET "available" = false WHERE "date" <= $1 AND "available" = true AND "place" != $2', [getDateLong(new Date((new Date).getTime() + 86400000)), "Online"])
+    const lockedOnline = await db.query('UPDATE "courses" SET "available" = false WHERE "date" <= $1 AND "available" = true AND "place" = $2', [getDateLong(new Date((new Date).getTime() + 43200000)), "Online"])
+    return (locked.rowCount ? locked.rowCount : 0) + (lockedOnline.rowCount ? lockedOnline.rowCount : 0)
 }
 
 export async function ADMarchiveCourses(db: Pool): Promise<number[]>{
