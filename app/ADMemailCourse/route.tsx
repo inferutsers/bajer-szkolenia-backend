@@ -23,6 +23,7 @@ export async function POST(req: Request, res: Response){
     if (!validatedUser) { return unauthorized(rm001000) }
     const course = await ADMgetCourse(db, courseID)
     if (!course) { systemLog(systemAction.ADMemailCourse, systemActionStatus.error, rm011000, validatedUser, db); return notFound(rm011000) }
+    if (course.permissionRequired > validatedUser.status) { systemLog(systemAction.ADMemailCourse, systemActionStatus.error, rm001000, validatedUser, db); return unauthorized(rm001000) }
     const courseSingups = await getCourseSignups(db, courseID)
     if (!courseSingups) { systemLog(systemAction.ADMemailCourse, systemActionStatus.error, rm011001, validatedUser, db); return noContent(rm011001) }
     const messageReceivers: bulkEmailReceiver[] = courseSingups.map((result) => ({id: result.id, email: result.email}))

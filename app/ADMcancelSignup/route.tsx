@@ -18,6 +18,7 @@ export async function DELETE(req: Request, res: Response){
     if (!validatedUser) { return unauthorized(rm001000) }
     const signup = await getSignup(db, signupID)
     if (!signup) { systemLog(systemAction.ADMcancelSignup, systemActionStatus.error, rm021000, validatedUser, db); return notFound(rm021000) }
+    if (signup.permissionRequired > validatedUser.status) { systemLog(systemAction.ADMcancelSignup, systemActionStatus.error, rm001000, validatedUser, db); return unauthorized(rm001000) }
     const signupInvoiceCount = await getSignupInvoiceCount(db, signupID)
     if (signupInvoiceCount > 0) { systemLog(systemAction.ADMcancelSignup, systemActionStatus.error, rm021005, validatedUser, db); return unprocessableContent(rm021005) }
     const signupInvalidated = await invalidateSignup(db, signupID)

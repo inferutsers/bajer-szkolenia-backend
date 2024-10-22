@@ -5,6 +5,7 @@ import { getDateLongGMT2Readable, getDateShortReadable } from "./dates";
 import autoTable, { RowInput } from 'jspdf-autotable'
 import signupElement from "@/interfaces/signupElement";
 import administrationAccount from "@/interfaces/administrationAccount";
+import { v4 as uuidv4 } from 'uuid';
 
 export default async function generateAttendeeListPDF(course: ADMcourseElement, signups: signupElement[], administrator: administrationAccount): Promise<Buffer>{
     const attendees = signups.map(signup => {
@@ -16,7 +17,16 @@ export default async function generateAttendeeListPDF(course: ADMcourseElement, 
     }).flat()
     const courseName = course.title.length > 64 ? `${course.title.slice(0, 61)}...` : course.title
     const footer = `Raport wygenerowany ${getDateLongGMT2Readable()} Administrator #${administrator.id}; Szkolenie #${course.id} ${getDateShortReadable(course.date)}; Zapisów ${signups.length}; Uczestników ${attendees.length}\nW przypadku znalezienia listy przez osobę postronną prosimy o natychmiastowe zniszczenie\nBAJER EXPERT Centrum Szkoleniowe Spółdzielni i Wspólnot Mieszkaniowych Jerzy Bajer ul. Zygmunta Krasińskiego 4/2 07-100 Węgrów NIP: 8240003999 Tel: +48 728816495 Email: info@bajerszkolenia.pl`
-    const pdf = new jsPDF
+    const pdf = new jsPDF({encryption: {
+        ownerPassword: uuidv4(),
+        userPermissions: ["print"]
+    }})
+    pdf.setProperties({
+        title: `Lista Uczestników #${course.id}`,
+        subject: `Lista Uczestników #${course.id}`,
+        author: "BAJEREXPERT ADMIN PANEL",
+        creator: "BAJEREXPERT ADMIN PANEL"
+    })
     const regularFont = fs.readFileSync("/home/ubuntu/backend/fonts/Arial-Unicode-Regular.ttf", 'binary')
     pdf.addFileToVFS('Arial-Unicode-Regular.ttf', regularFont);
     pdf.addFont('Arial-Unicode-Regular.ttf', 'ArialUTF', 'normal');

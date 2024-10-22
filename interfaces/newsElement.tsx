@@ -4,5 +4,6 @@ export default interface newsElement{
     description?: String,
     date: Date, 
     pin: Boolean,  
-    image?: Buffer
+    image?: Buffer,
+    permissionRequired: number
 }

@@ -56,5 +56,5 @@ export async function getAllNewsData(db: Pool, id: number | string): Promise<new
 }
 
 export function formatAsNewsElement(row: any): newsElement{
-    return { id: row.id, title: row.title, description: row.description, date: row.date, pin: row.pin, image: row.image }
+    return { id: row.id, title: row.title, description: row.description, date: row.date, pin: row.pin, image: row.image, permissionRequired: row.permissionRequired }
 }

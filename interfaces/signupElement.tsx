@@ -22,5 +22,6 @@ export default interface signupElement{
     attendees: string[],
     servicePrice?: number,
     serviceDate?: Date,
-    reminderSent: Boolean
+    reminderSent: Boolean,
+    permissionRequired: number
 }

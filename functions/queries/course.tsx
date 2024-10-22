@@ -52,14 +52,14 @@ export async function getCourses(db: Pool): Promise<courseElement[] | undefined>
 }
 
 export async function getRecentCourses(db: Pool): Promise<courseElement[] | undefined>{
-    const courses = await db.query('SELECT "id", "date", "title", "place", "instructor", "note", "price", "span", "slots", "available", "dateCreated", "fileName", "customURL" FROM courses WHERE "archived" = false AND title != $1 ORDER BY "dateCreated" DESC LIMIT 4', ["--##"])
+    const courses = await db.query('SELECT "id", "date", "title", "place", "instructor", "note", "price", "span", "slots", "available", "dateCreated", "fileName", "customURL", "permissionRequired" FROM courses WHERE "archived" = false AND title != $1 ORDER BY "dateCreated" DESC LIMIT 4', ["--##"])
     if (!courses || courses.rowCount == 0) { return undefined }
     const coursesFormatted: courseElement[] = await Promise.all(courses.rows.map(async (result) => await formatAsCourseElement(result, db)))
     return coursesFormatted
 }
 
 export async function getCourse(db: Pool, id: number | string, withOffers: boolean = true): Promise<courseElement | undefined>{
-    const courses = await db.query('SELECT "id", "date", "title", "place", "instructor", "note", "price", "span", "slots", "available", "dateCreated", "fileName", "customURL" FROM "courses" WHERE "archived" = false AND id = $1 LIMIT 1', [id])
+    const courses = await db.query('SELECT "id", "date", "title", "place", "instructor", "note", "price", "span", "slots", "available", "dateCreated", "fileName", "customURL", "permissionRequired" FROM "courses" WHERE "archived" = false AND id = $1 LIMIT 1', [id])
     if (!courses || courses.rowCount == 0) { return undefined}
     const courseFormatted: courseElement = await formatAsCourseElement(courses.rows[0], db, withOffers)
     return courseFormatted
@@ -72,21 +72,21 @@ export async function getCourseFile(db: Pool, id: number | string): Promise<Buff
 }
 
 export async function ADMgetCourse(db: Pool, id: number | string): Promise<ADMcourseElement | undefined>{
-    const course = await db.query('SELECT "id", "date", "title", "place", "instructor", "note", "price", "span", "slots", "available", "dateCreated", "fileName", "customURL" FROM "courses" WHERE "archived" = false AND id = $1 LIMIT 1', [id])
+    const course = await db.query('SELECT "id", "date", "title", "place", "instructor", "note", "price", "span", "slots", "available", "dateCreated", "fileName", "customURL", "permissionRequired" FROM "courses" WHERE "archived" = false AND id = $1 LIMIT 1', [id])
     if (!course || course.rowCount == 0) { return undefined }
     const courseFormatted: ADMcourseElement = await formatAsADMCourseElement(course.rows[0], db)
     return courseFormatted
 }
 
 export async function ADMgetArchivedCourses(db: Pool): Promise<ADMcourseElement[] | undefined>{
-    const courses = await db.query('SELECT "id", "date", "title", "place", "instructor", "note", "price", "span", "slots", "available", "dateCreated", "fileName", "customURL" FROM "courses" WHERE "archived" = true AND title != $1 ORDER BY date', ["--##"])
+    const courses = await db.query('SELECT "id", "date", "title", "place", "instructor", "note", "price", "span", "slots", "available", "dateCreated", "fileName", "customURL", "permissionRequired" FROM "courses" WHERE "archived" = true AND title != $1 ORDER BY date', ["--##"])
     if (!courses || courses.rowCount == 0) { return undefined }
     const coursesFormatted: ADMcourseElement[] = await Promise.all(courses.rows.map(async (result) => await formatAsADMCourseElement(result, db)))
     return coursesFormatted
 }
 
 export async function ADMgetCourses(db: Pool): Promise<ADMcourseElement[] | undefined>{
-    const courses = await db.query('SELECT "id", "date", "title", "place", "instructor", "note", "price", "span", "slots", "available", "dateCreated", "fileName", "customURL" FROM "courses" WHERE "archived" = false AND title != $1 ORDER BY date', ["--##"])
+    const courses = await db.query('SELECT "id", "date", "title", "place", "instructor", "note", "price", "span", "slots", "available", "dateCreated", "fileName", "customURL", "permissionRequired" FROM "courses" WHERE "archived" = false AND title != $1 ORDER BY date', ["--##"])
     if (!courses || courses.rowCount == 0) { return undefined }
     const coursesFormatted: ADMcourseElement[] = await Promise.all(courses.rows.map(async (result) => await formatAsADMCourseElement(result, db)))
     return coursesFormatted
@@ -108,9 +108,9 @@ export async function ADMarchiveCourses(db: Pool): Promise<number[]>{
 }
 
 export async function formatAsCourseElement(row: any, db: Pool, withOffers: boolean = true): Promise<courseElement>{
-    return { id: row.id, date: row.date, span: row.span, price: row.price, title: row.title, place: row.place, instructor: row.instructor, note: row.note, slots: row.customURL == undefined ? row.slots : 0, slotAvailable: row.customURL == undefined ? (await getSlotAvailability(db, row.id, row.slots)) : true, available: row.customURL == undefined ? row.available : true, dateCreated: row.dateCreated, fileName: row.fileName, customURL: row.customURL, offers: withOffers ? (await getCourseOffers(db, row.id)) : undefined }
+    return { id: row.id, date: row.date, span: row.span, price: row.price, title: row.title, place: row.place, instructor: row.instructor, note: row.note, slots: row.customURL == undefined ? row.slots : 0, slotAvailable: row.customURL == undefined ? (await getSlotAvailability(db, row.id, row.slots)) : true, available: row.customURL == undefined ? row.available : true, dateCreated: row.dateCreated, fileName: row.fileName, customURL: row.customURL, offers: withOffers ? (await getCourseOffers(db, row.id)) : undefined, permissionRequired: row.permissionRequired }
 }
 
 export async function formatAsADMCourseElement(row: any, db: Pool): Promise<ADMcourseElement>{
-    return { id: row.id, date: row.date, span: row.span, price: row.price, title: row.title, place: row.place, instructor: row.instructor, note: row.note, slots: row.customURL == undefined ? row.slots : 0, slotsUsed: row.customURL == undefined ? (await getCourseSignupsCount(db, row.id)) : 0, available: row.customURL == undefined ? row.available : true, dateCreated: row.dateCreated, fileName: row.fileName, customURL: row.customURL }
+    return { id: row.id, date: row.date, span: row.span, price: row.price, title: row.title, place: row.place, instructor: row.instructor, note: row.note, slots: row.customURL == undefined ? row.slots : 0, slotsUsed: row.customURL == undefined ? (await getCourseSignupsCount(db, row.id)) : 0, available: row.customURL == undefined ? row.available : true, dateCreated: row.dateCreated, fileName: row.fileName, customURL: row.customURL, permissionRequired: row.permissionRequired }
 }

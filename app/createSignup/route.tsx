@@ -52,7 +52,8 @@ export async function POST(req: Request, res: Response){
             courseID == "" ? undefined : courseID,
             undefined,
             Math.round(adjustedPrice),
-            sattendees.map((attendee) => (capitalizeWords(attendee)))
+            sattendees.map((attendee) => (capitalizeWords(attendee))),
+            course.permissionRequired
         )
         if (!signup) { return unprocessableContent(rm021019) }
         const signupConfirmation = await sendSignupConfirmation(db, signup, course)
@@ -88,7 +89,8 @@ export async function POST(req: Request, res: Response){
             undefined,
             offerID == "" ? undefined : offerID,
             offer.price * sattendees.length,
-            sattendees.map((attendee) => (capitalizeWords(attendee)))
+            sattendees.map((attendee) => (capitalizeWords(attendee))),
+            1
         )
         if (!signup) { return unprocessableContent(rm021019) }
         const signupConfirmation = await sendSignupConfirmation(db, signup, undefined, offer)

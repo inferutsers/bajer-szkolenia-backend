@@ -21,6 +21,7 @@ export const rm011008: String = "01.1008 | Szkolenie zawiera już załączony pl
 export const rm011009: String = "01.1009 | Nie udało się załączyć pliku" //buffer problem
 export const rm011010: String = "01.1010 | Nie udało się załączyć pliku" //insert problem
 export const rm011011: String = "01.1011 | Nie udało się pobrać załączonego pliku"
+export const rm011012: String = "01.1012 | Szkolenie zablokowane"
 export const rm011100: String = "01.1100 | Brak szkoleń"
 
 //ZAPISY
@@ -44,6 +45,7 @@ export const rm021017: String = "02.1017 | Niewystarczająca ilość wolnych mie
 export const rm021018: String = "02.1018 | Szkolenie jest niedostępne" //czas minal
 export const rm021019: String = "02.1019 | Nie udało się stworzyć zapisu"
 export const rm021020: String = "02.1020 | Jedno (lub więcej) ze szkoleń w pakiecie jest niedostępne"
+export const rm021021: String = "02.1021 | Usługa bezpłatna"
 export const rm021100: String = "02.1100 | Brak zapisów"
 
 //AKTUALNOSCI
@@ -90,3 +92,6 @@ export const rm091001: String = "09.1001 | Token zgłoszenia do newsletteru niep
 export const rm091002: String = "09.1002 | Nie udało się anulować zgłoszenia do newsletteru"
 export const rm091003: String = "09.1003 | Nie udało się potwierdzić zgłoszenia do newsletteru"
 export const rm091004: String = "09.1004 | Zapis nieudany"
+
+//PUBLIC FILE
+export const rm101000: String = "10.1000 | Plik nieznaleziony"

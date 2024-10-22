@@ -34,6 +34,7 @@ export async function PATCH(req: Request, res: Response){
     if (!validatedUser) { return unauthorized(rm001000) }
     const signup = await getSignup(db, signupID)
     if (!signup) { systemLog(systemAction.ADMeditSignup, systemActionStatus.error, rm021000, validatedUser, db); return notFound(rm021000) }
+    if (signup.permissionRequired > validatedUser.status) { systemLog(systemAction.ADMcancelSignup, systemActionStatus.error, rm001000, validatedUser, db); return unauthorized(rm001000) }
     const signupInvoiceCount = await getSignupInvoiceCount(db, signupID)
     if (signupInvoiceCount > 0) { systemLog(systemAction.ADMeditSignup, systemActionStatus.error, rm021005, validatedUser, db); return unprocessableContent(rm021005) }
     if (signup.attendees.length < suAttendees.length){
@@ -54,6 +55,6 @@ export async function PATCH(req: Request, res: Response){
     }
     const changedSignup = await updateSignup(db, signupID, utf8.decode(suName), utf8.decode(suSurname), utf8.decode(suEmail), suPhonenumber, utf8.decode(suAdress), suPesel ? suPesel : undefined, suIscompany, suCompanyname ? utf8.decode(suCompanyname): undefined, suCompanyNIP ? suCompanyNIP : undefined, suSupprice, suAttendees)
     if (!changedSignup) { systemLog(systemAction.ADMeditSignup, systemActionStatus.error, rm021006, validatedUser, db); return unprocessableContent(rm021006) }
-    systemLog(systemAction.ADMeditSignup, systemActionStatus.success, `Zmieniono zapis\n${compareObjects(signup, changedSignup)}`, validatedUser, db);
+    systemLog(systemAction.ADMeditSignup, systemActionStatus.success, `Zmieniono zapis #${signup.id}\n${compareObjects(signup, changedSignup)}`, validatedUser, db);
     return NextResponse.json(changedSignup, {status: 200})
 }

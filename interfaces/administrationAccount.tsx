@@ -3,7 +3,7 @@ export default interface administrationAccount{
     login: String,
     displayName: String,
     password?: String,
-    status: Number,
+    status: number,
     sessionID?: String,
     sessionValidity?: Date,
     passwordResetToken?: String,

@@ -1,5 +1,5 @@
 import signupElement from "@/interfaces/signupElement";
-import { native, Pool } from "pg";
+import { Pool } from "pg";
 import getCourseName from "../getCourseName";
 import getInvoiceNumber from "../invoices/getInvoiceNumber";
 import mailStructure from "@/interfaces/mailStructure";
@@ -18,14 +18,14 @@ export async function addPaymentToSignup(db: Pool, id: string | number, amount: 
 
 export async function addEmailSentToSignup(db: Pool, id: string | number, mailSent: mailStructure, reminderMail: boolean = false){
     if (reminderMail){
-        await db.query('UPDATE signups SET "emailsSent" = ARRAY_APPEND("emailsSent", $1), "reminderSent" = true WHERE "id" = $2 AND', [mailSent, id])
+        await db.query('UPDATE signups SET "emailsSent" = ARRAY_APPEND("emailsSent", $1), "reminderSent" = true WHERE "id" = $2', [mailSent, id])
     } else {
         await db.query('UPDATE signups SET "emailsSent" = ARRAY_APPEND("emailsSent", $1) WHERE "id" = $2', [mailSent, id])
     }
 }
 
-export async function createSignup(db: Pool, name: string, surname: string, email: string, phoneNumber: string, adress: string, pesel: string | undefined = undefined, isCompany: string, companyName: string | undefined = undefined, companyNIP: string | undefined = undefined, courseID: string | number | undefined, offerID: string | number | undefined, price: string | number, attendees: string[]): Promise<signupElement | undefined>{
-    const signup = await db.query('INSERT INTO signups("id", "name", "surname", "email", "phoneNumber", "isCompany", "companyName", "adress", "companyNIP", "date", "courseID", "supPrice", "pesel", "attendees", "offerID") VALUES (DEFAULT, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *', [name, surname, email, phoneNumber, isCompany, companyName, adress, companyNIP, getDateLong(), courseID, price, pesel, attendees, offerID])
+export async function createSignup(db: Pool, name: string, surname: string, email: string, phoneNumber: string, adress: string, pesel: string | undefined = undefined, isCompany: string, companyName: string | undefined = undefined, companyNIP: string | undefined = undefined, courseID: string | number | undefined, offerID: string | number | undefined, price: string | number, attendees: string[], coursePermissionRequired: number): Promise<signupElement | undefined>{
+    const signup = await db.query('INSERT INTO signups("id", "name", "surname", "email", "phoneNumber", "isCompany", "companyName", "adress", "companyNIP", "date", "courseID", "supPrice", "pesel", "attendees", "offerID", "permissionRequired") VALUES (DEFAULT, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *', [name, surname, email, phoneNumber, isCompany, companyName, adress, companyNIP, getDateLong(), courseID, price, pesel, attendees, offerID, coursePermissionRequired])
     if (!signup || signup.rowCount == 0) { return undefined }
     return await formatAsSignupElement(signup.rows[0], db)
 }
@@ -76,5 +76,5 @@ export async function formatAsSignupElement(row: any, db: Pool): Promise<signupE
     const price = row.courseID ? (await getCoursePrice(db, row.courseID)) : (row.offerID ? (await getOfferPrice(db, row.offerID)) : -1)
     const servicename = row.courseID ? (await getCourseName(db, row.courseID)) : (row.offerID ? (await getOfferName(db, row.offerID)) : "nieznana usluga")
     const servicedate = row.courseID ? (await getCourseDate(db, row.courseID)) : (row.offerID? (await getOfferDate(db, row.offerID)): new Date)
-    return {id: row.id, name: row.name, surname: row.surname, email: row.email, phoneNumber: row.phoneNumber, isCompany: row.isCompany, companyName: row.companyName, adress: row.adress, companyNIP: row.companyNIP, date: row.date, courseID: row.courseID, offerID: row.offerID, supPrice: row.supPrice, emailsSent: row.emailsSent, paidIn: row.paidIn, invoiceNumber: await getInvoiceNumber(db, row.id), serviceName: servicename, pesel: row.pesel, attendees: row.attendees, servicePrice: price, serviceDate: servicedate, reminderSent: row.reminderSent}
+    return {id: row.id, name: row.name, surname: row.surname, email: row.email, phoneNumber: row.phoneNumber, isCompany: row.isCompany, companyName: row.companyName, adress: row.adress, companyNIP: row.companyNIP, date: row.date, courseID: row.courseID, offerID: row.offerID, supPrice: row.supPrice, emailsSent: row.emailsSent, paidIn: row.paidIn, invoiceNumber: await getInvoiceNumber(db, row.id), serviceName: servicename, pesel: row.pesel, attendees: row.attendees, servicePrice: price, serviceDate: servicedate, reminderSent: row.reminderSent, permissionRequired: row.permissionRequired }
 }

@@ -12,5 +12,6 @@ export default interface ADMcourseElement{
     available: boolean,
     dateCreated: Date,
     fileName?: string,
-    customURL?: string
+    customURL?: string,
+    permissionRequired: number
 }

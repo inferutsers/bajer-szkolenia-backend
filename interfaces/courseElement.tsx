@@ -15,5 +15,6 @@ export default interface courseElement{
     dateCreated: Date,
     fileName?: string,
     customURL: string,
-    offers?: offerElement[]
+    offers?: offerElement[],
+    permissionRequired: number
 }

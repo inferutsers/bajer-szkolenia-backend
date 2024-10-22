@@ -20,6 +20,7 @@ export async function POST(req: Request, res: Response){
     if (!validatedUser) { return unauthorized(rm001000) }
     const signup = await getSignup(db, signupID)
     if (!signup) { systemLog(systemAction.ADMresendSignupConfirmation, systemActionStatus.error, rm021000, validatedUser, db); return notFound(rm021000) }
+    if (signup.permissionRequired > validatedUser.status) { systemLog(systemAction.ADMresendSignupConfirmation, systemActionStatus.error, rm001000, validatedUser, db); return unauthorized(rm001000) }
     if (signup.courseID && !signup.offerID) { //COURSE
         const course = await getCourse(db, signup.courseID)
         if (!course) { systemLog(systemAction.ADMresendSignupConfirmation, systemActionStatus.error, rm021008, validatedUser, db); return gone(rm021008) }

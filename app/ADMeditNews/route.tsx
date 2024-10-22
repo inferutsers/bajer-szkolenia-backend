@@ -25,9 +25,10 @@ export async function PATCH(req: NextRequest, res: Response){
     if (!validatedUser) { return unauthorized(rm001000) }
     const news = await getAllNewsData(db, newsID)
     if (!news) { systemLog(systemAction.ADMeditNews, systemActionStatus.error, rm031000, validatedUser, db); return notFound(rm031000) }
+    if (news.permissionRequired > validatedUser.status) { systemLog(systemAction.ADMeditNews, systemActionStatus.error, rm001000, validatedUser, db); return unauthorized(rm001000) }
     const imgbufer = await getBufferFromString(image)
     const changedNews = await updateNews(db, newsID, utf8.decode(title), utf8.decode(description), date, pin, imgbufer)
     if (!changedNews) { systemLog(systemAction.ADMeditNews, systemActionStatus.error, rm031005, validatedUser, db); return unprocessableContent(rm031005) }
-    systemLog(systemAction.ADMeditNews, systemActionStatus.success, `Zmieniono aktualność\n${compareObjects(news, changedNews)}`, validatedUser, db);
+    systemLog(systemAction.ADMeditNews, systemActionStatus.success, `Zmieniono aktualność #${news.id}\n${compareObjects(news, changedNews)}`, validatedUser, db);
     return NextResponse.json(changedNews, {status: 200})
 }

@@ -17,6 +17,7 @@ export async function DELETE(req: Request, res: Response){
     if (!validatedUser) { return unauthorized(rm001000) }
     const news = await getAllNewsData(db, newsID)
     if (!news) { systemLog(systemAction.ADMdeleteNews, systemActionStatus.error, rm031000, validatedUser, db); return notFound(rm031000) }
+    if (news.permissionRequired > validatedUser.status) { systemLog(systemAction.ADMdeleteNews, systemActionStatus.error, rm001000, validatedUser, db); return unauthorized(rm001000) }
     await deleteNews(db, newsID)
     systemLog(systemAction.ADMdeleteNews, systemActionStatus.success, `Usunięto aktualność\n${dumpObject(news)}`, validatedUser, db);
     return NextResponse.json(null, {status: 200})
