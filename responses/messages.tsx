@@ -94,4 +94,7 @@ export const rm091003: String = "09.1003 | Nie udało się potwierdzić zgłosze
 export const rm091004: String = "09.1004 | Zapis nieudany"
 
 //PUBLIC FILE
-export const rm101000: String = "10.1000 | Plik nieznaleziony"
+export const rm101000: String = "10.1000 | Taki klucz nie istnieje"
+export const rm101001: String = "10.1001 | Plik przypisany do klucza nie istnieje"
+export const rm101002: String = "10.1002 | Nie znaleziono właściciela klucza pliku"
+export const rm101003: String = "10.1003 | Limit użyć klucza wykorzystany"
