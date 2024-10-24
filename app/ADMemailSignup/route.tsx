@@ -1,12 +1,9 @@
 import getDatabase from "@/connection/database"
 import { ADMgetCourse } from "@/functions/queries/course"
-import sendCourseEmail from "@/functions/emails/sendCourseEmail"
 import validateSession from "@/functions/validateSession"
-import { bulkEmailReceiver } from "@/interfaces/newsletterReceiver"
 import { badRequest, notFound, unauthorized, unprocessableContent } from "@/responses/responses"
 import { NextResponse } from "next/server"
 import utf8 from 'utf8'
-import { getCourseSignups } from "@/functions/getCourseSignups"
 import { getSignup } from "@/functions/queries/signups"
 import sendSignupEmail from "@/functions/emails/sendSignupEmail"
 import { rm001000, rm001001, rm021000, rm021001, rm021008, rm021012 } from "@/responses/messages"

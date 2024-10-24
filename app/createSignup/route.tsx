@@ -4,11 +4,10 @@ import { NextResponse } from "next/server"
 import utf8 from "utf8"
 import sendSignupConfirmation from "@/functions/emails/sendSignupConfirmation"
 import { getCourse } from "@/functions/queries/course"
-import { createSignup, deleteSignup } from "@/functions/queries/signups"
+import { createSignup, deleteSignup, getCourseSignups } from "@/functions/queries/signups"
 import formatAttendees from "@/functions/attendeesFormatting"
 import signupForNewsletter from "@/functions/signupForNewsletter"
 import { getOffer } from "@/functions/queries/offer"
-import { getCourseSignupsCount } from "@/functions/getCourseSignups"
 import { rm001001, rm021011, rm021012, rm021013, rm021015, rm021016, rm021017, rm021018, rm021019, rm021020 } from "@/responses/messages"
 import { capitalizeAdress, capitalizeWords } from "@/functions/capitalizeStrings"
 
@@ -33,8 +32,8 @@ export async function POST(req: Request, res: Response){
     if ((!offerID || offerID == "") && courseID && courseID != ""){ //COURSE
         const course = await getCourse(db, courseID)
         if (!course || course.customURL != undefined) { return notFound(rm021015) }
-        const courseSignupsAmount = await getCourseSignupsCount(db, courseID)
-        if (courseSignupsAmount + sattendees.length > course.slots){ return notAcceptable(rm021017) }
+        const courseSignupsAmount = await getCourseSignups(db, courseID)
+        if (courseSignupsAmount ? courseSignupsAmount : 0 + sattendees.length > course.slots){ return notAcceptable(rm021017) }
         if (course.available == false) { return notAcceptable(rm021018) }
         const price = course.price * sattendees.length
         const adjustedPrice = price - (sattendees.length == 2 ? price * 0.05 : (sattendees.length > 2 ? price * 0.1 : 0))
@@ -70,8 +69,8 @@ export async function POST(req: Request, res: Response){
         const offer = await getOffer(db, offerID)
         if (!offer || !offer.courses) { return notFound(rm021016) }
         const coursesState = await Promise.all(offer.courses!.map(async course => {
-            const courseSignupsAmount = await getCourseSignupsCount(db, course.id)
-            if (courseSignupsAmount + sattendees.length > course.slots || course.available == false){ return false; }
+            const courseSignupsAmount = await getCourseSignups(db, course.id)
+            if (courseSignupsAmount ? courseSignupsAmount : 0 + sattendees.length > course.slots || course.available == false){ return false; }
             return true
         }));
         if (coursesState.includes(false)) { return notAcceptable(rm021020) }

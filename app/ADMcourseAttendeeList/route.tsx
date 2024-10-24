@@ -1,10 +1,10 @@
 import getDatabase from "@/connection/database";
-import { getCourseSignups } from "@/functions/getCourseSignups";
 import { ADMgetCourse } from "@/functions/queries/course";
 import validateSession from "@/functions/validateSession";
 import { badRequest, noContent, notFound, unauthorized } from "@/responses/responses";
 import { NextResponse } from "next/server";
 import { rm001000, rm001001, rm011000, rm011001 } from "@/responses/messages";
+import { getCourseSignups } from "@/functions/queries/signups";
 
 export async function GET(req: Request, res: Response){
     const headers = req.headers,

@@ -1,8 +1,8 @@
 import getDatabase from "@/connection/database";
-import { getCourseSignupsCount } from "@/functions/getCourseSignups";
 import { dumpObject, systemAction, systemActionStatus } from "@/functions/logging/actions";
 import { systemLog } from "@/functions/logging/log";
 import { deleteCourse, getCourse } from "@/functions/queries/course";
+import { getCourseSignups } from "@/functions/queries/signups";
 import validateSession from "@/functions/validateSession";
 import { rm001000, rm001001, rm011000, rm011002, rm011012 } from "@/responses/messages";
 import { badRequest, notFound, serviceUnavailable, unauthorized, unprocessableContent } from "@/responses/responses";
@@ -20,8 +20,8 @@ export async function DELETE(req: Request, res: Response){
     if (!course) { systemLog(systemAction.ADMdeleteCourse, systemActionStatus.error, rm011000, validatedUser, db); return notFound(rm011000) }
     if (!course.available) { systemLog(systemAction.ADMeditCourse, systemActionStatus.error, rm011012, validatedUser, db); return serviceUnavailable(rm011012) }
     if (course.permissionRequired > validatedUser.status) { systemLog(systemAction.ADMdeleteCourse, systemActionStatus.error, rm001000, validatedUser, db); return unauthorized(rm001000) }
-    const signups = await getCourseSignupsCount(db, courseID)
-    if (signups != 0) { systemLog(systemAction.ADMdeleteCourse, systemActionStatus.error, rm011002, validatedUser, db); return unprocessableContent(rm011002) }
+    const signups = await getCourseSignups(db, courseID)
+    if (signups && signups.length != 0) { systemLog(systemAction.ADMdeleteCourse, systemActionStatus.error, rm011002, validatedUser, db); return unprocessableContent(rm011002) }
     await deleteCourse(db, courseID)
     systemLog(systemAction.ADMdeleteCourse, systemActionStatus.success, `Usunięto szkolenie\n${dumpObject(course)}`, validatedUser, db)
     return NextResponse.json(null, {status: 200})

@@ -1,10 +1,9 @@
 import { Pool } from "pg";
 import { getUpcomingCourses } from "./queries/course";
-import { getCourseSignups } from "./getCourseSignups";
 import sendSingleEmail from "./emails/processor/sendSingleEmail";
 import fs from 'fs'
 import mailFormatAsCourseReminder from "./formattings/mailFormatAsCourseReminder";
-import { addEmailSentToSignup } from "./queries/signups";
+import { addEmailSentToSignup, getCourseSignups } from "./queries/signups";
 
 export async function sendCourseReminders(db: Pool): Promise<number>{
     const courses = await getUpcomingCourses(db)

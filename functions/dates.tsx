@@ -8,7 +8,8 @@ export function getDateLong(date: Date = new Date): string{
     return moment(date).format("YYYY-MM-DD HH:mm:ssZ")
 }
 
-export function getDateShortReadable(date: Date = new Date): string{
+export function getDateShortReadable(date: Date = new Date, inverted: boolean = false): string{
+    if (inverted) { return moment(date).tz("Europe/Warsaw").format("DD-MM-YYYY z") }
     return moment(date).tz("Europe/Warsaw").format("YYYY-MM-DD z")
 }
 

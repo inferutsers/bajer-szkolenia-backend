@@ -6,10 +6,10 @@ import { bulkEmailReceiver } from "@/interfaces/newsletterReceiver"
 import { badRequest, noContent, notFound, unauthorized, unprocessableContent } from "@/responses/responses"
 import { NextResponse } from "next/server"
 import utf8 from 'utf8'
-import { getCourseSignups } from "@/functions/getCourseSignups"
 import { rm001000, rm001001, rm011000, rm011001, rm011007 } from "@/responses/messages"
 import { systemLog } from "@/functions/logging/log"
 import { systemAction, systemActionStatus } from "@/functions/logging/actions"
+import { getCourseSignups } from "@/functions/queries/signups"
 
 export async function POST(req: Request, res: Response){
     const headers = req.headers,

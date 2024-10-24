@@ -1,7 +1,6 @@
 
 import { Pool } from "pg";
 import offerElement from "@/interfaces/offerElement";
-import getOfferCourses from "../getOfferCourses";
 import { getDateLong } from "../dates";
 
 export async function uploadFile(db: Pool, id: string | number, file: Buffer, fileName: string): Promise<boolean>{
@@ -59,5 +58,5 @@ export async function getOfferFile(db: Pool, id: number | string): Promise<Buffe
 }
 
 export async function formatAsOfferElement(row: any, db: Pool, withCourses: boolean): Promise<offerElement>{
-    return { id: row.id, name: row.name, courses: withCourses ? (await getOfferCourses(db, row.courses)) : undefined, price: row.price, note: row.note, available: row.available, dateCreated: row.dateCreated, fileName: row.fileName}
+    return { id: row.id, name: row.name, courses: undefined, price: row.price, note: row.note, available: row.available, dateCreated: row.dateCreated, fileName: row.fileName}
 }

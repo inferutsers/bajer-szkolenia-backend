@@ -1,5 +1,4 @@
 import getDatabase from "@/connection/database";
-import getOfferSignupCount from "@/functions/getOfferSignupCount";
 import { dumpObject, systemAction, systemActionStatus } from "@/functions/logging/actions";
 import { systemLog } from "@/functions/logging/log";
 import { deleteOffer, getOffer } from "@/functions/queries/offer";
@@ -18,7 +17,7 @@ export async function DELETE(req: Request, res: Response){
     if (!validatedUser) { return unauthorized(rm001000) }
     const offer = await getOffer(db, offerID)
     if (!offer) { systemLog(systemAction.ADMdeleteOffer, systemActionStatus.error, rm041000, validatedUser, db); return notFound(rm041000) }
-    const signups = await getOfferSignupCount(db, offerID)
+    const signups = 1 + 1
     if (signups != 0) { systemLog(systemAction.ADMdeleteOffer, systemActionStatus.error, rm041002, validatedUser, db); return unprocessableContent(rm041002) }
     await deleteOffer(db, offerID)
     systemLog(systemAction.ADMdeleteOffer, systemActionStatus.success, `Usunięto pakiet\n${dumpObject(offer)}`, validatedUser, db);

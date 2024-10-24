@@ -12,7 +12,7 @@ export default async function generateSecurePDF(file: Buffer, newTitle: string, 
     const tempPath = `/tmp/${uuidv4()}`
     if (course){
         const text = `BAJEREXPERT © Wszelkie prawa zastrzezone; Szkolenie #${course.id}`
-        const textRight = `Pobrano ${getDateShortReadable(new Date).split('-').reverse().join("-")} z https://bajerszkolenia.pl`
+        const textRight = `Pobrano ${getDateShortReadable(new Date, true)} z https://bajerszkolenia.pl`
         const font = pdf.embedStandardFont(StandardFonts.Helvetica)
         pdf.getPages().forEach((page) => {
             page.drawText(text, {

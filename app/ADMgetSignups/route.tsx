@@ -2,8 +2,7 @@ import getDatabase from "@/connection/database"
 import validateSession from "@/functions/validateSession"
 import { badRequest, noContent, unauthorized } from "@/responses/responses"
 import { NextResponse } from "next/server"
-import { getSignups } from "@/functions/queries/signups"
-import { getCourseSignups } from "@/functions/getCourseSignups"
+import { getCourseSignups, getSignups } from "@/functions/queries/signups"
 import { rm001000, rm001001, rm021100 } from "@/responses/messages"
 
 export async function GET(req: Request, res: Response){
