@@ -46,6 +46,11 @@ export const rm021018: String = "02.1018 | Szkolenie jest niedostępne" //czas m
 export const rm021019: String = "02.1019 | Nie udało się stworzyć zapisu"
 export const rm021020: String = "02.1020 | Jedno (lub więcej) ze szkoleń w pakiecie jest niedostępne"
 export const rm021021: String = "02.1021 | Usługa bezpłatna"
+export const rm021022: String = "02.1022 | Niepoprawnie sformatowane dane: Number telefonu"
+export const rm021023: String = "02.1023 | Niepoprawnie sformatowane dane: Kod pocztowy (xx-xxx)"
+export const rm021024: String = "02.1024 | Niepoprawnie sformatowane dane: Imię i/lub nazwisko"
+export const rm021025: String = "02.1025 | Niepoprawnie sformatowane dane: Dane uczestników"
+export const rm021026: String = "02.1026 | Niepoprawnie sformatowane dane: Adres email"
 export const rm021100: String = "02.1100 | Brak zapisów"
 
 //AKTUALNOSCI
