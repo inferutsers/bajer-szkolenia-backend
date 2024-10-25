@@ -97,6 +97,7 @@ export const rm091001: String = "09.1001 | Token zgłoszenia do newsletteru niep
 export const rm091002: String = "09.1002 | Nie udało się anulować zgłoszenia do newsletteru"
 export const rm091003: String = "09.1003 | Nie udało się potwierdzić zgłoszenia do newsletteru"
 export const rm091004: String = "09.1004 | Zapis nieudany"
+export const rm091005: String = "09.1005 | Email jest już zapisany. Jeżeli jeszcze tego nie zrobiono, prosimy o potwierdzenie zapisu poprzez kliknięcie w link wysłany w wiadomości"
 
 //PUBLIC FILE
 export const rm101000: String = "10.1000 | Taki klucz nie istnieje"

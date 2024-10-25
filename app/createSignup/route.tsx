@@ -34,8 +34,8 @@ export async function POST(req: Request, res: Response){
     const db = await getDatabase(req)
     const course = await getCourse(db, courseID)
     if (!course || course.customURL != undefined) { return notFound(rm021015) }
-    const courseSignupsAmount = await getCourseSignups(db, courseID)
-    if (courseSignupsAmount ? courseSignupsAmount : 0 + sattendees.length > course.slots){ return notAcceptable(rm021017) }
+    const courseSignupsAmount = (await getCourseSignups(db, courseID))?.length
+    if ((courseSignupsAmount ? courseSignupsAmount : 0) + sattendees.length > course.slots){ return notAcceptable(rm021017) }
     if (course.available == false) { return notAcceptable(rm021018) }
     const price = course.price * sattendees.length
     const adjustedPrice = price - (sattendees.length == 2 ? price * 0.05 : (sattendees.length > 2 ? price * 0.1 : 0))
