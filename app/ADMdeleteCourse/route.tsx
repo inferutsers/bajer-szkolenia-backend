@@ -6,9 +6,8 @@ import { getCourseSignups } from "@/functions/queries/signups";
 import validateSession from "@/functions/validateSession";
 import { rm001000, rm001001, rm011000, rm011002, rm011012 } from "@/responses/messages";
 import { badRequest, notFound, serviceUnavailable, unauthorized, unprocessableContent } from "@/responses/responses";
-import { NextResponse } from "next/server";
 
-export async function DELETE(req: Request, res: Response){
+export async function DELETE(req: Request){
     const headers = req.headers,
     sessionID = headers.get("sessionID"),
     courseID = headers.get("courseID")
@@ -24,5 +23,5 @@ export async function DELETE(req: Request, res: Response){
     if (signups && signups.length != 0) { systemLog(systemAction.ADMdeleteCourse, systemActionStatus.error, rm011002, validatedUser, db); return unprocessableContent(rm011002) }
     await deleteCourse(db, courseID)
     systemLog(systemAction.ADMdeleteCourse, systemActionStatus.success, `Usunięto szkolenie\n${dumpObject(course)}`, validatedUser, db)
-    return NextResponse.json(null, {status: 200})
+    return Response.json(null, {status: 200})
 }

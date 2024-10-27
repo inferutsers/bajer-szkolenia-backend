@@ -1,33 +1,25 @@
 import getDatabase from "@/connection/database"
-import administrationAccount from "@/interfaces/administrationAccount"
-import { badRequest, notFound } from "@/responses/responses"
-import { NextResponse } from "next/server"
-import bcrypt from "bcrypt"
-import speakeasy from "speakeasy"
-import { rm001001, rm001008 } from "@/responses/messages"
+import { badRequest, notFound, unprocessableContent } from "@/responses/responses"
+import { rm001001, rm001006, rm001008 } from "@/responses/messages"
 import { systemLog } from "@/functions/logging/log"
 import { systemAction, systemActionStatus } from "@/functions/logging/actions"
+import { getAdministratorByPRT, updatePassword, updateTfaSecret } from "@/functions/queries/administration"
+import { generateTfa } from "@/functions/TwoFactorAuth"
+import validateAndHashPassword from "@/functions/passwordValidator"
 
-export async function POST(req: Request, res: Response){
+export async function POST(req: Request){
     const headers = req.headers,
     resetToken = headers.get("resetToken"),
     newPassword = headers.get("newPassword")
     if (!resetToken || !newPassword) { return badRequest(rm001001) }
     const db = await getDatabase(req)
-    const accountFoundArray = await db.query('SELECT * FROM "administration" WHERE "passwordResetToken" = $1 AND "status" > 0 LIMIT 1', [resetToken])
-    if (!accountFoundArray || accountFoundArray.rowCount == 0) { return notFound(rm001008) }
-    const accountFound: administrationAccount = accountFoundArray.rows.map((result) => ({id: result.id, login: result.login, displayName: result.displayName, password: result.password, status: result.status, sessionID: result.sessionID, sessionValidity: result.sessionValidity, passwordResetToken: result.passwordResetToken, tfaSecret: result.tfaSecret}))[0]
-    const newPasswordHashed = await bcrypt.hash(newPassword, 7)
-    const tfasecret = speakeasy.generateSecret().base32
-    const tfaSetupLink = speakeasy.otpauthURL({
-        secret: tfasecret,
-        label: process.env.TFALABEL as string,
-        type: 'totp',
-        issuer: process.env.TFAISSUER as string,
-        digits: Number(process.env.TFADIGITS),
-        period: Number(process.env.TFAPERIOD)
-    })
-    await db.query('UPDATE "administration" SET "password" = $1, "passwordResetToken" = NULL, "sessionID" = NULL, "sessionValidity" = NULL, "tfaSecret" = $2 WHERE "id" = $3', [String(newPasswordHashed), tfasecret, accountFound.id])
+    const accountFound = await getAdministratorByPRT(db, resetToken)
+    if (!accountFound) { return notFound(rm001008) }
+    const hashedPassword = await validateAndHashPassword(newPassword)
+    if (!hashedPassword) { systemLog(systemAction.changePasswordWithToken, systemActionStatus.error, rm001006, accountFound, db); return unprocessableContent(rm001006) }
+    const {secret, setupLink} = generateTfa()
+    await updatePassword(db, hashedPassword, accountFound.id)
+    await updateTfaSecret(db, secret, accountFound.id)
     systemLog(systemAction.changePasswordWithToken, systemActionStatus.success, `Użyto tokenu zmiany hasła`, accountFound, db)
-    return NextResponse.json(tfaSetupLink, {status: 200})
+    return Response.json(setupLink, {status: 200})
 }

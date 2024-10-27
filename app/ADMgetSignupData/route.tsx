@@ -1,11 +1,10 @@
 import getDatabase from "@/connection/database"
 import validateSession from "@/functions/validateSession"
 import { badRequest, notFound, unauthorized } from "@/responses/responses"
-import { NextResponse } from "next/server"
 import { getSignup } from "@/functions/queries/signups"
 import { rm001000, rm001001, rm021000 } from "@/responses/messages"
 
-export async function GET(req: Request, res: Response){
+export async function GET(req: Request){
     const headers = req.headers,
     sessionID = headers.get("sessionID"),
     signupID = headers.get("signupID")
@@ -15,5 +14,5 @@ export async function GET(req: Request, res: Response){
     if (!validatedUser) { return unauthorized(rm001000) }
     const signup = await getSignup(db, signupID)
     if (!signup) { return notFound(rm021000) }
-    return NextResponse.json(signup, {status: 200})
+    return Response.json(signup, {status: 200})
 }

@@ -3,11 +3,10 @@ import mailFormatAsNewsletterConfirmation from "@/functions/formattings/mailForm
 import { addEmailSentToNewsletterUser, confirmNewsletterUser, getNewsletterUserPresenceByConfirmationKey } from "@/functions/queries/newsletter"
 import sendSingleEmail from "@/functions/emails/processor/sendSingleEmail"
 import { badRequest, notFound, unprocessableContent } from "@/responses/responses"
-import { NextResponse } from "next/server"
 import fs from 'fs'
 import { rm001001, rm091001, rm091003 } from "@/responses/messages"
 
-export async function POST(req: Request, res: Response){
+export async function POST(req: Request){
     const headers = req.headers,
     confirmationKey = headers.get("confirmationKey")
     if (!confirmationKey) { return badRequest(rm001001) }
@@ -23,5 +22,5 @@ export async function POST(req: Request, res: Response){
     if(mailSent.failure == false) {
         await addEmailSentToNewsletterUser(db, confirmationKey, email, mailSent)
     }
-    return NextResponse.json(null, {status: 200})
+    return Response.json(null, {status: 200})
 }

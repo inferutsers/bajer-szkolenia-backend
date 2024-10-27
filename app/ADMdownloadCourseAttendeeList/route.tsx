@@ -2,12 +2,11 @@ import getDatabase from "@/connection/database";
 import { ADMgetCourse } from "@/functions/queries/course";
 import validateSession from "@/functions/validateSession";
 import { badRequest, noContent, notFound, unauthorized } from "@/responses/responses";
-import { NextResponse } from "next/server";
 import generateAttendeeListPDF from "@/functions/generateAttendeeListPDF";
 import { rm001000, rm001001, rm011000, rm011001 } from "@/responses/messages";
 import { getCourseSignups } from "@/functions/queries/signups";
 
-export async function GET(req: Request, res: Response){
+export async function GET(req: Request){
     const headers = req.headers,
     sessionID = headers.get("sessionID"),
     courseID = headers.get("courseID")
@@ -20,5 +19,5 @@ export async function GET(req: Request, res: Response){
     const signups = await getCourseSignups(db, courseID)
     if (!signups){ return noContent(rm011001) }
     const pdf = await generateAttendeeListPDF(course, signups, validatedUser)
-    return NextResponse.json(pdf, {status: 200})
+    return Response.json(pdf, {status: 200})
 }

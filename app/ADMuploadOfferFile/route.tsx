@@ -7,10 +7,9 @@ import { getOffer, uploadFile } from "@/functions/queries/offer";
 import validateSession from "@/functions/validateSession";
 import { rm001000, rm001001, rm041000, rm041007, rm041008 } from "@/responses/messages";
 import { badRequest, notFound, unauthorized, unprocessableContent } from "@/responses/responses";
-import { NextRequest, NextResponse } from "next/server";
 import utf8 from 'utf8'
 
-export async function POST(req: NextRequest, res: Response){
+export async function POST(req: Request){
     const headers = req.headers,
     sessionID = headers.get("sessionID"),
     offerID = headers.get("offerID"),
@@ -27,5 +26,5 @@ export async function POST(req: NextRequest, res: Response){
     const updatedOffer = await uploadFile(db, offer.id, buffer, utf8.decode(fileName))
     if (updatedOffer == false) { systemLog(systemAction.ADMuploadOfferFile, systemActionStatus.error, rm041008, validatedUser, db); return unprocessableContent(rm041008) }
     systemLog(systemAction.ADMuploadOfferFile, systemActionStatus.success, `Załączono plik do pakietu #${offer.id}`, validatedUser, db);
-    return NextResponse.json(null, {status: 200})
+    return Response.json(null, {status: 200})
 }

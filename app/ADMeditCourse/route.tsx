@@ -5,10 +5,9 @@ import { getCourse, updateCourse } from "@/functions/queries/course"
 import validateSession from "@/functions/validateSession"
 import { rm001000, rm001001, rm011000, rm011005, rm011012 } from "@/responses/messages"
 import { badRequest, notFound, serviceUnavailable, unauthorized, unprocessableContent } from "@/responses/responses"
-import { NextResponse } from "next/server"
 import utf8 from "utf8"
 
-export async function PATCH(req: Request, res: Response){
+export async function PATCH(req: Request){
     const headers = req.headers,
     sessionID = headers.get("sessionID"),
     courseID = headers.get("courseID"),
@@ -32,5 +31,5 @@ export async function PATCH(req: Request, res: Response){
     const changedCourse = await updateCourse(db, courseID, date, utf8.decode(title), utf8.decode(place), utf8.decode(instructor), note ? utf8.decode(note) : undefined, price, span, (customURL ? utf8.decode(customURL) : undefined), slots)
     if (!changedCourse) { systemLog(systemAction.ADMeditCourse, systemActionStatus.error, rm011005, validatedUser, db); return unprocessableContent(rm011005) }
     systemLog(systemAction.ADMeditCourse, systemActionStatus.success, `Zmieniono szkolenie #${course.id}\n${compareObjects(course, changedCourse)}`, validatedUser, db);
-    return NextResponse.json(changedCourse, {status: 200})
+    return Response.json(changedCourse, {status: 200})
 }

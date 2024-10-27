@@ -3,9 +3,8 @@ import { getCustomInvoiceFile } from "@/functions/queries/invoices"
 import validateSession from "@/functions/validateSession"
 import { rm001000, rm001001, rm051000 } from "@/responses/messages"
 import { badRequest, notFound, unauthorized } from "@/responses/responses"
-import { NextResponse } from "next/server"
 
-export async function GET(req: Request, res: Response){
+export async function GET(req: Request){
     const headers = req.headers,
     sessionID = headers.get("sessionID"),
     invoiceRecordID = headers.get("invoiceRecordID")
@@ -15,5 +14,5 @@ export async function GET(req: Request, res: Response){
     if (!validatedUser) { return unauthorized(rm001000) }
     const invoice = await getCustomInvoiceFile(db, invoiceRecordID)
     if (!invoice) { return notFound(rm051000) }
-    return NextResponse.json(invoice, {status: 200})
+    return Response.json(invoice, {status: 200})
 }

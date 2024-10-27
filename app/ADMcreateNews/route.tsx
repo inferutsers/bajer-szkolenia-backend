@@ -7,10 +7,9 @@ import { createNews } from "@/functions/queries/news"
 import validateSession from "@/functions/validateSession"
 import { rm001000, rm001001, rm031006 } from "@/responses/messages"
 import { badRequest, unauthorized, unprocessableContent } from "@/responses/responses"
-import { NextRequest, NextResponse } from "next/server"
 import utf8 from "utf8"
 
-export async function POST(req: NextRequest, res: Response){
+export async function POST(req: Request){
     const headers = req.headers,
     sessionID = headers.get("sessionID"),
     date = headers.get("CDate"),
@@ -26,5 +25,5 @@ export async function POST(req: NextRequest, res: Response){
     const insertedNews = await createNews(db, utf8.decode(title), utf8.decode(description), date, pin, imgbufer)
     if (!insertedNews) { systemLog(systemAction.ADMcreateNews, systemActionStatus.error, rm031006, validatedUser, db); return unprocessableContent(rm031006) }
     systemLog(systemAction.ADMcreateNews, systemActionStatus.success, `Stworzono aktualność\n${dumpObject(insertedNews)}`, validatedUser, db)
-    return NextResponse.json(insertedNews, {status: 200})
+    return Response.json(insertedNews, {status: 200})
 }

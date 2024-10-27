@@ -5,10 +5,9 @@ import { createCourse } from "@/functions/queries/course"
 import validateSession from "@/functions/validateSession"
 import { rm001000, rm001001, rm011006 } from "@/responses/messages"
 import { badRequest, unauthorized, unprocessableContent } from "@/responses/responses"
-import { NextResponse } from "next/server"
 import utf8 from "utf8"
 
-export async function POST(req: Request, res: Response){
+export async function POST(req: Request){
     const headers = req.headers,
     sessionID = headers.get("sessionID"),
     date = headers.get("CDate"),
@@ -38,5 +37,5 @@ export async function POST(req: Request, res: Response){
     )
     if (!insertedCourse) { systemLog(systemAction.ADMcreateCourse, systemActionStatus.error, rm011006, validatedUser, db); return unprocessableContent(rm011006) }
     systemLog(systemAction.ADMcreateCourse, systemActionStatus.success, `Stworzono szkolenie\n${dumpObject(insertedCourse)}`, validatedUser, db);
-    return NextResponse.json(insertedCourse, {status: 200})
+    return Response.json(insertedCourse, {status: 200})
 }

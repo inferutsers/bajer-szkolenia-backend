@@ -2,7 +2,7 @@ import offerElement from "@/interfaces/offerElement";
 import signupElement from "@/interfaces/signupElement";
 import { getDateLongGMT2Readable } from "../dates";
 
-export default function mailFormatAsOfferConfirmation(input: String, signup: signupElement, offer: offerElement): String{
+export default function mailFormatAsOfferConfirmation(input: string, signup: signupElement, offer: offerElement): string{
     return input
     .replaceAll("{name}", signup.name as string)
     .replaceAll("{surname}", signup.surname as string)

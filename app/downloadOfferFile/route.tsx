@@ -2,9 +2,8 @@ import getDatabase from "@/connection/database";
 import { getOffer, getOfferFile } from "@/functions/queries/offer";
 import { rm001001, rm041000, rm041009 } from "@/responses/messages";
 import { badRequest, notFound } from "@/responses/responses";
-import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req: NextRequest, res: Response){
+export async function GET(req: Request){
     const headers = req.headers,
     offerID = headers.get("offerID")
     if (!offerID) { return badRequest(rm001001) }
@@ -13,5 +12,5 @@ export async function GET(req: NextRequest, res: Response){
     if (!offer) { return notFound(rm041000) }
     const offerFile = await getOfferFile(db, offer.id)
     if (!offerFile) { return notFound(rm041009) }
-    return NextResponse.json({name: offer.fileName, file: offerFile}, {status: 200})
+    return Response.json({name: offer.fileName, file: offerFile}, {status: 200})
 }

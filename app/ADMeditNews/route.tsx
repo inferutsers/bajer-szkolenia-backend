@@ -10,7 +10,7 @@ import { badRequest, notFound, unauthorized, unprocessableContent } from "@/resp
 import { NextRequest, NextResponse } from "next/server"
 import utf8 from "utf8"
 
-export async function PATCH(req: NextRequest, res: Response){
+export async function PATCH(req: NextRequest){
     const headers = req.headers,
     sessionID = headers.get("sessionID"),
     newsID = headers.get("newsID"),

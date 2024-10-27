@@ -5,7 +5,7 @@ import { encrypt } from "node-qpdf2";
 import courseElement from "@/interfaces/courseElement";
 import { getDateLongGMT2Readable, getDateShortReadable } from "./dates";
 import signupElement from "@/interfaces/signupElement";
-import removeSpecialCharacters from "./removeSpecialCharacters";
+import removeSpecialCharacters from "./formattings/removeSpecialCharacters";
 
 export default async function generateSecurePDF(file: Buffer, newTitle: string, course?: courseElement, signup?: signupElement): Promise<Buffer>{
     const pdf = await PDFDocument.load(file);

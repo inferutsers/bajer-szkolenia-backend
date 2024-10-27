@@ -6,9 +6,8 @@ import { systemLog } from "@/functions/logging/log"
 import { ADMlockDueCourses } from "@/functions/queries/course"
 import { rm001000, rm001001 } from "@/responses/messages"
 import { badRequest, unauthorized } from "@/responses/responses"
-import { NextResponse } from "next/server"
 
-export async function GET(req: Request, res: Response){
+export async function GET(req: Request){
     const headers = req.headers,
     providedSecret = headers.get("AUTOCRONSECRET")
     if (!headers || !providedSecret) { return badRequest(rm001001) }
@@ -18,5 +17,5 @@ export async function GET(req: Request, res: Response){
     if (coursesLocked > 0) {
         systemLog(systemAction.AUTOCRONlockcourses, systemActionStatus.success, `Zablokowano ${coursesLocked} szkoleń`, undefined, db)
     }
-    return NextResponse.json(`${getDateLongGMT2Readable()} >>> Locked ${coursesLocked} courses...`, {status: 200})
+    return Response.json(`${getDateLongGMT2Readable()} >>> Locked ${coursesLocked} courses...`, {status: 200})
 }

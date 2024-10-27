@@ -1,11 +1,10 @@
 import getDatabase from "@/connection/database"
 import validateSession from "@/functions/validateSession"
 import { badRequest, noContent, unauthorized } from "@/responses/responses"
-import { NextResponse } from "next/server"
 import { rm001000, rm001001, rm021100 } from "@/responses/messages"
 import { getCourseSignups, getSignups } from "@/functions/queries/signups"
 
-export async function GET(req: Request, res: Response){
+export async function GET(req: Request){
     const headers = req.headers,
     sessionID = headers.get("sessionID")
     if (!sessionID) { return badRequest(rm001001) }
@@ -15,5 +14,5 @@ export async function GET(req: Request, res: Response){
     const courseID = headers.get("courseID")
     const signups = !courseID ? await getSignups(db, true) : await getCourseSignups(db, courseID)
     if (!signups) { return noContent(rm021100) }
-    return NextResponse.json(signups, {status: 200})
+    return Response.json(signups, {status: 200})
 }

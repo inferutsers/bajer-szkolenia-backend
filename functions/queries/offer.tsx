@@ -1,4 +1,3 @@
-
 import { Pool } from "pg";
 import offerElement from "@/interfaces/offerElement";
 import { getDateLong } from "../dates";

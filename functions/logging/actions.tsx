@@ -38,7 +38,7 @@ export enum systemActionStatus{
     error = "Błąd"
 }
 
-export function dumpObject(object: Object): String{
+export function dumpObject(object: Object): string{
     return Object.entries(object).map(([key, value]) => {
         if (!Buffer.isBuffer(value) && key != "emailsSent"){
             return `${key}: ${value}`
@@ -46,7 +46,7 @@ export function dumpObject(object: Object): String{
     }).join("\n")
 }
 
-export function compareObjects(old: Object, current: Object): String{
+export function compareObjects(old: Object, current: Object): string{
     return Object.entries(current).map(([key, value]) => {
         const oldvalue = Object.entries(old).find(([okey, ovalue]) => { return (okey == key) })?.[1]
         if ((Object.prototype.toString.call(value) !== '[object Date]' && value != oldvalue) || (Object.prototype.toString.call(value) === '[object Date]' && (value as Date).getTime() != (oldvalue as Date).getTime())){

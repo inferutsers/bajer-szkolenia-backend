@@ -7,10 +7,9 @@ import { ADMgetCourse, uploadFile } from "@/functions/queries/course";
 import validateSession from "@/functions/validateSession";
 import { rm001000, rm001001, rm011000, rm011008, rm011009, rm011010, rm011012 } from "@/responses/messages";
 import { badRequest, notFound, serviceUnavailable, unauthorized, unprocessableContent } from "@/responses/responses";
-import { NextRequest, NextResponse } from "next/server";
 import utf8 from 'utf8'
 
-export async function POST(req: NextRequest, res: Response){
+export async function POST(req: Request){
     const headers = req.headers,
     sessionID = headers.get("sessionID"),
     courseID = headers.get("courseID"),
@@ -30,5 +29,5 @@ export async function POST(req: NextRequest, res: Response){
     const courseUpdated = await uploadFile(db, course.id, buffer, utf8.decode(fileName))
     if (courseUpdated == false) { systemLog(systemAction.ADMuploadCourseFile, systemActionStatus.error, rm011010, validatedUser, db); return unprocessableContent(rm011010) }
     systemLog(systemAction.ADMuploadCourseFile, systemActionStatus.success, `Załączono plik do szkolenia #${course.id}`, validatedUser, db);
-    return NextResponse.json(null, {status: 200})
+    return Response.json(null, {status: 200})
 }

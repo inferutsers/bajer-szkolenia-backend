@@ -5,9 +5,8 @@ import { deleteNews, getAllNewsData } from "@/functions/queries/news";
 import validateSession from "@/functions/validateSession";
 import { rm001000, rm001001, rm031000 } from "@/responses/messages";
 import { badRequest, notFound, unauthorized } from "@/responses/responses";
-import { NextResponse } from "next/server";
 
-export async function DELETE(req: Request, res: Response){
+export async function DELETE(req: Request){
     const headers = req.headers,
     sessionID = headers.get("sessionID"),
     newsID = headers.get("newsID")
@@ -20,5 +19,5 @@ export async function DELETE(req: Request, res: Response){
     if (news.permissionRequired > validatedUser.status) { systemLog(systemAction.ADMdeleteNews, systemActionStatus.error, rm001000, validatedUser, db); return unauthorized(rm001000) }
     await deleteNews(db, newsID)
     systemLog(systemAction.ADMdeleteNews, systemActionStatus.success, `Usunięto aktualność\n${dumpObject(news)}`, validatedUser, db);
-    return NextResponse.json(null, {status: 200})
+    return Response.json(null, {status: 200})
 }

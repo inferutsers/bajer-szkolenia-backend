@@ -5,7 +5,7 @@ export function getDateShort(date: Date = new Date): string{
 }
 
 export function getDateLong(date: Date = new Date): string{
-    return moment(date).format("YYYY-MM-DD HH:mm:ssZ")
+    return moment(date).format("YYYY-MM-DD HH:mm:ss")
 }
 
 export function getDateShortReadable(date: Date = new Date, inverted: boolean = false): string{

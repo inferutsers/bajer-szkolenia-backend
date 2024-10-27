@@ -6,9 +6,8 @@ import { getSignup, invalidateSignup } from "@/functions/queries/signups"
 import validateSession from "@/functions/validateSession"
 import { rm001000, rm001001, rm021000, rm021004, rm021005 } from "@/responses/messages"
 import { badRequest, notFound, unauthorized, unprocessableContent } from "@/responses/responses"
-import { NextResponse } from "next/server"
 
-export async function DELETE(req: Request, res: Response){
+export async function DELETE(req: Request){
     const headers = req.headers,
     sessionID = headers.get("sessionID"),
     signupID = headers.get("signupID")
@@ -24,5 +23,5 @@ export async function DELETE(req: Request, res: Response){
     const signupInvalidated = await invalidateSignup(db, signupID)
     if (!signupInvalidated) { systemLog(systemAction.ADMcancelSignup, systemActionStatus.error, rm021004, validatedUser, db); return unprocessableContent(rm021004) }
     systemLog(systemAction.ADMcancelSignup, systemActionStatus.success, `Anulowano zapis\n${dumpObject(signup)}`, validatedUser, db)
-    return NextResponse.json(null, {status: 200})
+    return Response.json(null, {status: 200})
 } 

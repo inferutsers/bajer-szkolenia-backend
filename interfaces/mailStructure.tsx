@@ -1,10 +1,10 @@
 export default interface mailStructure{
-    date: String,
-    messageID?: String,
-    response?: String,
-    receivers: String[],
-    subject: String,
-    text: String,
-    html: String,
-    failure: Boolean
+    date: string,
+    messageID?: string,
+    response?: string,
+    receivers: string[],
+    subject: string,
+    text: string,
+    html: string,
+    failure: boolean
 }

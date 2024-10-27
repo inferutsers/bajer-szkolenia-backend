@@ -2,7 +2,6 @@ import getDatabase from "@/connection/database"
 import { ADMgetCourse } from "@/functions/queries/course"
 import validateSession from "@/functions/validateSession"
 import { badRequest, notFound, unauthorized, unprocessableContent } from "@/responses/responses"
-import { NextResponse } from "next/server"
 import utf8 from 'utf8'
 import { getSignup } from "@/functions/queries/signups"
 import sendSignupEmail from "@/functions/emails/sendSignupEmail"
@@ -10,7 +9,7 @@ import { rm001000, rm001001, rm021000, rm021001, rm021008, rm021012 } from "@/re
 import { systemLog } from "@/functions/logging/log"
 import { systemAction, systemActionStatus } from "@/functions/logging/actions"
 
-export async function POST(req: Request, res: Response){
+export async function POST(req: Request){
     const headers = req.headers,
     sessionID = headers.get("sessionID"),
     signupID = headers.get("signupID"),
@@ -29,5 +28,5 @@ export async function POST(req: Request, res: Response){
     const mailSent = await sendSignupEmail(db, course, utf8.decode(messageSubject), utf8.decode(messageContent), signup)
     if (!mailSent) { systemLog(systemAction.ADMemailSignup, systemActionStatus.error, rm021012, validatedUser, db); return unprocessableContent(rm021012) }
     systemLog(systemAction.ADMemailCourse, systemActionStatus.success, `Wysłano wiadomość\nOdbiorca: ${signup.email}\nTemat: ${messageSubject}\nWiadomość: ${messageContent}`, validatedUser, db);
-    return NextResponse.json(mailSent, {status: 200})
+    return Response.json(mailSent, {status: 200})
 }

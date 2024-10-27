@@ -7,7 +7,7 @@ import { Attachment } from "nodemailer/lib/mailer";
 import mailFormatAsInvoice from "../formattings/mailFormatAsInvoice";
 import sendSingleEmailWithAttachment from "../emails/processor/sendSingleEmailWithAttachment";
 import mailStructure from "@/interfaces/mailStructure";
-import { getDateShortReadable } from "../dates";
+import { getDateShort } from "../dates";
 import BIR11NipSearch from "../bir11/complete";
 import checkIfTaxPayer from "../taxPayerList/checkIfTaxPayer";
 import { insertInvoice, insertRamzesDataToInvoice, invoiceNumberingGetNumber, invoiceNumberingPlusOne } from "../queries/invoices";
@@ -37,9 +37,9 @@ export default async function generateSignupInvoice(db: Pool, signup: signupElem
         dok_KntId: signup.id,
         dok_DokId: invoiceID,
         dok_Numer: invoiceNumber,
-        dok_DataDat: getDateShortReadable(),
-        dok_DataOper: getDateShortReadable(),
-        dok_DataZap: getDateShortReadable(),
+        dok_DataDat: getDateShort(),
+        dok_DataOper: getDateShort(),
+        dok_DataZap: getDateShort(),
         dok_Opis: `Szkolenie (${signup.attendees.length} osob)`,
         dok_Typ: "1",
         dok_DokFoz: "2",

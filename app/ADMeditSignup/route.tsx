@@ -1,5 +1,5 @@
 import getDatabase from "@/connection/database"
-import formatAttendees from "@/functions/attendeesFormatting"
+import formatAttendees from "@/functions/formattings/attendeesFormatting"
 import { compareObjects, systemAction, systemActionStatus } from "@/functions/logging/actions"
 import { systemLog } from "@/functions/logging/log"
 import { ADMgetCourse } from "@/functions/queries/course"
@@ -10,7 +10,6 @@ import validateSession from "@/functions/validateSession"
 import ADMcourseElement from "@/interfaces/ADMcourseElement"
 import { rm001000, rm001001, rm021000, rm021005, rm021006, rm021008, rm021009, rm021010, rm021011 } from "@/responses/messages"
 import { badRequest, gone, notAcceptable, notFound, serviceUnavailable, unauthorized, unprocessableContent } from "@/responses/responses"
-import { NextResponse } from "next/server"
 import utf8 from "utf8"
 
 export async function PATCH(req: Request, res: Response){
@@ -56,5 +55,5 @@ export async function PATCH(req: Request, res: Response){
     const changedSignup = await updateSignup(db, signupID, utf8.decode(suName), utf8.decode(suSurname), utf8.decode(suEmail), suPhonenumber, utf8.decode(suAdress), suPesel ? suPesel : undefined, suIscompany, suCompanyname ? utf8.decode(suCompanyname): undefined, suCompanyNIP ? suCompanyNIP : undefined, suSupprice, suAttendees)
     if (!changedSignup) { systemLog(systemAction.ADMeditSignup, systemActionStatus.error, rm021006, validatedUser, db); return unprocessableContent(rm021006) }
     systemLog(systemAction.ADMeditSignup, systemActionStatus.success, `Zmieniono zapis #${signup.id}\n${compareObjects(signup, changedSignup)}`, validatedUser, db);
-    return NextResponse.json(changedSignup, {status: 200})
+    return Response.json(changedSignup, {status: 200})
 }

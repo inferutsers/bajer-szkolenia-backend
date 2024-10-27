@@ -9,9 +9,8 @@ import { addPaymentToSignup, getSignup } from "@/functions/queries/signups"
 import validateSession from "@/functions/validateSession"
 import { rm001000, rm001001, rm021000, rm021006, rm021011, rm021014 } from "@/responses/messages"
 import { badRequest, notAcceptable, notFound, serviceUnavailable, unauthorized, unprocessableContent } from "@/responses/responses"
-import { NextResponse } from "next/server"
 
-export async function POST(req: Request, res: Response){
+export async function POST(req: Request){
     const headers = req.headers,
     sessionID = headers.get("sessionID"),
     signupID = headers.get("signupID"),
@@ -46,5 +45,5 @@ export async function POST(req: Request, res: Response){
         } else { systemLog(systemAction.ADMsignupPayment, systemActionStatus.error, rm021011, validatedUser, db); return serviceUnavailable(rm021011) }
     }
     systemLog(systemAction.ADMsignupPayment, systemActionStatus.success, `Zarejestrowano płatność ${paymentAmount}PLN dla zapisu #${signup.id}`, validatedUser, db);
-    return NextResponse.json(null, {status: 200})
+    return Response.json(null, {status: 200})
 }

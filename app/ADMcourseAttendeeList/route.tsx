@@ -2,11 +2,10 @@ import getDatabase from "@/connection/database";
 import { ADMgetCourse } from "@/functions/queries/course";
 import validateSession from "@/functions/validateSession";
 import { badRequest, noContent, notFound, unauthorized } from "@/responses/responses";
-import { NextResponse } from "next/server";
 import { rm001000, rm001001, rm011000, rm011001 } from "@/responses/messages";
 import { getCourseSignups } from "@/functions/queries/signups";
 
-export async function GET(req: Request, res: Response){
+export async function GET(req: Request){
     const headers = req.headers,
     sessionID = headers.get("sessionID"),
     courseID = headers.get("courseID")
@@ -21,5 +20,5 @@ export async function GET(req: Request, res: Response){
     const attendees: {companyName: String, attendees: String, status: String}[] = (signups.map(result => 
         ({companyName: (result.companyName ? result.companyName : "OSOBA PRYWATNA"), attendees: result.attendees.join(", "), status: (result.paidIn >= result.supPrice ? (result.invoiceNumber ? `Opłacone - Faktura ${result.invoiceNumber}` : "Opłacone") : "Nieopłacone")})
     ))
-    return NextResponse.json({attendees: attendees}, {status: 200})
+    return Response.json({attendees: attendees}, {status: 200})
 }

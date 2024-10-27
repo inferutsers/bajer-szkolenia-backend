@@ -1,11 +1,12 @@
 export default interface administrationAccount{
-    id: Number,
-    login: String,
-    displayName: String,
-    password?: String,
+    id: number,
+    login: string,
+    displayName: string,
+    password?: string,
     status: number,
-    sessionID?: String,
+    sessionID?: string,
     sessionValidity?: Date,
-    passwordResetToken?: String,
-    tfaSecret: String 
+    passwordResetToken?: string,
+    tfaSecret?: string,
+    technicalBreak?: string
 }

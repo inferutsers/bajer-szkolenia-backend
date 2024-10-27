@@ -9,10 +9,9 @@ import checkIfTaxPayer from "@/functions/taxPayerList/checkIfTaxPayer"
 import validateSession from "@/functions/validateSession"
 import { rm001000, rm001001, rm051001, rm051006 } from "@/responses/messages"
 import { badRequest, unauthorized, unprocessableContent } from "@/responses/responses"
-import { NextResponse } from "next/server"
 import utf8 from "utf8"
 
-export async function POST(req: Request, res: Response){
+export async function POST(req: Request){
     const headers = req.headers,
     sessionID = headers.get("sessionID"),
     clientName = headers.get("clientName"),
@@ -73,5 +72,5 @@ export async function POST(req: Request, res: Response){
     await insertRamzesDataToInvoice(db, invoiceID, invoiceRamzesKontrahent, invoiceRamzesNagdok, invoiceRamzesDekret)
     await invoiceNumberingPlusOne(db)
     systemLog(systemAction.ADMgenerateCustomInvoice, systemActionStatus.success, `Wystawiono własną fakturę #${invoiceNumber}`, validatedUser, db);
-    return NextResponse.json(invoiceBuffer, {status: 200})
+    return Response.json(invoiceBuffer, {status: 200})
 }

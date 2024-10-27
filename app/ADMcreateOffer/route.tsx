@@ -6,10 +6,9 @@ import { createOffer } from "@/functions/queries/offer"
 import validateSession from "@/functions/validateSession"
 import { rm001000, rm001001, rm041001, rm041006 } from "@/responses/messages"
 import { badRequest, unauthorized, unprocessableContent } from "@/responses/responses"
-import { NextResponse } from "next/server"
 import utf8 from "utf8"
 
-export async function POST(req: Request, res: Response){
+export async function POST(req: Request){
     const headers = req.headers,
     sessionID = headers.get("sessionID"),
     name = headers.get("OName"),
@@ -34,5 +33,5 @@ export async function POST(req: Request, res: Response){
     )
     if (!insertedOffer) { systemLog(systemAction.ADMcreateOffer, systemActionStatus.error, rm041006, validatedUser, db); return badRequest(rm041006) }
     systemLog(systemAction.ADMcreateOffer, systemActionStatus.success, `Stworzono pakiet\n${dumpObject(insertedOffer)}`, validatedUser, db);
-    return NextResponse.json(insertedOffer, {status: 200})
+    return Response.json(insertedOffer, {status: 200})
 }

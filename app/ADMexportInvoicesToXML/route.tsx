@@ -5,9 +5,8 @@ import { getInvoicesRamzesData } from '@/functions/queries/invoices';
 import validateSession from '@/functions/validateSession';
 import { rm001000, rm001001, rm061000 } from '@/responses/messages';
 import { badRequest, notFound, unauthorized } from '@/responses/responses';
-import { NextResponse } from 'next/server';
 import builder from 'xmlbuilder'
-export async function GET(req: Request, res: Response){
+export async function GET(req: Request){
     const headers = req.headers,
     sessionID = headers.get("sessionID"),
     dateStart = headers.get("dateStart"),
@@ -52,5 +51,5 @@ export async function GET(req: Request, res: Response){
     const xml = baza.end({ pretty: true});
     const xmlbuffer = Buffer.from(xml, 'utf-8')
     systemLog(systemAction.ADMexportInvoicesToXML, systemActionStatus.success, `Eksport faktur\n${dateStart}\n${dateEnd}`, validatedUser, db)
-    return NextResponse.json(xmlbuffer, {status: 200})
+    return Response.json(xmlbuffer, {status: 200})
 }

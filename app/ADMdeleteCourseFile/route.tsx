@@ -5,9 +5,8 @@ import { ADMgetCourse, deleteFile } from "@/functions/queries/course";
 import validateSession from "@/functions/validateSession";
 import { rm001000, rm001001, rm011000, rm011003, rm011004, rm011012 } from "@/responses/messages";
 import { badRequest, notFound, serviceUnavailable, unauthorized, unprocessableContent } from "@/responses/responses";
-import { NextRequest, NextResponse } from "next/server";
 
-export async function DELETE(req: NextRequest, res: Response){
+export async function DELETE(req: Request){
     const headers = req.headers,
     sessionID = headers.get("sessionID"),
     courseID = headers.get("courseID")
@@ -23,5 +22,5 @@ export async function DELETE(req: NextRequest, res: Response){
     const courseUpdated = await deleteFile(db, course.id)
     if (courseUpdated == false) { systemLog(systemAction.ADMdeleteCourseFile, systemActionStatus.error, rm011004, validatedUser, db); return unprocessableContent(rm011004) }
     systemLog(systemAction.ADMdeleteCourseFile, systemActionStatus.success, `Usunięto plik ze szkolenia #${course.id}`, validatedUser, db);
-    return NextResponse.json(null, {status: 200})
+    return Response.json(null, {status: 200})
 }

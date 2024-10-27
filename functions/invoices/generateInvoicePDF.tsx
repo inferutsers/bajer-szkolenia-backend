@@ -2,7 +2,7 @@ import jsPDF from "jspdf";
 import fs from "fs"
 import PriceFormater from "price-to-words-pl"
 
-export default function generateInvoicePDF(vat: number, invoiceNumber: string, isCompany: boolean, adress: string, supPrice: number, courseTitle: string, amount: number, paidIn: Number, name?: string, surname?: string, signupID?: number, phoneNumber?: string, email?: string, companyName?: string, companyNIP?: string, clientPesel?: string): String{
+export default function generateInvoicePDF(vat: number, invoiceNumber: string, isCompany: boolean, adress: string, supPrice: number, courseTitle: string, amount: number, paidIn: Number, name?: string, surname?: string, signupID?: number, phoneNumber?: string, email?: string, companyName?: string, companyNIP?: string, clientPesel?: string): string{
     const pdf = new jsPDF()
     const priceFormatter = new PriceFormater()
     const regularFont = fs.readFileSync("/home/ubuntu/backend/fonts/Arial-Unicode-Regular.ttf", 'binary')

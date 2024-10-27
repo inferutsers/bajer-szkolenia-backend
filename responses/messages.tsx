@@ -7,6 +7,7 @@ export const rm001007: String = "00.1007 | Nie udało sie zmienić hasła" //upd
 export const rm001008: String = "00.1008 | Token resetu hasła niepoprawny" 
 export const rm001009: String = "00.1009 | Podano niepoprawne dane logowania"
 export const rm001010: String = "00.1010 | Konto nieaktywne"
+export const rm001011: String = "00.1011 | Brak dostępu: $$$" //technical break, $$$ as message 
 
 //SZKOLENIA
 export const rm011000: String = "01.1000 | Nie znaleziono szkolenia"
@@ -51,6 +52,7 @@ export const rm021023: String = "02.1023 | Niepoprawnie sformatowane dane: Kod p
 export const rm021024: String = "02.1024 | Niepoprawnie sformatowane dane: Imię i/lub nazwisko"
 export const rm021025: String = "02.1025 | Niepoprawnie sformatowane dane: Dane uczestników"
 export const rm021026: String = "02.1026 | Niepoprawnie sformatowane dane: Adres email"
+export const rm021027: String = "02.1027 | $$$" //technical break
 export const rm021100: String = "02.1100 | Brak zapisów"
 
 //AKTUALNOSCI

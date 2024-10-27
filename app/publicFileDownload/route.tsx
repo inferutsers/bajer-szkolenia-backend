@@ -1,13 +1,11 @@
 import getDatabase from "@/connection/database";
-import { getDateLong, getDateLongGMT2Readable, getDateShort, getDateShortReadable } from "@/functions/dates";
 import generateSecurePDF from "@/functions/generateSecurePDF";
 import { getPublicFile, getPublicFileKey, recordDownload } from "@/functions/queries/publicFiles";
 import { getSignup } from "@/functions/queries/signups";
 import { rm001001, rm101000, rm101001, rm101002, rm101003 } from "@/responses/messages";
-import { badRequest, notFound, unauthorized, unprocessableContent } from "@/responses/responses";
-import { NextRequest, NextResponse } from "next/server";
+import { badRequest, notFound } from "@/responses/responses";
 
-export async function GET(req: NextRequest, res: Response){
+export async function GET(req: Request){
     const headers = req.headers,
     key = headers.get("fileKey")
     if (!key) { return badRequest(rm001001) }
@@ -24,7 +22,7 @@ export async function GET(req: NextRequest, res: Response){
     await recordDownload(db, file.id, fileKey.id)
     if (file.watermarked) {
         file.data = await generateSecurePDF(file.data, file.fileName, undefined, fileKeyOwner)
-        return NextResponse.json(file, {status: 200})
+        return Response.json(file, {status: 200})
     }
-    return NextResponse.json(file, {status: 200})
+    return Response.json(file, {status: 200})
 }
