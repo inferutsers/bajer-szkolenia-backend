@@ -12,7 +12,7 @@ import { rm001000, rm001001, rm021000, rm021005, rm021006, rm021008, rm021009, r
 import { badRequest, gone, notAcceptable, notFound, serviceUnavailable, unauthorized, unprocessableContent } from "@/responses/responses"
 import utf8 from "utf8"
 
-export async function PATCH(req: Request, res: Response){
+export async function PATCH(req: Request){
     const headers = req.headers,
     sessionID = headers.get("sessionID"),
     signupID = headers.get("signupID"),
