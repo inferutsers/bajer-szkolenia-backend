@@ -4,8 +4,8 @@ export function validateFormData(isCompany: string, companyNip: string | null, p
     if (isCompany == 'true' && companyNip!.length != 10) { return rm021013 }
     if (!/^\d{9}$/.test(phoneNumber)) { return rm021022 }
     if (!/^\d{2}-\d{3}$/.test(adress.split("|=|")[1])) { return rm021023 }
-    if (!/^[a-zA-Z]+$/.test(name) || !/^[a-zA-Z-]+$/.test(surname)) { return rm021024 }
-    if (attendees.map(attendee => { return /^[a-zA-Z]+ [a-zA-Z-]+$/.test(attendee) }).includes(false)) { return rm021025 }
+    if (!/^[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ]+$/.test(name) || !/^[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ-]+$/.test(surname)) { return rm021024 }
+    if (attendees.map(attendee => { return /^[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ]+ [a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ-]+$/.test(attendee) }).includes(false)) { return rm021025 }
     if (!/^[a-zA-Z0-9!#$%&'*+-/=?^_\{|}~]+@[a-zA-Z0-9-.]+$/.test(email)) { return rm021026 }
     return undefined
 }
