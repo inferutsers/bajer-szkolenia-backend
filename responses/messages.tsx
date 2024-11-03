@@ -106,3 +106,6 @@ export const rm101000: String = "10.1000 | Taki klucz nie istnieje"
 export const rm101001: String = "10.1001 | Plik przypisany do klucza nie istnieje"
 export const rm101002: String = "10.1002 | Nie znaleziono właściciela klucza pliku"
 export const rm101003: String = "10.1003 | Limit użyć klucza wykorzystany"
+
+//LOGS
+export const rm110001: String = "11.0001 | Brak logów"

@@ -2,7 +2,7 @@ import getDatabase from "@/connection/database"
 import validateSession from "@/functions/validateSession"
 import { badRequest, noContent, unauthorized } from "@/responses/responses"
 import { rm001000, rm001001, rm021100 } from "@/responses/messages"
-import { getCourseSignups, getSignups } from "@/functions/queries/signups"
+import { getSignups } from "@/functions/queries/signups"
 
 export async function GET(req: Request){
     const headers = req.headers,
@@ -11,8 +11,7 @@ export async function GET(req: Request){
     const db = await getDatabase(req)
     const validatedUser = await validateSession(db, sessionID)
     if (!validatedUser) { return unauthorized(rm001000) }
-    const courseID = headers.get("courseID")
-    const signups = !courseID ? await getSignups(db, true) : await getCourseSignups(db, courseID)
+    const signups = await getSignups(db, true)
     if (!signups) { return noContent(rm021100) }
     return Response.json(signups, {status: 200})
 }

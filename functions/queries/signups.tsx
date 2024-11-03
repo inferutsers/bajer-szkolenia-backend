@@ -109,8 +109,8 @@ export async function getSignups(db: Pool, archive: boolean = false): Promise<si
     return signups.rows.map(result => formatAsSignupElement(result))
 }
 
-export async function getSignup(db: Pool, id: number | string): Promise<signupElement | undefined>{
-    const signup = await db.query(`${baseSelect} ${baseWhere} AND "s"."id" = $1 LIMIT 1`, [id])
+export async function getSignup(db: Pool, id: number | string, archive: boolean = false): Promise<signupElement | undefined>{
+    const signup = await db.query(`${baseSelect} WHERE "s"."invalidated" = false AND "s"."archived" = $1 AND "s"."id" = $2 LIMIT 1`, [archive, id])
     if (!signup?.rowCount) { return undefined }
     return formatAsSignupElement(signup.rows[0])
 }
