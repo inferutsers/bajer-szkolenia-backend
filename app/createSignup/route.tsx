@@ -25,10 +25,10 @@ export async function POST(req: Request){
     snewsletter = headers.get("sNewsletter"),
     sattendees = formatAttendees(utf8.decode(sname ?? ""), utf8.decode(ssurname ?? ""), siscompany === "true", headers.get("sAttendees"))
     if (!courseID || !sname || !ssurname || !semail || !sphonenumber || !siscompany || !sadress || !sattendees || !snewsletter) { return badRequest(rm001001) }
-    const validationError = validateFormData(siscompany, scompanynip, sphonenumber, sadress, sname, ssurname, sattendees, semail)
+    const db = await getDatabase(req)
+    const validationError = validateFormData(siscompany, scompanynip, sphonenumber, utf8.decode(sadress), utf8.decode(sname), utf8.decode(ssurname), sattendees, semail)
     if (validationError) { return unprocessableContent(validationError) }
-    const db = await getDatabase(req),
-    technicalBreak = await signupTechnicalBreak(db)
+    const technicalBreak = await signupTechnicalBreak(db)
     if (technicalBreak) { return unauthorized(rm021027.replaceAll("$$$", technicalBreak)) }
     const course = await getCourse(db, courseID)
     if (!course || course.customURL != undefined) { return notFound(rm021015) }
