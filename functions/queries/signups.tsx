@@ -40,6 +40,7 @@ const baseSelect = `SELECT
     LEFT JOIN "courses" "c" ON "s"."courseID" = "c"."id" AND "c"."archived" = false
     LEFT JOIN "invoices" "i" ON "s"."id" = "i"."signup"
 `
+const baseSelectArchive = baseSelect.replace(`"archived" = false`, `"archived" = true`)
 const baseWhere = 'WHERE "s"."invalidated" = false AND "s"."archived" = false'
 const baseSelectOrder = 'ORDER BY "s"."date" DESC'
 
@@ -97,20 +98,20 @@ export async function updateSignup(db: Pool, id: string, name: string, surname: 
     return await getSignup(db, id)
 }
 
-export async function getCourseSignups(db: Pool, id: number | string): Promise<signupElement[] | undefined>{
-    const signups = await db.query(`${baseSelect} ${baseWhere} AND "c"."id" = $1 ${baseSelectOrder}`, [id])
+export async function getCourseSignups(db: Pool, id: number | string, archive: boolean = false): Promise<signupElement[] | undefined>{
+    const signups = await db.query(`${archive ? baseSelectArchive : baseSelect} WHERE "s"."invalidated" = false AND "s"."archived" = $1 AND "c"."id" = $2 ${baseSelectOrder}`, [archive, id])
     if (!signups?.rowCount) { return undefined }
     return signups.rows.map(result => formatAsSignupElement(result))
 }
 
 export async function getSignups(db: Pool, archive: boolean = false): Promise<signupElement[] | undefined>{
-    const signups = await db.query(`${baseSelect} WHERE "s"."invalidated" = false AND "s"."archived" = $1 ${baseSelectOrder}`, [archive])
+    const signups = await db.query(`${archive ? baseSelectArchive : baseSelect} WHERE "s"."invalidated" = false AND "s"."archived" = $1 ${baseSelectOrder}`, [archive])
     if (!signups?.rowCount) { return undefined }
     return signups.rows.map(result => formatAsSignupElement(result))
 }
 
 export async function getSignup(db: Pool, id: number | string, archive: boolean = false): Promise<signupElement | undefined>{
-    const signup = await db.query(`${baseSelect} WHERE "s"."invalidated" = false AND "s"."archived" = $1 AND "s"."id" = $2 LIMIT 1`, [archive, id])
+    const signup = await db.query(`${archive ? baseSelectArchive : baseSelect} WHERE "s"."invalidated" = false AND "s"."archived" = $1 AND "s"."id" = $2 LIMIT 1`, [archive, id])
     if (!signup?.rowCount) { return undefined }
     return formatAsSignupElement(signup.rows[0])
 }

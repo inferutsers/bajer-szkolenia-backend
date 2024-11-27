@@ -20,8 +20,14 @@ export async function insertRamzesDataToInvoice(db: Pool, id: string, kontrahent
     await db.query('UPDATE "invoices" SET "ramzesKontrahent" = $1, "ramzesNagdok" = $2, "ramzesDektet" = $3 WHERE "id" = $4', [kontrahent, nagdok, dekret, id])
 }
 
+export async function getInvoicesFiles(db: Pool, dateStart: string, dateEnd: string): Promise<Buffer[] | undefined>{
+    const invoices = await db.query(`SELECT "file" FROM "invoices" WHERE "date" > $1 AND "date" < $2 ORDER BY CAST(split_part("number", '/', 1) AS INTEGER)`, [dateStart, dateEnd])
+    if (!invoices?.rowCount) { return undefined }
+    return invoices.rows.map(row => row.file)
+}
+
 export async function getInvoicesRamzesData(db: Pool, dateStart: string, dateEnd: string): Promise<undefined | {kontrahent: any, nagdok: any, dekret: any}[]>{
-    const invoices = await db.query('SELECT "ramzesKontrahent", "ramzesNagdok", "ramzesDektet" FROM "invoices" WHERE "date" > $1 AND "date" < $2', [dateStart, dateEnd])
+    const invoices = await db.query(`SELECT "ramzesKontrahent", "ramzesNagdok", "ramzesDektet" FROM "invoices" WHERE "date" > $1 AND "date" < $2 ORDER BY CAST(split_part(number, '/', 1) AS INTEGER)`, [dateStart, dateEnd])
     if (!invoices || invoices.rowCount == 0){ return undefined }
     return invoices.rows.map((row) => ({kontrahent: row.ramzesKontrahent, nagdok: row.ramzesNagdok, dekret: row.ramzesDektet}))
 }

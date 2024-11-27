@@ -23,6 +23,7 @@ const baseSelect = `SELECT
     FROM "courses" "c"
     LEFT JOIN "signups" "s" ON "s"."courseID" = "c"."id" AND "s"."invalidated" = false AND "s"."archived" = false
 `
+const baseSelectArchive = baseSelect.replace(`"archived" = false`, `"archived" = true`)
 const baseWhere = 'WHERE "c"."archived" = false'
 const baseGrouping = 'GROUP BY "c"."id"'
 const baseOrder = 'ORDER BY "c"."date"'
@@ -64,11 +65,11 @@ export async function getUpcomingCourses(db: Pool): Promise<courseElement[] | un
 }
 
 async function getAllCoursesRecords(db: Pool, archived: boolean = false): Promise<QueryResult>{
-    return await db.query(`${baseSelect} WHERE "c"."archived" = $1 ${baseGrouping} ${baseOrder}`, [archived])
+    return await db.query(`${archived ? baseSelectArchive : baseSelect} WHERE "c"."archived" = $1 ${baseGrouping} ${baseOrder}`, [archived])
 }
 
-async function getCourseRecord(db: Pool, id: string | number): Promise<QueryResult>{
-    return await db.query(`${baseSelect} ${baseWhere} AND "c"."id" = $1 ${baseGrouping} LIMIT 1`, [id])
+async function getCourseRecord(db: Pool, id: string | number, archived: boolean = false): Promise<QueryResult>{
+    return await db.query(`${archived ? baseSelectArchive : baseSelect} WHERE "c"."archived" = $1 AND "c"."id" = $2 ${baseGrouping} LIMIT 1`, [archived, id])
 }
 export async function getCourses(db: Pool): Promise<courseElement[] | undefined>{
     const courses = await getAllCoursesRecords(db)
@@ -92,6 +93,12 @@ export async function getCourseFile(db: Pool, id: number | string): Promise<Buff
     const course = await db.query(`SELECT "file" FROM "courses" "c" ${baseWhere} AND id = $1 LIMIT 1`, [id])
     if (!course?.rowCount) { return undefined }
     return course.rows[0].file
+}
+
+export async function ADMgetArchivedCourse(db: Pool, id: number | string): Promise<ADMcourseElement | undefined>{
+    const course = await getCourseRecord(db, id, true)
+    if (!course?.rowCount) { return undefined }
+    return formatAsADMCourseElement(course.rows[0])
 }
 
 export async function ADMgetCourse(db: Pool, id: number | string): Promise<ADMcourseElement | undefined>{

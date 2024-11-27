@@ -102,10 +102,17 @@ export const rm091004: String = "09.1004 | Zapis nieudany"
 export const rm091005: String = "09.1005 | Email jest już zapisany. Jeżeli jeszcze tego nie zrobiono, prosimy o potwierdzenie zapisu poprzez kliknięcie w link wysłany w wiadomości"
 
 //PUBLIC FILE
-export const rm101000: String = "10.1000 | Taki klucz nie istnieje"
-export const rm101001: String = "10.1001 | Plik przypisany do klucza nie istnieje"
-export const rm101002: String = "10.1002 | Nie znaleziono właściciela klucza pliku"
-export const rm101003: String = "10.1003 | Limit użyć klucza wykorzystany"
+// export const rm101000: String = "10.1000 | Taki klucz nie istnieje"
+// export const rm101001: String = "10.1001 | Plik przypisany do klucza nie istnieje"
+export const rm101002: String = "10.1002 | Nazwa pliku nie zawiera rozszerzenia"
+export const rm101003: String = "10.1003 | Plik nie istnieje lub nie jest już dostępny"
+export const rm101004: String = "10.1004 | Nie znaleziono plików"
+export const rm101005: String = "10.1005 | Nie znaleziono pliku"
+export const rm101006: String = "10.1006 | Nie udało się stworzyć pliku"
+export const rm101007: String = "10.1007 | Nie można stworzyć klucza do nieistniejącego pliku"
+export const rm101008: String = "10.1008 | Nie udało się stworzyć klucza"
+export const rm101009: String = "10.1008 | Nie udało się edytować klucza"
+export const rm101010: String = "10.1010 | Nie można aktywować pliku bez kluczy"
 
 //LOGS
 export const rm110001: String = "11.0001 | Brak logów"
