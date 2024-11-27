@@ -14,9 +14,9 @@ export async function getNewsletterUserPresenceByConfirmationKey(db: Pool, key: 
     return true
 }
 export async function gatherNewsletterEmails(db: Pool): Promise<bulkEmailReceiver[] | undefined>{
-    const newsletterUsers = await db.query('SELECT "id", "email" FROM "newsletterUsers" WHERE "confirmed" = TRUE')
+    const newsletterUsers = await db.query('SELECT "id", "email", "confirmationKey" FROM "newsletterUsers" WHERE "confirmed" = TRUE')
     if (!newsletterUsers || newsletterUsers.rowCount == 0) { return undefined }
-    return newsletterUsers.rows.map((result) => ({id: result.id, email: result.email}))
+    return newsletterUsers.rows.map((result) => ({id: result.id, email: result.email, newsletterKey: result.confirmationKey}))
 }
 export async function getNewsletterMessages(db: Pool): Promise<newsletterMessage[] | undefined>{
     const newsletterMessages = await db.query('SELECT * FROM "newsletterMessages" ORDER BY "date" DESC')
@@ -56,5 +56,7 @@ function removeMessageHeader(input: string): string{
     .replaceAll(`<div style="text-align: left;">&nbsp;</div>
 <div style="text-align: left;"></div>
 <div style="text-align: left;">Pozdrawiamy,</div>
-<div style="text-align: left;"><em>Zesp&oacute;ł BAJER EXPERT</em></div>`, "")
+<div style="text-align: left;"><em>Zesp&oacute;ł BAJER EXPERT</em></div>
+<div style="text-align: left;">&nbsp;</div>
+<div style="text-align: left;"><span style="color: #999999;"><em>{newsletterFooter}</em></span></div>`, "")
 }
