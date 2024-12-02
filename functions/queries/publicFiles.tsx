@@ -2,8 +2,7 @@ import { PublicFileData, ADMPublicFileOutline, ADMPublicFileKey } from "@/interf
 import { Pool } from "pg";
 import { v4 as uuidv4 } from 'uuid';
 
-export async function ADMgetFiles(db: Pool): Promise<ADMPublicFileOutline[] | undefined>{
-    const elements = await db.query(`SELECT 
+const baseSelect = `SELECT 
         "f"."id" as "id", 
         "f"."fileName" as "fileName", 
         "f"."downloads" as "downloads", 
@@ -13,8 +12,12 @@ export async function ADMgetFiles(db: Pool): Promise<ADMPublicFileOutline[] | un
         "k"."usageLimit" as "key_usageLimit", 
         "k"."expiryDate" as "key_expiryDate",
         "k"."note" as "key_note"
-        FROM "public_files" "f" 
-        LEFT JOIN "public_file_keys" "k" ON "k"."fileID" = "f"."id"
+        FROM "public_files" "f"
+        LEFT JOIN "public_file_keys" "k" ON "k"."fileID" = "f"."id"`
+
+export async function ADMgetFiles(db: Pool): Promise<ADMPublicFileOutline[] | undefined>{
+    const elements = await db.query(`
+        ${baseSelect}
         ORDER BY "f"."fileName", "k"."note"
     `)
     if (!elements?.rowCount) { return undefined }
@@ -22,18 +25,8 @@ export async function ADMgetFiles(db: Pool): Promise<ADMPublicFileOutline[] | un
 }
 
 export async function ADMgetFile(db: Pool, id: string | number): Promise<ADMPublicFileOutline | undefined>{
-    const elements = await db.query(`SELECT 
-        "f"."id" as "id", 
-        "f"."fileName" as "fileName",
-        "f"."downloads" as "downloads", 
-        "k"."id" as "key_id", 
-        "k"."key" as "key_key", 
-        "k"."usages" as "key_usages", 
-        "k"."usageLimit" as "key_usageLimit", 
-        "k"."expiryDate" as "key_expiryDate",
-        "k"."note" as "key_note"
-        FROM "public_files" "f" 
-        LEFT JOIN "public_file_keys" "k" ON "k"."fileID" = "f"."id"
+    const elements = await db.query(`
+        ${baseSelect}
         WHERE "f"."id" = $1
         ORDER BY "k"."note"
     `, [id])
