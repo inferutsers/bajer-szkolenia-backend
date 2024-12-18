@@ -50,10 +50,10 @@ export async function signupTechnicalBreak(db: Pool): Promise<string | undefined
     return message.rows[0].stringValue
 }
 
-export async function addPaymentToSignup(db: Pool, id: string | number, amount: string | number): Promise<signupElement | undefined>{
-    const signup = await db.query(`UPDATE "signups" "s" SET "paidIn" = "paidIn" + $1 ${baseWhere} AND "id" = $2`, [amount, id])
+export async function addPaymentToSignup(db: Pool, id: string | number, amount: string | number, archive: boolean = false): Promise<signupElement | undefined>{
+    const signup = await db.query(`UPDATE "signups" "s" SET "paidIn" = "paidIn" + $1 WHERE "s"."invalidated" = false AND "s"."archived" = ${archive} AND "id" = $2`, [amount, id])
     if (!signup?.rowCount) { return undefined }
-    return await getSignup(db, id)
+    return await getSignup(db, id, archive)
 }
 
 export async function addEmailSentToSignup(db: Pool, id: string | number, mailSent: mailStructure, reminderMail: boolean = false){

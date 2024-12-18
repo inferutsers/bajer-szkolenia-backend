@@ -2,7 +2,7 @@ import getDatabase from "@/connection/database"
 import generateSignupInvoice from "@/functions/invoices/generateSignupInvoice"
 import { systemAction, systemActionStatus } from "@/functions/logging/actions"
 import { systemLog } from "@/functions/logging/log"
-import { ADMgetCourse } from "@/functions/queries/course"
+import { ADMgetArchivedCourse, ADMgetCourse } from "@/functions/queries/course"
 import { getSignupInvoiceCount } from "@/functions/queries/invoices"
 import { getOffer } from "@/functions/queries/offer"
 import { addPaymentToSignup, getSignup } from "@/functions/queries/signups"
@@ -24,11 +24,11 @@ export async function POST(req: Request){
     if (!signup) { systemLog(systemAction.ADMsignupPayment, systemActionStatus.error, rm021000, validatedUser, db); return notFound(rm021000) }
     if (signup.permissionRequired > validatedUser.status) { systemLog(systemAction.ADMsignupPayment, systemActionStatus.error, rm001000, validatedUser, db); return unauthorized(rm001000) }
     if ((signup.supPrice - signup.paidIn) < (Number(paymentAmount))) { systemLog(systemAction.ADMsignupPayment, systemActionStatus.error, rm021014, validatedUser, db); return notAcceptable(rm021014) }
-    const updatedSignup = await addPaymentToSignup(db, signupID, paymentAmount)
+    const updatedSignup = await addPaymentToSignup(db, signupID, paymentAmount, archive === "true")
     if (!updatedSignup) { systemLog(systemAction.ADMsignupPayment, systemActionStatus.error, rm021006, validatedUser, db); return unprocessableContent(rm021006) }
     if (updatedSignup.paidIn >= updatedSignup.supPrice && (await getSignupInvoiceCount(db, updatedSignup.id)) == 0 && updatedSignup.supPrice != 0) { 
         if (updatedSignup.courseID && !updatedSignup.offerID) { //COURSE
-            const course = await ADMgetCourse(db, updatedSignup.courseID)
+            const course = archive === "true" ? (await ADMgetArchivedCourse(db, updatedSignup.courseID)) : (await ADMgetCourse(db, updatedSignup.courseID))
             if (course != undefined){
                 const result = await generateSignupInvoice(db, updatedSignup, course)
                 if (result) {
