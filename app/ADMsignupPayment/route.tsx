@@ -14,12 +14,13 @@ export async function POST(req: Request){
     const headers = req.headers,
     sessionID = headers.get("sessionID"),
     signupID = headers.get("signupID"),
-    paymentAmount = headers.get("paymentAmount")
+    paymentAmount = headers.get("paymentAmount"),
+    archive = headers.get("archive")
     if (!sessionID || !signupID || !paymentAmount) { return badRequest(rm001001) }
     const db = await getDatabase(req)
     const validatedUser = await validateSession(db, sessionID)
     if (!validatedUser) { return unauthorized(rm001000) }
-    const signup = await getSignup(db, signupID)
+    const signup = await getSignup(db, signupID, archive === "true")
     if (!signup) { systemLog(systemAction.ADMsignupPayment, systemActionStatus.error, rm021000, validatedUser, db); return notFound(rm021000) }
     if (signup.permissionRequired > validatedUser.status) { systemLog(systemAction.ADMsignupPayment, systemActionStatus.error, rm001000, validatedUser, db); return unauthorized(rm001000) }
     if ((signup.supPrice - signup.paidIn) < (Number(paymentAmount))) { systemLog(systemAction.ADMsignupPayment, systemActionStatus.error, rm021014, validatedUser, db); return notAcceptable(rm021014) }
