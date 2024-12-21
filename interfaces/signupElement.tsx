@@ -1,3 +1,4 @@
+import { ClickMeetingAttendeeURL } from "./ClickMeetingAttendeeURL";
 import mailStructure from "./mailStructure";
 
 export default interface signupElement{
@@ -23,5 +24,7 @@ export default interface signupElement{
     servicePrice?: number,
     serviceDate?: Date,
     reminderSent: Boolean,
-    permissionRequired: number
+    webinarURLsSent: Boolean,
+    permissionRequired: number,
+    webinarURLs?: ClickMeetingAttendeeURL[]
 }

@@ -1,11 +1,12 @@
 import getDatabase from "@/connection/database"
+import { generateAttendeeURL } from "@/functions/clickmeeting/generateAttendeeURL"
 import generateSignupInvoice from "@/functions/invoices/generateSignupInvoice"
 import { systemAction, systemActionStatus } from "@/functions/logging/actions"
 import { systemLog } from "@/functions/logging/log"
 import { ADMgetArchivedCourse, ADMgetCourse } from "@/functions/queries/course"
 import { getSignupInvoiceCount } from "@/functions/queries/invoices"
 import { getOffer } from "@/functions/queries/offer"
-import { addPaymentToSignup, getSignup } from "@/functions/queries/signups"
+import { addPaymentToSignup, addWebinarUrls, getSignup } from "@/functions/queries/signups"
 import validateSession from "@/functions/validateSession"
 import { rm001000, rm001001, rm021000, rm021006, rm021011, rm021014 } from "@/responses/messages"
 import { badRequest, notAcceptable, notFound, serviceUnavailable, unauthorized, unprocessableContent } from "@/responses/responses"
@@ -30,6 +31,12 @@ export async function POST(req: Request){
         if (updatedSignup.courseID && !updatedSignup.offerID) { //COURSE
             const course = archive === "true" ? (await ADMgetArchivedCourse(db, updatedSignup.courseID)) : (await ADMgetCourse(db, updatedSignup.courseID))
             if (course != undefined){
+                if (course.webinar) {
+                    const urls = await generateAttendeeURL(course.webinar, signup.attendees.map(attendee => ({name: attendee, email: signup.email})))
+                    if (urls) { 
+                        await addWebinarUrls(db, signup.id, urls)
+                    }
+                }
                 const result = await generateSignupInvoice(db, updatedSignup, course)
                 if (result) {
                     systemLog(systemAction.ADMsignupPayment, systemActionStatus.success, `Wystawiono fakturę #${result.invoiceNumber} do zapisu #${signup.id}`, validatedUser, db);

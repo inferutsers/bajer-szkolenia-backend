@@ -35,9 +35,14 @@ export enum systemAction{
     ADMcreateFileKey = 10.4,
     ADMeditFileKey = 10.5,
     ADMdeleteFileKey = 10.6,
+    ADMcreateOnlineMeeting = 11.1,
+    ADMcreateOnlineMeetingJoinURL = 11.2,
+    ADMcreateOnlineMeetingExternalJoinURL = 11.3,
+    ADMdeleteOnlineMeeting = 11.4,
     AUTOCRONlockcourses = 90.1,
     AUTOCRONcoursereminders = 90.2,
-    AUTOCRONcoursearchive = 90.3
+    AUTOCRONcoursearchive = 90.3,
+    AUTOCRONsendURLS = 90.3
 }
 
 export enum systemActionStatus{

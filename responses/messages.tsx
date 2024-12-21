@@ -23,6 +23,7 @@ export const rm011009: String = "01.1009 | Nie udało się załączyć pliku" //
 export const rm011010: String = "01.1010 | Nie udało się załączyć pliku" //insert problem
 export const rm011011: String = "01.1011 | Nie udało się pobrać załączonego pliku"
 export const rm011012: String = "01.1012 | Szkolenie zablokowane"
+export const rm011013: String = "01.1013 | Nie można zmienić miejsca szkolenia Online"
 export const rm011100: String = "01.1100 | Brak szkoleń"
 
 //ZAPISY
@@ -53,6 +54,7 @@ export const rm021024: String = "02.1024 | Niepoprawnie sformatowane dane: Imię
 export const rm021025: String = "02.1025 | Niepoprawnie sformatowane dane: Dane uczestników"
 export const rm021026: String = "02.1026 | Niepoprawnie sformatowane dane: Adres email"
 export const rm021027: String = "02.1027 | $$$" //technical break
+export const rm021028: String = "02.1028 | Nie można edytować uczestników. Linki do webinaru zostały już wysłane"
 export const rm021100: String = "02.1100 | Brak zapisów"
 
 //AKTUALNOSCI
@@ -116,3 +118,13 @@ export const rm101010: String = "10.1010 | Nie można aktywować pliku bez klucz
 
 //LOGS
 export const rm110001: String = "11.0001 | Brak logów"
+
+//ONLINE MEETINGS
+export const rm121000: String = "12.1000 | Nie znaleziono szkolenia"
+export const rm121001: String = "12.1001 | Nie udało się stworzyć webinaru"
+export const rm121002: String = "12.1002 | Nie znaleziono zapisu"
+export const rm121003: String = "12.1003 | Szkolenie nie ma webinaru"
+export const rm121004: String = "12.1004 | Nie udało się stworzyć linku do dołączenia dla uczestnika"
+export const rm121005: String = "12.1005 | Szkolenie ma już webinar"
+export const rm121006: String = "12.1006 | Nie udało się usunąć webinaru"
+export const rm121007: String = "12.1007 | Linki dla tego uczestnika są już wygenerowane"

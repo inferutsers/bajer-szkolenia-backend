@@ -2,6 +2,7 @@ import signupElement from "@/interfaces/signupElement";
 import { Pool } from "pg";
 import mailStructure from "@/interfaces/mailStructure";
 import { getDateLong } from "../dates";
+import { ClickMeetingAttendeeURL } from "@/interfaces/ClickMeetingAttendeeURL";
 
 const baseSelect = `SELECT
     "s"."id" AS "S_ID",
@@ -21,6 +22,8 @@ const baseSelect = `SELECT
     "s"."attendees" AS "S_ATTENDEES",
     "s"."reminderSent" AS "S_REMINDERSENT",
     "s"."permissionRequired" AS "S_PERMISSIONREQUIRED",
+    "s"."webinarURLs" AS "S_WEBINARURLS",
+    "s"."webinarURLsSent" AS "S_WEBINARURLSSENT",
     "c"."id" AS "C_ID",
     "c"."date" AS "C_DATE",
     "c"."title" AS "C_TITLE",
@@ -56,8 +59,8 @@ export async function addPaymentToSignup(db: Pool, id: string | number, amount: 
     return await getSignup(db, id, archive)
 }
 
-export async function addEmailSentToSignup(db: Pool, id: string | number, mailSent: mailStructure, reminderMail: boolean = false){
-    await db.query(`UPDATE signups SET "emailsSent" = ARRAY_APPEND("emailsSent", $1) ${reminderMail ? ', "reminderSent" = true' : ""} WHERE "id" = $2`, [mailSent, id])
+export async function addEmailSentToSignup(db: Pool, id: string | number, mailSent: mailStructure, reminderMail: boolean = false, urlMail: boolean = false){
+    await db.query(`UPDATE signups SET "emailsSent" = ARRAY_APPEND("emailsSent", $1) ${reminderMail ? ', "reminderSent" = true' : ""} ${urlMail ? ', "webinarURLsSent" = true' : ""} WHERE "id" = $2`, [mailSent, id])
 }
 
 export async function createSignup(db: Pool, name: string, surname: string, email: string, phoneNumber: string, adress: string, pesel: string | undefined = undefined, isCompany: string, companyName: string | undefined = undefined, companyNIP: string | undefined = undefined, courseID: string | number | undefined, offerID: string | number | undefined, price: string | number, attendees: string[], coursePermissionRequired: number): Promise<signupElement | undefined>{
@@ -131,6 +134,12 @@ export async function deleteSignup(db: Pool, id: number | string){
     await db.query('DELETE FROM signups WHERE id = $1 AND "archived" = false', [id])
 }
 
+export async function addWebinarUrls(db: Pool, id: number | string, urls: ClickMeetingAttendeeURL[]): Promise<boolean> {
+    const result = await db.query(`UPDATE "signups" SET "webinarURLs" = $1 WHERE "id" = $2`, [urls, id])
+    if (!result?.rowCount) { return false }
+    return true
+}
+
 export function formatAsSignupElement(row: any): signupElement{
     return {
         id: row.S_ID,
@@ -155,6 +164,8 @@ export function formatAsSignupElement(row: any): signupElement{
         servicePrice: row.C_PRICE, 
         serviceDate: row.C_DATE, 
         reminderSent: row.S_REMINDERSENT,
-        permissionRequired: row.S_PERMISSIONREQUIRED 
+        webinarURLsSent: row.S_WEBINARURLSSENT,
+        permissionRequired: row.S_PERMISSIONREQUIRED,
+        webinarURLs: row.S_WEBINARURLS
     }
 }

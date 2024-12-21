@@ -3,6 +3,8 @@ import courseElement from "@/interfaces/courseElement";
 import { Pool, QueryResult } from "pg";
 import { getDateLong } from "../dates";
 import { archiveSignupsByCourse } from "./signups";
+import { ClickMeetingConference } from "@/interfaces/ClickMeetingConference";
+import { ClickMeetingAttendeeURL } from "@/interfaces/ClickMeetingAttendeeURL";
 
 const baseSelect = `SELECT
     "c"."id" AS "C_ID",
@@ -19,6 +21,7 @@ const baseSelect = `SELECT
     "c"."fileName" AS "C_FILENAME",
     "c"."customURL" AS "C_CUSTOMURL",
     "c"."permissionRequired" AS "C_PERMISSIONREQUIRED",
+    "c"."webinar" as "C_WEBINAR",
     COALESCE(SUM(array_length("s"."attendees", 1)), 0) AS "C_SLOTSUSED"
     FROM "courses" "c"
     LEFT JOIN "signups" "s" ON "s"."courseID" = "c"."id" AND "s"."invalidated" = false AND "s"."archived" = false
@@ -58,11 +61,18 @@ export async function updateCourse(db: Pool, id: string, date: string, title: st
     return await ADMgetCourse(db, id)
 }
 
-export async function getUpcomingCourses(db: Pool): Promise<courseElement[] | undefined> {
+export async function getUpcomingCourses(db: Pool): Promise<ADMcourseElement[] | undefined> {
     const courses = await db.query(`${baseSelect} ${baseWhere} AND "c"."date" < $1 ${baseGrouping} ${baseOrder}`, [getDateLong(new Date((new Date).getTime() + 172800000))])
     if (!courses?.rowCount) { return undefined }
-    return courses.rows.map(result => formatAsCourseElement(result))
+    return courses.rows.map(result => formatAsADMCourseElement(result))
 }
+
+export async function getUpcomingCourses1day(db: Pool): Promise<ADMcourseElement[] | undefined> {
+    const courses = await db.query(`${baseSelect} ${baseWhere} AND "c"."date" < $1 ${baseGrouping} ${baseOrder}`, [getDateLong(new Date((new Date).getTime() + 86400000))])
+    if (!courses?.rowCount) { return undefined }
+    return courses.rows.map(result => formatAsADMCourseElement(result))
+}
+
 
 async function getAllCoursesRecords(db: Pool, archived: boolean = false): Promise<QueryResult>{
     return await db.query(`${archived ? baseSelectArchive : baseSelect} WHERE "c"."archived" = $1 ${baseGrouping} ${baseOrder}`, [archived])
@@ -134,6 +144,23 @@ export async function ADMarchiveCourses(db: Pool): Promise<number[]>{
     return [archived.rowCount, archivedSignups]
 }
 
+export async function addCourseWebinarExternalAttendees(db: Pool, id: number | string, attendees: ClickMeetingAttendeeURL[]){
+    await db.query(`UPDATE "courses" SET "webinarExternalAttendees" = ARRAY_CAT("webinarExternalAttendees", $1) WHERE "id" = $2`, [attendees, id])
+}
+
+export async function addCourseWebinar(db: Pool, id: number | string, conference: ClickMeetingConference): Promise<boolean> {
+    const result = await db.query(`UPDATE "courses" SET "webinar" = $1 WHERE "id" = $2`, [conference, id])
+    if (!result?.rowCount) { return false }
+    return true
+}
+
+export async function eraseCourseWebinar(db: Pool, id: number | string): Promise<boolean> {
+    await db.query(`UPDATE "signups" SET "webinarURLs" = NULL WHERE "courseID" = $1`, [id])
+    const result = await db.query(`UPDATE "courses" SET "webinar" = NULL, "webinarExternalAttendees" = NULL WHERE "id" = $1`, [id])
+    if (!result?.rowCount) { return false }
+    return true
+}
+
 export function formatAsCourseElement(row: any): courseElement{
     return { 
         id: row.C_ID, 
@@ -171,6 +198,7 @@ export function formatAsADMCourseElement(row: any): ADMcourseElement{
         dateCreated: row.C_DATECREATED, 
         fileName: row.C_FILENAME, 
         customURL: row.C_CUSTOMURL, 
-        permissionRequired: row.C_PERMISSIONREQUIRED 
+        permissionRequired: row.C_PERMISSIONREQUIRED,
+        webinar: row.C_WEBINAR
     }
 }

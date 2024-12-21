@@ -1,3 +1,5 @@
+import { ClickMeetingConference } from "./ClickMeetingConference";
+
 export default interface ADMcourseElement{
     id: number,
     date: Date,
@@ -13,5 +15,6 @@ export default interface ADMcourseElement{
     dateCreated: Date,
     fileName?: string,
     customURL?: string,
-    permissionRequired: number
+    permissionRequired: number,
+    webinar?: ClickMeetingConference
 }

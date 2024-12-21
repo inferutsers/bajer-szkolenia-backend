@@ -1,8 +1,8 @@
-import courseElement from "@/interfaces/courseElement";
 import signupElement from "@/interfaces/signupElement";
 import { getDateShortReadable, getTimeReadable } from "../dates";
+import ADMcourseElement from "@/interfaces/ADMcourseElement";
 
-export default function mailFormatAsCourseReminder(input: string, signup: signupElement, course: courseElement): string{
+export default function mailFormatAsCourseReminder(input: string, signup: signupElement, course: ADMcourseElement): string{
     return input
     .replaceAll("{name}", signup.name)
     .replaceAll("{surname}", signup.surname)

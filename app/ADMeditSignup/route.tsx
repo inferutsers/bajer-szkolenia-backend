@@ -8,7 +8,7 @@ import { getOffer } from "@/functions/queries/offer"
 import { getSignup, updateSignup } from "@/functions/queries/signups"
 import validateSession from "@/functions/validateSession"
 import ADMcourseElement from "@/interfaces/ADMcourseElement"
-import { rm001000, rm001001, rm021000, rm021005, rm021006, rm021008, rm021009, rm021010, rm021011 } from "@/responses/messages"
+import { rm001000, rm001001, rm021000, rm021005, rm021006, rm021008, rm021009, rm021010, rm021011, rm021028 } from "@/responses/messages"
 import { badRequest, gone, notAcceptable, notFound, serviceUnavailable, unauthorized, unprocessableContent } from "@/responses/responses"
 import utf8 from "utf8"
 
@@ -34,6 +34,8 @@ export async function PATCH(req: Request){
     const signup = await getSignup(db, signupID)
     if (!signup) { systemLog(systemAction.ADMeditSignup, systemActionStatus.error, rm021000, validatedUser, db); return notFound(rm021000) }
     if (signup.permissionRequired > validatedUser.status) { systemLog(systemAction.ADMcancelSignup, systemActionStatus.error, rm001000, validatedUser, db); return unauthorized(rm001000) }
+    console.log(signup.webinarURLs, signup.attendees, suAttendees, signup.attendees == suAttendees)
+    if (signup.webinarURLs && JSON.stringify(signup.attendees) != JSON.stringify(suAttendees)) { systemLog(systemAction.ADMcancelSignup, systemActionStatus.error, rm021028, validatedUser, db); return unprocessableContent(rm021028) }
     const signupInvoiceCount = await getSignupInvoiceCount(db, signupID)
     if (signupInvoiceCount > 0) { systemLog(systemAction.ADMeditSignup, systemActionStatus.error, rm021005, validatedUser, db); return unprocessableContent(rm021005) }
     if (signup.attendees.length < suAttendees.length){
