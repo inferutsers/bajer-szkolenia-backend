@@ -23,6 +23,7 @@ export default interface signupElement{
     attendees: string[],
     servicePrice?: number,
     serviceDate?: Date,
+    serviceHasWebinar: Boolean,
     reminderSent: Boolean,
     webinarURLsSent: Boolean,
     permissionRequired: number,

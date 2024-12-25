@@ -23,5 +23,5 @@ export async function GET(req: Request){
     const recordings = await getConferenceRecordingList(conference)
     if (!recordings) { systemLog(systemAction.ADMmeetingRecordings, systemActionStatus.error, rm121008, validatedUser, db); return notFound(rm121008) }
     await insertMeetingRecordings(db, recordings)
-    return Response.json(recordings.map(recording => ({...recording, url: undefined})), {status: 200})
+    return Response.json(recordings.map(recording => ({...recording, url: undefined, relativePath: undefined})), {status: 200})
 }

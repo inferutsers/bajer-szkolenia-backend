@@ -38,6 +38,7 @@ const baseSelect = `SELECT
     "c"."fileName" AS "C_FILENAME",
     "c"."customURL" AS "C_CUSTOMURL",
     "c"."permissionRequired" AS "C_PERMISSIONREQUIRED",
+    "c"."webinar" AS "C_WEBINAR",
     "i"."number" AS "I_NUMBER"
     FROM "signups" "s"
     LEFT JOIN "courses" "c" ON "s"."courseID" = "c"."id" AND "c"."archived" = false
@@ -163,6 +164,7 @@ export function formatAsSignupElement(row: any): signupElement{
         attendees: row.S_ATTENDEES, 
         servicePrice: row.C_PRICE, 
         serviceDate: row.C_DATE, 
+        serviceHasWebinar: row.C_WEBINAR != undefined,
         reminderSent: row.S_REMINDERSENT,
         webinarURLsSent: row.S_WEBINARURLSSENT,
         permissionRequired: row.S_PERMISSIONREQUIRED,
