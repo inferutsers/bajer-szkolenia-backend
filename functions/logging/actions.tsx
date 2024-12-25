@@ -42,6 +42,8 @@ export enum systemAction{
     ADMmeetingSessions = 11.5,
     ADMmeetingAttendees = 11.6,
     ADMmeetingChat = 11.7,
+    ADMmeetingRecordings = 11.8,
+    ADMdownloadMeetingRecording = 11.9,
     AUTOCRONlockcourses = 90.1,
     AUTOCRONcoursereminders = 90.2,
     AUTOCRONcoursearchive = 90.3,

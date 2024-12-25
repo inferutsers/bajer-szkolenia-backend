@@ -131,3 +131,6 @@ export const rm121007: String = "12.1007 | Linki dla tego uczestnika są już wy
 export const rm121008: String = "12.1008 | Nie odbyły się żadne sesje webinaru dla tego szkolenia"
 export const rm121009: String = "12.1009 | Nie znaleziono uczesntików dla tej sesji webinaru"
 export const rm121010: String = "12.1010 | Nie znaleziono wiadomości chatu dla tej sesji"
+export const rm121011: String = "12.1011 | Nie znaleziono nagrań webinaru"
+export const rm121012: String = "12.1012 | Nie znaleziono nagrania"
+export const rm121013: String = "12.1013 | Nie udało się zapisać nagrania na serwerze"
