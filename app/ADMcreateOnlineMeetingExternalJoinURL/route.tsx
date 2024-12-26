@@ -18,7 +18,7 @@ export async function POST(req: Request){
     if (!sessionID || !attendees || !email || !courseID) { return badRequest(rm001001) }
     const db = await getDatabase(req)
     const validatedUser = await validateSession(db, sessionID)
-    if (!validatedUser || validatedUser.status < 5) { return unauthorized(rm001000) }
+    if (!validatedUser) { return unauthorized(rm001000) }
     const course = await ADMgetCourse(db, courseID)
     if (!course) { systemLog(systemAction.ADMcreateOnlineMeetingExternalJoinURL, systemActionStatus.error, rm121000, validatedUser, db); return notFound(rm121000) }
     const conference = course.webinar
