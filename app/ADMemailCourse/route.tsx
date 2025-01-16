@@ -1,5 +1,5 @@
 import getDatabase from "@/connection/database"
-import { ADMgetCourse } from "@/functions/queries/course"
+import { ADMgetArchivedCourse, ADMgetCourse } from "@/functions/queries/course"
 import sendCourseEmail from "@/functions/emails/sendCourseEmail"
 import validateSession from "@/functions/validateSession"
 import { bulkEmailReceiver } from "@/interfaces/newsletterReceiver"
@@ -15,15 +15,16 @@ export async function POST(req: Request){
     sessionID = headers.get("sessionID"),
     courseID = headers.get("courseID"),
     messageSubject = headers.get("messageSubject"),
-    messageContent = headers.get("messageContent")
+    messageContent = headers.get("messageContent"),
+    archive = headers.get("archive")
     if (!sessionID || !courseID || !messageSubject || !messageContent) { return badRequest(rm001001) }
     const db = await getDatabase(req),
     validatedUser = await validateSession(db, sessionID)
     if (!validatedUser) { return unauthorized(rm001000) }
-    const course = await ADMgetCourse(db, courseID)
+    const course = archive === "true" ? (await ADMgetArchivedCourse(db, courseID)) : (await ADMgetCourse(db, courseID))
     if (!course) { systemLog(systemAction.ADMemailCourse, systemActionStatus.error, rm011000, validatedUser, db); return notFound(rm011000) }
     if (course.permissionRequired > validatedUser.status) { systemLog(systemAction.ADMemailCourse, systemActionStatus.error, rm001000, validatedUser, db); return unauthorized(rm001000) }
-    const courseSingups = await getCourseSignups(db, courseID)
+    const courseSingups = await getCourseSignups(db, courseID, archive === "true")
     if (!courseSingups) { systemLog(systemAction.ADMemailCourse, systemActionStatus.error, rm011001, validatedUser, db); return noContent(rm011001) }
     const messageReceivers: bulkEmailReceiver[] = courseSingups.map((result) => ({id: result.id, email: result.email}))
     const mailSent = await sendCourseEmail(db, course, utf8.decode(messageSubject), utf8.decode(messageContent), messageReceivers)
