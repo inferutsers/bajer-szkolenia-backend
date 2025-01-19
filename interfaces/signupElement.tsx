@@ -18,6 +18,7 @@ export default interface signupElement{
     emailsSent?: mailStructure[],
     paidIn: number,
     invoiceNumber?: string,
+    certificate: boolean
     serviceName?: string,
     pesel?: string,
     attendees: string[],

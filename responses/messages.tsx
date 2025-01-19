@@ -134,3 +134,10 @@ export const rm121010: String = "12.1010 | Nie znaleziono wiadomości chatu dla 
 export const rm121011: String = "12.1011 | Nie znaleziono nagrań webinaru"
 export const rm121012: String = "12.1012 | Nie znaleziono nagrania"
 export const rm121013: String = "12.1013 | Nie udało się zapisać nagrania na serwerze"
+
+//CERTIFICATES
+export const rm131000: String = "13.1000 | Nie znaleziono zapisu"
+export const rm131001: String = "13.1001 | Nie znaleziono szkolenia dla zapisu"
+export const rm131002: String = "13.1002 | Zapis posiada już certyfikat"
+export const rm131003: String = "13.1003 | Nie udało się zapisać certyfikatu"
+export const rm131004: String = "13.1004 | Dla podanego zapisu nie znaleziono certyfikatu do pobrania"

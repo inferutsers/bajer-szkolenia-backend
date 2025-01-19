@@ -15,5 +15,6 @@ export async function GET(req: Request){
     if (!validatedUser) { return unauthorized(rm001000) }
     const signup = await getSignup(db, signupID, (archive ?? "false") === "true")
     if (!signup) { return notFound(rm021000) }
+    console.log(signup)
     return Response.json(signup, {status: 200})
 }

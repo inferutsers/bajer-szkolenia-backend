@@ -39,10 +39,12 @@ const baseSelect = `SELECT
     "c"."customURL" AS "C_CUSTOMURL",
     "c"."permissionRequired" AS "C_PERMISSIONREQUIRED",
     "c"."webinar" AS "C_WEBINAR",
-    "i"."number" AS "I_NUMBER"
+    "i"."number" AS "I_NUMBER",
+    "cert"."issueDate" AS "CERT_ISSUEDATE"
     FROM "signups" "s"
     LEFT JOIN "courses" "c" ON "s"."courseID" = "c"."id" AND "c"."archived" = false
     LEFT JOIN "invoices" "i" ON "s"."id" = "i"."signup"
+    LEFT JOIN "certificates" "cert" ON "s"."id" = "cert"."signup"
 `
 const baseSelectArchive = baseSelect.replace(`"archived" = false`, `"archived" = true`)
 const baseWhere = 'WHERE "s"."invalidated" = false AND "s"."archived" = false'
@@ -158,6 +160,7 @@ export function formatAsSignupElement(row: any): signupElement{
         supPrice: row.S_SUPPRICE,
         emailsSent: row.S_EMAILSSENT, 
         paidIn: row.S_PAIDIN, 
+        certificate: row.CERT_ISSUEDATE ? true : false,
         invoiceNumber: row.I_NUMBER,
         serviceName: row.C_TITLE, 
         pesel: row.S_PESEL,
