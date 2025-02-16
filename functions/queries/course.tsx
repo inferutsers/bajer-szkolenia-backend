@@ -138,8 +138,10 @@ export async function ADMlockDueCourses(db: Pool): Promise<number>{
 export async function ADMarchiveCourses(db: Pool): Promise<number[]>{
     const archived = await db.query(`UPDATE "courses" "c" SET "archived" = true ${baseWhere} AND "date" + ("span" * interval '1 minute') <= $1 RETURNING "id"`, [getDateLong()])
     if (!archived?.rowCount) { return [0,0] }
-    const archivedSignups = (await Promise.all(archived.rows.map(async course => {
-        return await archiveSignupsByCourse(db, course.id)
+    const archivedSignups = (await Promise.all(archived.rows.map(async archivedCourse => {
+        const course = await ADMgetArchivedCourse(db, archivedCourse.id)
+        if (course){ return await archiveSignupsByCourse(db, course) }
+        return 0
     }))).reduce((a, b) => a + b, 0);
     return [archived.rowCount, archivedSignups]
 }

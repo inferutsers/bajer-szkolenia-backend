@@ -3,6 +3,10 @@ import { Pool } from "pg";
 import mailStructure from "@/interfaces/mailStructure";
 import { getDateLong } from "../dates";
 import { ClickMeetingAttendeeURL } from "@/interfaces/ClickMeetingAttendeeURL";
+import { generateCertificate } from "../certificates/generateCertificate";
+import ADMcourseElement from "@/interfaces/ADMcourseElement";
+import { systemLog } from "../logging/log";
+import { dumpObject, systemAction, systemActionStatus } from "../logging/actions";
 
 const baseSelect = `SELECT
     "s"."id" AS "S_ID",
@@ -128,8 +132,18 @@ export async function invalidateSignup(db: Pool, id: number | string): Promise<b
     return true
 }
 
-export async function archiveSignupsByCourse(db: Pool, courseID: number): Promise<number>{
-    const archived = await db.query(`UPDATE "signups" "s" SET "archived" = true ${baseWhere} AND "courseID" = $1`, [courseID])
+export async function archiveSignupsByCourse(db: Pool, course: ADMcourseElement): Promise<number>{
+    const archived = await db.query(`UPDATE "signups" "s" SET "archived" = true ${baseWhere} AND "courseID" = $1 RETURNING "id"`, [course.id])
+    if (!archived?.rowCount) { return 0 }
+    for (const archivedSignup of archived.rows){
+        const signup = await getSignup(db, archivedSignup.id, true)
+        if (signup && !signup.certificate){
+            const certificate = await generateCertificate(db, signup, course)
+            if (certificate.certificate){
+                systemLog(systemAction.AUTOCRONcoursearchive, systemActionStatus.success, `Wygenerowano zaświadczenia o uczestnictwie\nmailSent: ${certificate.mailSent}\n${dumpObject(certificate.certificate)}`, undefined, db)
+            }
+        }
+    }
     return archived.rowCount ?? 0
 }
 
