@@ -104,7 +104,7 @@ export default function generateInvoicePDF(vat: number, invoiceNumber: string, i
     }
     pdf.text(`${vatAmount.toFixed(2)} PLN`, 130, 105)
     pdf.text(`${(supPrice as number).toFixed(2)} PLN`, 155, 105)
-    const heightOffset = pdf.getTextDimensions(`${courseTitle}`, {maxWidth: 40}).h - pdf.getTextDimensions("x").h
+    const heightOffset = pdf.getTextDimensions(`Szkolenie ${courseTitle}`, {maxWidth: 40}).h - pdf.getTextDimensions("x").h
     pdf.line(25, 107 + heightOffset, 185, 107 + heightOffset)
     pdf.setFontSize(11)
     pdf.setFont("ArialUTF", "bold")
