@@ -91,7 +91,7 @@ export default function generateInvoicePDF(vat: number, invoiceNumber: string, i
     //TABELA USLUGA
     pdf.setFont("ArialUTF", "normal")
     pdf.text("1", 25, 105)
-    pdf.text(`${courseTitle}`, 30, 105, { maxWidth: 40 })
+    pdf.text(`Szkolenie ${courseTitle}`, 30, 105, { maxWidth: 40 })
     pdf.text(`${amount} szt`, 70, 105)
     const netto = (supPrice as number / (1 + (vat / 100)))
     const vatAmount = supPrice - netto
