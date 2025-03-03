@@ -15,7 +15,7 @@ export async function GET(req: Request){
     const db = await getDatabase(req),
     validatedUser = await validateSession(db, sessionID)
     if (!validatedUser) { return unauthorized(rm001000) }
-    const invoices = await getInvoicesFiles(db, dateStart, dateEnd)
+    const invoices = await getInvoicesFiles(db, dateStart, new Date(Date.parse(dateEnd) + 24 * 60 * 60 * 1000).toISOString())
     if (!invoices) { systemLog(systemAction.ADMexportInvoicesToPDF, systemActionStatus.error, rm061000, validatedUser, db); return notFound(rm061000) }
     const combinedInvoices = await combineInvoices(invoices)
     systemLog(systemAction.ADMexportInvoicesToPDF, systemActionStatus.success, `Eksport faktur do PDF\n${dateStart}\n${dateEnd}`, validatedUser, db)
